@@ -1,0 +1,18 @@
+{
+  "name": "orvia-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/sync-github.js",
+    "photos": "node scripts/scan-photos.js",
+    "dev": "node scripts/ensure-data.js && astro dev",
+    "build": "node scripts/ensure-data.js && node scripts/check-profile.js && astro build",
+    "preview": "astro preview",
+    "refresh": "npm run sync && npm run photos && npm run build"
+  },
+  "dependencies": {
+    "astro": "^5.2.5",
+    "sharp": "^0.33.5"
+  }
+}

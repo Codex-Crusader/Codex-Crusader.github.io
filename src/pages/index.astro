@@ -1,0 +1,265 @@
+---
+import '../styles/global.css';
+import OrviaMap from '../components/OrviaMap.astro';
+import Lorebook from '../components/Lorebook.astro';
+import profile from '../data/profile.js';
+import github from '../data/github.json';
+import photos from '../data/photos.json';
+
+// The workflow passes github.run_number in. Locally it falls back to 0.
+const runNumber = import.meta.env.PUBLIC_RUN_NUMBER ?? '0';
+const inscription = profile.site.mapInscription.replace('{run}', runNumber);
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+function ago(iso) {
+  if (!iso) return 'unknown';
+  const days = Math.floor((Date.now() - new Date(iso)) / 86400000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 30) return `${days} days ago`;
+  const months = Math.round(days / 30);
+  if (months < 12) return months === 1 ? '1 month ago' : `${months} months ago`;
+  const years = Math.round(days / 365);
+  return years === 1 ? '1 year ago' : `${years} years ago`;
+}
+
+// Repo ledger line: only the facts we actually have.
+function repoLedger(r) {
+  const parts = [`★ ${r.stargazers_count.toLocaleString('en-IN')}`];
+  if (r.language) parts.push(r.language);
+  if (typeof r.commits === 'number') parts.push(`${r.commits.toLocaleString('en-IN')} commits`);
+  parts.push(`updated ${ago(r.pushed_at)}`);
+  return parts.join(' · ');
+}
+
+const repos = github.repos ?? [];
+const totalStars = repos.reduce((n, r) => n + r.stargazers_count, 0);
+const languages = {};
+for (const r of repos) if (r.language) languages[r.language] = (languages[r.language] ?? 0) + 1;
+const topLanguage = Object.entries(languages).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+
+const projectLedger = [
+  ['followers', String(github.profile?.followers ?? '—')],
+  ['public repos', String(repos.length)],
+  ['total stars', totalStars.toLocaleString('en-IN')],
+  ['top language', topLanguage],
+  ['last push', ago(repos[0]?.pushed_at)],
+];
+
+const base = import.meta.env.BASE_URL; // '/' or '/repo-name/'
+const plates = (photos.photos ?? []).map((p) => ({
+  ...p,
+  src: `${base}photos/${p.variants[p.variants.length - 1].name}`,
+  srcset: p.variants.map((v) => `${base}photos/${v.name} ${v.width}w`).join(', '),
+}));
+const galleryLedger = [
+  ['plates', String(plates.length)],
+  ['portrait', String(plates.filter((p) => p.orientation === 'portrait').length)],
+  ['landscape', String(plates.filter((p) => p.orientation !== 'portrait').length)],
+  ...(profile.gallery.ledgerExtra ?? []),
+];
+
+const nav = [
+  ['#projects', profile.projects],
+  ['#experience', profile.experience],
+  ['#gallery', profile.gallery],
+  ['#about', profile.about],
+  ['#contact', profile.contact],
+];
+
+// A contact row with no href is not finished. Skip it rather than publish a
+// dead link. Fill it in in profile.js and it appears on the next build.
+const contactLinks = profile.contact.links.filter(([, text, href]) => href && text);
+
+// Keep the "best channel" row honest: it names the first channel that is
+// actually filled in, rather than promising email before there is an address.
+const contactLedger = profile.contact.ledger.map(([term, value]) =>
+  term === 'best channel'
+    ? [term, contactLinks[0]?.[0].toLowerCase() ?? 'none listed']
+    : [term, value],
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{profile.site.metaTitle}</title>
+    <meta name="description" content={profile.site.metaDescription} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div
+      aria-hidden="true"
+      style="position: fixed; inset: 13px; pointer-events: none; z-index: 60; border: 2px solid rgba(74,59,34,0.5); box-shadow: inset 0 0 0 5px rgba(74,59,34,0), inset 0 0 0 6px rgba(74,59,34,0.24);"
+    >
+      <span style="position: absolute; top: -7px; left: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+      <span style="position: absolute; top: -7px; right: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+      <span style="position: absolute; bottom: -7px; left: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+      <span style="position: absolute; bottom: -7px; right: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+    </div>
+
+    <div style="max-width: 1040px; margin: 0 auto; padding: 0 44px;">
+      <!-- ============ MAP / FIRST VIEWPORT ============ -->
+      <div
+        id="map"
+        style="min-height: 100vh; box-sizing: border-box; width: 100vw; margin-left: calc(50% - 50vw); display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 28px 34px;"
+      >
+        <div style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 4px;">
+          <span style={`${serif} font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>{profile.site.name}</span>
+          <span style={`${mono} font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.tagline}</span>
+        </div>
+
+        <div class="map-panel" style="width: 100%; max-width: 1440px; margin: 0 auto; background: #E9DFC4; border: 3px solid #4A3B22; border-radius: 3px; padding: 12px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5), 0 5px 12px -3px rgba(44,34,16,0.28);">
+          <OrviaMap inscription={inscription} />
+        </div>
+
+        <!-- MOBILE NAV (replaces map below 700px) -->
+        <nav
+          class="mobile-nav"
+          aria-label="Territories"
+          style="width: 100%; max-width: 620px; margin: 0 auto; flex-direction: column; gap: 0; background: #E9DFC4; border: 3px solid #4A3B22; border-radius: 3px; overflow: hidden; box-shadow: 0 16px 40px -14px rgba(44,34,16,0.5), 0 4px 10px -3px rgba(44,34,16,0.26);"
+        >
+          {nav.map(([href, section], i) => (
+            <a
+              href={href}
+              aria-label={`${section.heading}, ${section.navNote}`}
+              style={`display: flex; flex-direction: column; gap: 3px; padding: 18px 20px; color: #3A2E19;${i < nav.length - 1 ? ' border-bottom: 1px solid #B9A87E;' : ''}`}
+            >
+              <span style={`${serif} font-weight: 600; font-size: 21px; letter-spacing: 2px;`}>{section.heading.toUpperCase()}</span>
+              <span style={`${mono} font-size: 11px; color: #6B5836;`}>{section.navNote}</span>
+            </a>
+          ))}
+        </nav>
+      </div>
+
+      <!-- ============ SECTION I — PROJECTS ============ -->
+      <Lorebook
+        id="projects"
+        heading={profile.projects.heading}
+        folio={profile.projects.folio}
+        intro={profile.projects.intro}
+        ledger={projectLedger}
+        ledgerNote={profile.projects.ledgerNote}
+      >
+        <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
+          {repos.map((r) => (
+            <div style="border-top: 1px solid #B9A87E; padding-top: 16px;">
+              <h3 style={`margin: 0 0 6px; ${mono} font-size: 14px; color: #3A2E19;`}>
+                <a href={r.html_url}>{r.name}</a>
+              </h3>
+              {r.description && <p style="margin: 0 0 10px; font-size: 15px; line-height: 1.65;">{r.description}</p>}
+              <p style={`margin: 0; ${mono} font-size: 11.5px; color: #6B5836; letter-spacing: 0.3px;`}>{repoLedger(r)}</p>
+            </div>
+          ))}
+          {repos.length === 0 && (
+            <p style={`margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
+              No repositories surveyed yet. Run <code>npm run sync</code> or wait for the nightly build.
+            </p>
+          )}
+        </div>
+      </Lorebook>
+
+      <!-- ============ SECTION II — EXPERIENCE ============ -->
+      <Lorebook
+        id="experience"
+        heading={profile.experience.heading}
+        folio={profile.experience.folio}
+        intro={profile.experience.intro}
+        ledger={profile.experience.ledger}
+        ledgerNote={profile.experience.ledgerNote}
+      >
+        <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
+          {profile.experience.roles.map((role) => (
+            <div style="border-top: 1px solid #B9A87E; padding-top: 16px;">
+              <h3 style={`margin: 0 0 4px; ${serif} font-weight: 600; font-size: 20px;`}>{role.title}</h3>
+              <p style={`margin: 0 0 10px; ${mono} font-size: 11.5px; color: #8A7752;`}>{role.meta}</p>
+              <p style="margin: 0; font-size: 15px; line-height: 1.65;">{role.body}</p>
+            </div>
+          ))}
+        </div>
+      </Lorebook>
+
+      <!-- ============ SECTION III — GALLERY ============ -->
+      <Lorebook
+        id="gallery"
+        heading={profile.gallery.heading}
+        folio={profile.gallery.folio}
+        intro={profile.gallery.intro}
+        ledger={galleryLedger}
+        ledgerNote={profile.gallery.ledgerNote}
+      >
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; clear: left;">
+          {plates.map((p) => (
+            <figure style={`margin: 0;${p.ratio >= 1.9 ? ' grid-column: 1 / -1;' : ''}`}>
+              <img
+                src={p.src}
+                srcset={p.srcset}
+                sizes="(max-width: 700px) 100vw, 320px"
+                width={p.width}
+                height={p.height}
+                alt={p.alt}
+                loading="lazy"
+                decoding="async"
+                style={`display: block; width: 100%; height: auto; aspect-ratio: ${p.width} / ${p.height}; border: 1px solid #B9A87E; background: #D6C69C;`}
+              />
+              <figcaption style={`${mono} font-size: 10.5px; color: #8A7752; margin-top: 6px;`}>{p.caption}</figcaption>
+            </figure>
+          ))}
+          {plates.length === 0 && (
+            <p style={`grid-column: 1 / -1; margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
+              No plates in this folio yet. Drop an image into <code>assets/photos/</code>.
+            </p>
+          )}
+        </div>
+      </Lorebook>
+
+      <!-- ============ SECTION IV — ABOUT ============ -->
+      <Lorebook
+        id="about"
+        heading={profile.about.heading}
+        folio={profile.about.folio}
+        intro={profile.about.paragraphs[0]}
+        ledger={profile.about.ledger}
+        ledgerNote={profile.about.ledgerNote}
+      >
+        {profile.about.paragraphs.slice(1).map((para) => (
+          <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.7;">{para}</p>
+        ))}
+      </Lorebook>
+
+      <!-- ============ SECTION V — CONTACT ============ -->
+      <Lorebook
+        id="contact"
+        heading={profile.contact.heading}
+        folio={profile.contact.folio}
+        intro={profile.contact.intro}
+        ledger={contactLedger}
+        ledgerNote={profile.contact.ledgerNote}
+      >
+        <ul style="list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px;">
+          {contactLinks.map(([label, text, href]) => (
+            <li style="border-top: 1px solid #B9A87E; padding-top: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+              <span style={`${mono} font-size: 11px; color: #8A7752; letter-spacing: 1px;`}>{label}</span>
+              <a href={href} style={`${mono} font-size: 14px;`}>{text}</a>
+            </li>
+          ))}
+        </ul>
+      </Lorebook>
+
+      <!-- ============ FOOTER ============ -->
+      <footer style={`text-align: center; padding: 20px 0 56px; ${mono} font-size: 11px; color: #8A7752; letter-spacing: 0.5px; line-height: 1.9;`}>
+        <div>{profile.site.footerLine}</div>
+        <div style="margin-top: 6px;"><a href="#map">↑ back to the top</a></div>
+      </footer>
+    </div>
+  </body>
+</html>

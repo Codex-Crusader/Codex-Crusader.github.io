@@ -1,0 +1,93 @@
+/* Lifted verbatim from the handed-off design. Do not restyle. */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  color: #3a2e19;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background:
+    repeating-linear-gradient(135deg, rgba(74, 59, 34, 0.035) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(48deg, rgba(74, 59, 34, 0.028) 0 1px, transparent 1px 9px),
+    radial-gradient(135% 85% at 50% -5%, #d9cba4 0%, #c7b991 52%, #ad9e72 100%);
+  background-attachment: fixed;
+}
+
+a {
+  color: #8c3b22;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #a2492e;
+  text-decoration: underline;
+}
+
+.region-link {
+  cursor: pointer;
+}
+
+.region-link:focus {
+  outline: none;
+}
+
+.region-link:focus-visible .land {
+  stroke: #8c3b22;
+  stroke-width: 3;
+}
+
+/* Province hover. In the handoff these were per-element `style-hover`
+   attributes, which only the design runtime understands. Each plain province
+   carries its own lighter fill as --hover-fill; the five gateway provinces
+   share one rust treatment. Same result, real CSS. */
+.land:hover {
+  fill: var(--hover-fill);
+}
+
+.region-link:hover .land-gateway {
+  fill: #ecd8a6;
+  stroke: #8c3b22;
+  stroke-width: 2;
+}
+
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .map-panel {
+    display: none !important;
+  }
+
+  .mobile-nav {
+    display: flex !important;
+  }
+
+  .prose-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  .margin-col {
+    border-left: none !important;
+    border-top: 1px solid #b9a87e;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    padding-top: 26px !important;
+    margin-top: 30px !important;
+  }
+}
