@@ -201,10 +201,12 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
           {/* Wide plates and tall plates are packed in separate masonry blocks,
               so landscapes sit beside landscapes and portraits beside portraits.
               CSS multi-column packing means a short frame never leaves a gap
-              under a tall one. column-width auto-fits the count to the width. */}
+              under a tall one. column-width auto-fits the count to the width.
+              Each block is ordered tallest-first (ascending width/height ratio)
+              so the balance point splits the columns to near-equal height. */}
           {[
-            plates.filter((p) => p.orientation !== 'portrait'),
-            plates.filter((p) => p.orientation === 'portrait'),
+            plates.filter((p) => p.orientation !== 'portrait').sort((a, b) => a.ratio - b.ratio),
+            plates.filter((p) => p.orientation === 'portrait').sort((a, b) => a.ratio - b.ratio),
           ].map((group) =>
             group.length > 0 && (
               <div style="columns: 250px; column-gap: 16px;">
