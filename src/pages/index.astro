@@ -197,25 +197,38 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
         ledger={galleryLedger}
         ledgerNote={profile.gallery.ledgerNote}
       >
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; clear: left;">
-          {plates.map((p) => (
-            <figure style={`margin: 0;${p.ratio >= 1.9 ? ' grid-column: 1 / -1;' : ''}`}>
-              <img
-                src={p.src}
-                srcset={p.srcset}
-                sizes="(max-width: 700px) 100vw, 320px"
-                width={p.width}
-                height={p.height}
-                alt={p.alt}
-                loading="lazy"
-                decoding="async"
-                style={`display: block; width: 100%; height: auto; aspect-ratio: ${p.width} / ${p.height}; border: 1px solid #B9A87E; background: #D6C69C;`}
-              />
-              <figcaption style={`${mono} font-size: 10.5px; color: #8A7752; margin-top: 6px;`}>{p.caption}</figcaption>
-            </figure>
-          ))}
+        <div style="display: flex; flex-direction: column; gap: 16px; clear: left;">
+          {/* Wide plates and tall plates are packed in separate masonry blocks,
+              so landscapes sit beside landscapes and portraits beside portraits.
+              CSS multi-column packing means a short frame never leaves a gap
+              under a tall one. column-width auto-fits the count to the width. */}
+          {[
+            plates.filter((p) => p.orientation !== 'portrait'),
+            plates.filter((p) => p.orientation === 'portrait'),
+          ].map((group) =>
+            group.length > 0 && (
+              <div style="columns: 250px; column-gap: 16px;">
+                {group.map((p) => (
+                  <figure style="margin: 0 0 16px; break-inside: avoid; -webkit-column-break-inside: avoid;">
+                    <img
+                      src={p.src}
+                      srcset={p.srcset}
+                      sizes="(max-width: 700px) 100vw, 250px"
+                      width={p.width}
+                      height={p.height}
+                      alt={p.alt}
+                      loading="lazy"
+                      decoding="async"
+                      style={`display: block; width: 100%; height: auto; aspect-ratio: ${p.width} / ${p.height}; border: 1px solid #B9A87E; background: #D6C69C;`}
+                    />
+                    <figcaption style={`${mono} font-size: 10.5px; color: #8A7752; margin-top: 6px;`}>{p.caption}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            )
+          )}
           {plates.length === 0 && (
-            <p style={`grid-column: 1 / -1; margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
+            <p style={`margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
               No plates in this folio yet. Drop an image into <code>assets/photos/</code>.
             </p>
           )}

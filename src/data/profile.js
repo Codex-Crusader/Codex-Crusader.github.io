@@ -175,8 +175,6 @@ export default {
     links: [
       ['EMAIL', 'bhargavaramkrishnapur@gmail.com', 'mailto:bhargavaramkrishnapur@gmail.com'],
       ['GITHUB', 'github.com/Codex-Crusader', 'https://github.com/Codex-Crusader'],
-      ['PULSEENGINE', 'github.com/The-Pulse-Engine', 'https://github.com/The-Pulse-Engine'],
-      ['COMMUNITY', 'pulseengine.streamlit.app', 'https://pulseengine.streamlit.app'],
       ['LINKEDIN', 'linkedin.com/in/bhargavaram-krishnapur', 'https://www.linkedin.com/in/bhargavaram-krishnapur/'],
     ],
     ledger: [
