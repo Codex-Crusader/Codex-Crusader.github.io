@@ -66,38 +66,52 @@ export default {
     // Add or remove entries freely. Order is the order they appear.
     roles: [
       {
+        title: 'Founder, The Pulse Engine',
+        meta: 'Apr 2026 — present · Mumbai · hybrid',
+        body:
+          'An open-source developer community built on one principle: software runs on your machine, your data stays on your machine, and your tools belong to you. Shipped the first project on day one. MIT licensed, free forever. Growing a contributor base through LinkedIn, Discord and daily GitHub activity.',
+      },
+      {
+        title: 'Podcast Host, VUTV',
+        meta: 'Mar 2026 — present · Karjat · on-site',
+        body:
+          'Co-host one of the university\'s official podcast series in a three-host rotation. Curate episode topics and build structured conversation outlines, research and reach out to guests across students, faculty and professionals, and moderate episodes for clear discussion flow and audience engagement. Also handle guest prep, interview framing and episode planning.',
+      },
+      {
+        title: 'Strategic Research & Idea Validation Advisor, Self-Employed (Udyam Registered)',
+        meta: 'Jan 2026 — present · Mumbai · remote · freelance',
+        body:
+          'A Udyam-registered micro-consultancy helping entrepreneurs validate business ideas before they sink months into them. Structured consultations and targeted research end in an honest, data-driven call to pursue, pivot or pause. Covers feasibility analysis, market and competitor research, strategic SWOT, financial forecasting and differentiation planning.',
+      },
+      {
         title: 'Technology & Operations Intern, Sanjay Electrical Enterprises',
-        meta: '2026 · Navi Mumbai · six weeks',
+        meta: 'May — Jun 2026 · Navi Mumbai · on-site',
         body:
-          'Built an ERP demo in React and Vite with a tap-first field app and a desktop admin console, digitised BOQs and tenders for four Mumbai sites, shipped the production website on Next.js and Sanity, and wrote a WhatsApp field-report bot. Also found a stored XSS bug in the old stack and reported it.',
+          'Company-side lead on the firm\'s ERP digitisation, owning QA, billing, documentation and marketing, and delivered a recommended ERP selected after direct vendor evaluation. Designed a tap-first billing model for square-foot electrical contracts (area × rate as a fixed cap, auto-distributed across stages), logged 50+ bugs and security issues as actionable tickets for a non-technical manager, ran field assessments across three active sites, and migrated tender handling to a fully digital workflow. Also authored a practical guide to square-foot contracting and Indian compliance (RA bills, Ind AS 115, MSMED Act, GST SAC 9954).',
       },
       {
-        title: 'Founder, PulseEngine',
-        meta: '2025 — present · open-source community',
+        title: 'Brand Partnership Management Intern, MedInventory',
+        meta: 'Jan — Apr 2026 · internship',
         body:
-          'Local-first, privacy-respecting, MIT-licensed tools. No subscriptions, no cloud lock-in, no data harvesting. First project is a market intelligence platform tracking 24 assets off 12 RSS feeds, running entirely on a laptop with no paid APIs.',
-      },
-      {
-        title: 'VP of Sustainability, Student Council',
-        meta: '2025 — present · Vijaybhoomi University',
-        body:
-          'Elected role. Sustainability policy and programmes across campus.',
-      },
-      {
-        title: 'Co-lead, Kanyathon',
-        meta: '2025 — present · Mumbai Division',
-        body:
-          'Charity marathon. Ran the Mumbai division: 100+ CSR outreaches, 30 volunteers, ₹24,000 in first-day sales.',
+          'Led end-to-end sponsorship acquisition for a company-hosted event, from prospect research through partner onboarding. Identified and evaluated brands and individuals able to sponsor or add strategic value, prepared pitch materials and partner briefs, and coordinated sponsor communications, timelines and deliverables through to execution.',
       },
       {
         title: 'Outreach Manager, FundNexus',
-        meta: '2025 · remote',
-        body: 'Partner outreach and pipeline.',
+        meta: 'Jun — Dec 2025 · Mumbai',
+        body:
+          'Advanced and closed early-stage engagements, and built a central deal-tracker consolidating pipeline status, next actions and owners, which cut duplicate follow-ups. Standardised outreach and deal-ops with lightweight playbooks and handoff templates, sourced and qualified 30+ startups, added 250+ relevant connections, and managed legal document workflows (term sheets, NDAs, data requests) for cleaner closings. Also assembled the pitch deck leadership used at a hackathon.',
       },
       {
-        title: 'Sponsorship Manager, Vijaybhoomi E-Cell',
-        meta: '2025 · Vijaybhoomi University',
-        body: 'Sponsorship for campus entrepreneurship programming.',
+        title: 'Freelance Resume Writer, Self-employed',
+        meta: 'Jan 2023 — Jul 2025 · Mumbai · remote',
+        body:
+          'Tailored resumes, cover letters and LinkedIn profiles for clients across career stages, with ATS optimisation to get them past the filters. Helped 50+ clients land interviews.',
+      },
+      {
+        title: 'Student Volunteer, DBM India (NIT)',
+        meta: 'May — Jun 2025 · Mumbai · on-site',
+        body:
+          'Co-created an education pipeline for Grades 1–5 for children in Mumbai slum communities. Ran field research across Deonar, Gautam Nagar and Bhim Nagar, collecting 50+ student interest profiles, wrote psychology-based interaction guidelines for future volunteers and teacher guidelines for low-literacy classrooms, and presented the final proposals to DBM\'s leadership for phased rollout.',
       },
     ],
     ledger: [
