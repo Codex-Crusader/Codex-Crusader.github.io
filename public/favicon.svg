@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Compass rose">
+  <rect width="64" height="64" rx="8" fill="#e9dfc4"/>
+  <circle cx="32" cy="32" r="25" fill="none" stroke="#8c3b22" stroke-width="2"/>
+  <!-- cardinal star -->
+  <path d="M32 5 L38 26 L59 32 L38 38 L32 59 L26 38 L5 32 L26 26 Z" fill="#8c3b22"/>
+  <!-- north point, left half struck out to read as a map "N" needle -->
+  <path d="M32 5 L32 26 L26 26 Z" fill="#e9dfc4"/>
+  <circle cx="32" cy="32" r="4" fill="#e9dfc4"/>
+</svg>

@@ -89,6 +89,17 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{profile.site.metaTitle}</title>
     <meta name="description" content={profile.site.metaDescription} />
+    <link rel="canonical" href="https://codex-crusader.github.io/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Bhargavaram Krishnapur — software, open source, maps" />
+    <meta property="og:description" content={profile.site.metaDescription} />
+    <meta property="og:url" content="https://codex-crusader.github.io/" />
+    <meta property="og:image" content="https://codex-crusader.github.io/og-cover.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bhargavaram Krishnapur — software, open source, maps" />
+    <meta name="twitter:description" content={profile.site.metaDescription} />
+    <meta name="twitter:image" content="https://codex-crusader.github.io/og-cover.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -114,7 +125,7 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
         style="min-height: 100vh; box-sizing: border-box; width: 100vw; margin-left: calc(50% - 50vw); display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 28px 34px;"
       >
         <div style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 4px;">
-          <span style={`${serif} font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>{profile.site.name}</span>
+          <h1 style={`${serif} margin: 0; font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>{profile.site.name}</h1>
           <span style={`${mono} font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.tagline}</span>
         </div>
 

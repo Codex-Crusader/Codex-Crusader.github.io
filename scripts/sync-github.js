@@ -61,6 +61,15 @@ async function commitCount(name) {
   return Array.isArray(body) ? body.length : undefined;
 }
 
+// A repo counts as "recently active" if it was pushed inside this window.
+// Widen it if the front of the ledger looks too thin.
+const RECENT_DAYS = 45;
+
+function isRecentlyActive(r) {
+  if (!r.pushed_at) return false;
+  return Date.now() - new Date(r.pushed_at) < RECENT_DAYS * 86400000;
+}
+
 // Small concurrency pool so a large account does not fire 60 requests at once.
 async function mapLimit(items, limit, fn) {
   const results = new Array(items.length);
@@ -106,12 +115,21 @@ async function main() {
       if (typeof counts[i] === 'number') entry.commits = counts[i];
       return entry;
     })
-    .sort(
-      (a, b) =>
+    .sort((a, b) => {
+      // "Redrawn nightly" should be visible in the ledger, not just claimed.
+      // Anything pushed inside the recent window floats to the top in push
+      // order; everything else keeps the old stars-first ordering. Same shape,
+      // same fields — only the order of the array changes.
+      const ra = isRecentlyActive(a);
+      const rb = isRecentlyActive(b);
+      if (ra !== rb) return ra ? -1 : 1;
+      if (ra && rb) return new Date(b.pushed_at) - new Date(a.pushed_at);
+      return (
         b.stargazers_count - a.stargazers_count ||
         new Date(b.pushed_at) - new Date(a.pushed_at) ||
-        a.name.localeCompare(b.name),
-    );
+        a.name.localeCompare(b.name)
+      );
+    });
 
   const data = {
     profile: {
