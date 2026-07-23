@@ -21,8 +21,10 @@ export default {
     fullName: 'Bhargavaram Krishnapur',
     // Shown top-right of the map.
     tagline: 'software · open source · maps',
-    // Browser tab title and meta description.
-    metaTitle: 'Bhargavaram Krishnapur',
+    // Browser tab title and meta description. The title carries the job words
+    // as well as the name: on its own, a name only wins searches from people
+    // who already know it.
+    metaTitle: 'Bhargavaram Krishnapur — Software Engineer & Open Source Developer',
     metaDescription:
       'Open-source software, local-first tools and photographs, laid out as a map.',
     // The line engraved along the bottom edge of the map. {run} is replaced

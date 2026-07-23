@@ -80,6 +80,26 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
     ? [term, contactLinks[0]?.[0].toLowerCase() ?? 'none listed']
     : [term, value],
 );
+
+// Structured data. Inert JSON, not a script that runs — the no-JS rule stands.
+// Built from profile.js and the live API so it cannot drift from the page:
+// sameAs is whatever contact rows are actually filled in, minus the mailto.
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.site.fullName,
+  url: 'https://codex-crusader.github.io/',
+  image: 'https://codex-crusader.github.io/og-cover.png',
+  jobTitle: 'Software Engineer',
+  description: profile.site.metaDescription,
+  email: contactLinks.find(([, , href]) => href.startsWith('mailto:'))?.[1],
+  address: { '@type': 'PostalAddress', addressLocality: 'Mumbai', addressCountry: 'IN' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Vijaybhoomi University' },
+  knowsAbout: [...new Set(repos.map((r) => r.language).filter(Boolean))],
+  sameAs: contactLinks
+    .map(([, , href]) => href)
+    .filter((href) => !href.startsWith('mailto:')),
+};
 ---
 
 <!doctype html>
@@ -100,6 +120,8 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
     <meta name="twitter:title" content="Bhargavaram Krishnapur — software, open source, maps" />
     <meta name="twitter:description" content={profile.site.metaDescription} />
     <meta name="twitter:image" content="https://codex-crusader.github.io/og-cover.png" />
+    <meta property="og:image:alt" content="A hand-drawn map of the realm of Orvia, the portfolio's five sections shown as provinces." />
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
