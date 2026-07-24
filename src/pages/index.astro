@@ -143,13 +143,13 @@ const personSchema = {
       <span style="position: absolute; bottom: -7px; right: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
     </div>
 
-    <div style="max-width: 1040px; margin: 0 auto; padding: 0 44px;">
+    <div class="page" style="max-width: 1040px; margin: 0 auto; padding: 0 44px;">
       <!-- ============ MAP / FIRST VIEWPORT ============ -->
       <div
         id="map"
         style="min-height: 100vh; box-sizing: border-box; width: 100vw; margin-left: calc(50% - 50vw); display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 28px 34px;"
       >
-        <div style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 4px;">
+        <div class="masthead" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 4px;">
           <h1 style={`${serif} margin: 0; font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>{profile.site.name}</h1>
           <span style={`${mono} font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.tagline}</span>
         </div>
@@ -185,15 +185,19 @@ const personSchema = {
         intro={profile.projects.intro}
         ledger={projectLedger}
         ledgerNote={profile.projects.ledgerNote}
+        epigraph={profile.projects.epigraph}
+        marginNote={profile.projects.marginNote}
       >
         <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
           {repos.map((r) => (
             <div style="border-top: 1px solid #B9A87E; padding-top: 16px;">
-              <h3 style={`margin: 0 0 6px; ${mono} font-size: 14px; color: #3A2E19;`}>
-                <a href={r.html_url}>{r.name}</a>
-              </h3>
-              {r.description && <p style="margin: 0 0 10px; font-size: 15px; line-height: 1.65;">{r.description}</p>}
-              <p style={`margin: 0; ${mono} font-size: 11.5px; color: #6B5836; letter-spacing: 0.3px;`}>{repoLedger(r)}</p>
+              <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 16px; margin: 0 0 8px;">
+                <h3 style={`margin: 0; ${mono} font-size: 14px; color: #3A2E19;`}>
+                  <a href={r.html_url}>{r.name}</a>
+                </h3>
+                <span style={`${mono} font-size: 11.5px; color: #6B5836; letter-spacing: 0.3px;`}>{repoLedger(r)}</span>
+              </div>
+              {r.description && <p style="margin: 0; font-size: 15px; line-height: 1.65;">{r.description}</p>}
             </div>
           ))}
           {repos.length === 0 && (
@@ -212,6 +216,8 @@ const personSchema = {
         intro={profile.experience.intro}
         ledger={profile.experience.ledger}
         ledgerNote={profile.experience.ledgerNote}
+        epigraph={profile.experience.epigraph}
+        marginNote={profile.experience.marginNote}
       >
         <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
           {profile.experience.roles.map((role) => (
@@ -232,6 +238,8 @@ const personSchema = {
         intro={profile.gallery.intro}
         ledger={galleryLedger}
         ledgerNote={profile.gallery.ledgerNote}
+        epigraph={profile.gallery.epigraph}
+        marginNote={profile.gallery.marginNote}
       >
         <div style="display: flex; flex-direction: column; gap: 16px; clear: left;">
           {/* Wide plates and tall plates are packed in separate masonry blocks,
@@ -281,6 +289,8 @@ const personSchema = {
         intro={profile.about.paragraphs[0]}
         ledger={profile.about.ledger}
         ledgerNote={profile.about.ledgerNote}
+        epigraph={profile.about.epigraph}
+        marginNote={profile.about.marginNote}
       >
         {profile.about.paragraphs.slice(1).map((para) => (
           <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.7;">{para}</p>
@@ -295,8 +305,10 @@ const personSchema = {
         intro={profile.contact.intro}
         ledger={contactLedger}
         ledgerNote={profile.contact.ledgerNote}
+        epigraph={profile.contact.epigraph}
+        marginNote={profile.contact.marginNote}
       >
-        <ul style="list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px;">
+        <ul class="link-list" style="list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px;">
           {contactLinks.map(([label, text, href]) => (
             <li style="border-top: 1px solid #B9A87E; padding-top: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
               <span style={`${mono} font-size: 11px; color: #8A7752; letter-spacing: 1px;`}>{label}</span>
@@ -309,6 +321,7 @@ const personSchema = {
       <!-- ============ FOOTER ============ -->
       <footer style={`text-align: center; padding: 20px 0 56px; ${mono} font-size: 11px; color: #8A7752; letter-spacing: 0.5px; line-height: 1.9;`}>
         <div>{profile.site.footerLine}</div>
+        {profile.site.colophon && <div style="margin-top: 6px; color: #A0906A;">{profile.site.colophon}</div>}
         <div style="margin-top: 6px;"><a href="#map">↑ back to the top</a></div>
       </footer>
     </div>

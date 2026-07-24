@@ -20,6 +20,10 @@ body {
   color: #3a2e19;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* The full-bleed map uses width:100vw, which counts the vertical scrollbar
+     and spills a few px past the content edge on desktop browsers with classic
+     scrollbars. Clip that stray horizontal overflow site-wide. */
+  overflow-x: hidden;
   background:
     repeating-linear-gradient(135deg, rgba(74, 59, 34, 0.035) 0 1px, transparent 1px 7px),
     repeating-linear-gradient(48deg, rgba(74, 59, 34, 0.028) 0 1px, transparent 1px 9px),
@@ -89,5 +93,41 @@ a:hover {
     margin-left: 0 !important;
     padding-top: 26px !important;
     margin-top: 30px !important;
+  }
+
+  /* Reclaim horizontal space on phones. The desktop gutters — 44px on the page
+     and 58px on each spread — leave only a ~186px text column at 390px wide.
+     These are inline styles, so the overrides need !important, same as above. */
+  .page {
+    padding: 0 16px !important;
+  }
+
+  #map {
+    padding: 24px 16px !important;
+  }
+
+  .spread {
+    padding: 40px 24px 34px !important;
+  }
+
+  /* The masthead is name vs. tagline with space-between; on a phone the two
+     collide. Stack them. */
+  .masthead {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 4px;
+  }
+
+  /* Contact rows are label vs. link on one baseline. A long URL like the
+     LinkedIn one has no spaces to wrap at, so it overruns the column and forces
+     a horizontal scroll. Stack the label over the link and let the URL break. */
+  .link-list li {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 4px !important;
+  }
+
+  .link-list a {
+    overflow-wrap: anywhere;
   }
 }

@@ -33,6 +33,9 @@ export default {
       'the realm of orvia · surveyed by b. krishnapur · redrawn nightly · run #{run}',
     // Footer.
     footerLine: '© 2026 b. krishnapur · built by hand · this map is not to scale',
+    // A short "how this map was made" line, printed under the footer. Optional:
+    // remove it and the footer simply loses the line.
+    colophon: 'drawn by hand in astro · redrawn nightly by github actions · no client-side script',
   },
 
   // ── GitHub ────────────────────────────────────────────────────────────────
@@ -50,6 +53,9 @@ export default {
     folio: 'FOL. I',
     // Sub-label under the province name in the mobile territory list.
     navNote: 'github profile',
+    // Optional italic line under the heading, and a marginal mark by the ledger.
+    epigraph: 'These lands were charted by the source, not by hand.',
+    marginNote: 'triangulated from the register',
     // First letter is set as the drop cap automatically.
     intro:
       'Public repositories. Everything here is open source, and most of it started as something I needed and could not find. The figures in the ledger come from the GitHub API, not from me typing them in.',
@@ -63,6 +69,8 @@ export default {
     heading: 'Ponstium Empire',
     folio: 'FOL. II',
     navNote: 'work history',
+    epigraph: 'The paper titles and the real work are recorded apart.',
+    marginNote: 'measured on foot',
     intro:
       'Where I have worked and what I have run, most recent first. The title is what was on the paperwork. The line under it is what I actually did.',
     // Add or remove entries freely. Order is the order they appear.
@@ -131,6 +139,8 @@ export default {
     heading: 'Republic of Corum',
     folio: 'FOL. III',
     navNote: 'photos',
+    epigraph: 'These plates were kept, not composed.',
+    marginNote: 'no compass, only light',
     intro:
       'Photographs I took. No theme and no series, just the ones I kept. Drop a file into assets/photos and it appears here on the next build.',
     // The grid is generated from the folder. These two ledger rows are counted
@@ -146,6 +156,8 @@ export default {
     heading: 'Kingdom of Dequm',
     folio: 'FOL. IV',
     navNote: 'who i am',
+    epigraph: 'This one province alone is written by a living hand.',
+    marginNote: 'the cartographer, in person',
     // Each string is one paragraph. The first letter of the first paragraph
     // becomes the drop cap.
     paragraphs: [
@@ -168,6 +180,8 @@ export default {
     heading: 'Phoededia',
     folio: 'FOL. V',
     navNote: 'links + email',
+    epigraph: 'Only the roads here actually reach the author.',
+    marginNote: 'all roads kept clear',
     intro:
       'Ways to reach me. Email is fastest. I read everything and answer most of it within a few days.',
     // label / display text / href. Add or remove rows freely.

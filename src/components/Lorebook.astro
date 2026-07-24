@@ -13,9 +13,13 @@ interface Props {
   intro: string;
   ledger: [string, string][];
   ledgerNote: string;
+  // Optional. A short in-voice line under the heading, and a marginal
+  // annotation under the ledger note. Absent fields render nothing.
+  epigraph?: string;
+  marginNote?: string;
 }
 
-const { id, heading, folio, intro, ledger, ledgerNote } = Astro.props;
+const { id, heading, folio, intro, ledger, ledgerNote, epigraph, marginNote } = Astro.props;
 const t = textures[id];
 
 // The design sets the first letter of the intro as a drop cap.
@@ -25,12 +29,17 @@ const rest = intro.slice(1);
 
 <section
   id={id}
+  class="spread"
   style={`background: ${t.background}; border: 2px solid #4A3B22; border-radius: 5px; padding: 52px 58px 44px; box-shadow: ${t.shadow}; margin-bottom: ${t.mb}px;`}
 >
   <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #B9A87E; padding-bottom: 12px; margin-bottom: 30px;">
     <h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 26px; letter-spacing: 5px; font-variant: small-caps; color: #3A2E19;">{heading}</h2>
     <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #6B5836; letter-spacing: 1px;">{folio}</span>
   </div>
+
+  {epigraph && (
+    <p style="margin: 0 0 20px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; line-height: 1.5; color: #6B5836;">{epigraph}</p>
+  )}
 
   <div class="prose-grid" style="display: grid; grid-template-columns: 1fr 210px; gap: 40px; align-items: start;">
     <div style="max-width: 68ch;">
@@ -49,6 +58,9 @@ const rest = intro.slice(1);
         ))}
       </dl>
       <p style="margin: 18px 0 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; line-height: 1.5; color: #6B5836;">{ledgerNote}</p>
+      {marginNote && (
+        <p style="margin: 14px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #8A7752; letter-spacing: 0.5px; line-height: 1.5;">※ {marginNote}</p>
+      )}
     </aside>
   </div>
 
