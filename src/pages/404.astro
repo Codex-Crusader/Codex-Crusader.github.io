@@ -15,9 +15,11 @@ const serif = "font-family: 'Cormorant Garamond', serif;";
 const base = import.meta.env.BASE_URL;
 
 // The five provinces, so the page is a way back in rather than a dead end.
+// In the order the folios are bound, which is the order index.astro renders
+// them and the order the phone's territory list gives them.
 const provinces = [
-  ['projects', profile.projects],
   ['experience', profile.experience],
+  ['projects', profile.projects],
   ['gallery', profile.gallery],
   ['about', profile.about],
   ['contact', profile.contact],

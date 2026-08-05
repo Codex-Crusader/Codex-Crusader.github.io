@@ -80,12 +80,22 @@ const languages = {};
 for (const r of repos) if (r.language) languages[r.language] = (languages[r.language] ?? 0) + 1;
 const topLanguage = Object.entries(languages).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '–';
 
+// Measured across the whole survey rather than read off the first entry. The
+// array used to open with the most recently pushed repo, so repos[0] was the
+// same number; profile.github.featured now seats a few holdings at the head of
+// it by hand, and a ledger row reading the top of a hand-ordered list would
+// report a decision as though it were a measurement.
+const lastPush = repos.reduce(
+  (latest, r) => (r.pushed_at && (!latest || r.pushed_at > latest) ? r.pushed_at : latest),
+  null,
+);
+
 const projectLedger = [
   ['followers', String(github.profile?.followers ?? '–')],
   ['public repos', String(repos.length)],
   ['total stars', totalStars.toLocaleString('en-IN')],
   ['top language', topLanguage],
-  ['last push', ago(repos[0]?.pushed_at)],
+  ['last push', ago(lastPush)],
 ];
 
 const base = import.meta.env.BASE_URL; // '/' or '/repo-name/'
@@ -101,9 +111,12 @@ const galleryLedger = [
   ...(profile.gallery.ledgerExtra ?? []),
 ];
 
+// The order the folios are bound in, which is what the phone's territory list
+// is: the table of contents for a document that has no map on it. Kept in step
+// with the section order below and with 404.astro's list of provinces.
 const nav = [
-  ['#projects', profile.projects],
   ['#experience', profile.experience],
+  ['#projects', profile.projects],
   ['#gallery', profile.gallery],
   ['#about', profile.about],
   ['#contact', profile.contact],
@@ -369,28 +382,14 @@ const personSchema = {
         >{profile.site.standfirst}</p>
       </div>
 
-      <!-- ============ SECTION I · PROJECTS ============ -->
-      <Lorebook
-        id="projects"
-        heading={profile.projects.heading}
-        folio={profile.projects.folio}
-        intro={profile.projects.intro}
-        ledger={projectLedger}
-        ledgerNote={profile.projects.ledgerNote}
-        epigraph={profile.projects.epigraph}
-        marginNote={profile.projects.marginNote}
-      >
-        <div class="holdings">
-          {repos.map((r) => <Holding repo={r} ago={ago} symbol={holdingSymbols.get(r.name)} />)}
-          {repos.length === 0 && (
-            <p style={`margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
-              No repositories surveyed yet. Run <code>npm run sync</code> or wait for the nightly build.
-            </p>
-          )}
-        </div>
-      </Lorebook>
-
-      <!-- ============ SECTION II · EXPERIENCE ============ -->
+      <!-- ============ SECTION I · EXPERIENCE ============ -->
+      <!-- Experience is bound first. The repositories are the larger folio and
+           they used to open the realm, but a stranger cannot rank a list of
+           twelve repository names on arrival, and the posts held are the part
+           of this document that reads in the order it is written. The `flip`
+           props move with the sections rather than staying with them: the
+           ledger alternates sides down the page, and that alternation is the
+           thing being preserved, not which side any one spread's ledger is on. -->
       <Lorebook
         id="experience"
         heading={profile.experience.heading}
@@ -400,7 +399,6 @@ const personSchema = {
         ledgerNote={profile.experience.ledgerNote}
         epigraph={profile.experience.epigraph}
         marginNote={profile.experience.marginNote}
-        flip
       >
         <div class="holdings">
           {timeline && (
@@ -438,6 +436,33 @@ const personSchema = {
               <p style={`margin: 8px 0 0; ${serif} font-style: italic; font-size: 17px; line-height: 1.45; color: #6B5836;`}>{profile.resume.line}</p>
               <span class="writ-link" style={`display: inline-block; margin-top: 10px; ${mono} font-size: 13px; color: #8C3B22;`}>↓ {profile.resume.linkText}</span>
             </a>
+          )}
+        </div>
+      </Lorebook>
+
+      <!-- ============ SECTION II · PROJECTS ============ -->
+      <Lorebook
+        id="projects"
+        heading={profile.projects.heading}
+        folio={profile.projects.folio}
+        intro={profile.projects.intro}
+        ledger={projectLedger}
+        ledgerNote={profile.projects.ledgerNote}
+        epigraph={profile.projects.epigraph}
+        marginNote={profile.projects.marginNote}
+        flip
+      >
+        <div class="holdings">
+          {/* Order comes out of the survey already settled: the few names in
+              profile.github.featured first, then everything else by how
+              recently it was pushed. sync-github.js does that sort, so
+              github.json is the ledger's order and this page has no second
+              opinion about it. */}
+          {repos.map((r) => <Holding repo={r} ago={ago} symbol={holdingSymbols.get(r.name)} />)}
+          {repos.length === 0 && (
+            <p style={`margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
+              No repositories surveyed yet. Run <code>npm run sync</code> or wait for the nightly build.
+            </p>
           )}
         </div>
       </Lorebook>

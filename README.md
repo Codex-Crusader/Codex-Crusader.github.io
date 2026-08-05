@@ -22,7 +22,7 @@ Two things are deliberately **not** in it, because they maintain themselves:
 
 | Content | Where it comes from |
 | --- | --- |
-| Repositories (Afon Empire) | GitHub API, via `scripts/sync-github.js` |
+| Repositories (Afon Empire) | GitHub API, the account and its orgs, via `scripts/sync-github.js` |
 | Photographs (Republic of Corum) | `assets/photos/`, via `scripts/scan-photos.js` |
 | The writ's size and whether it exists | `public/`, via `src/data/resume.js` |
 | The social share card | the built map, via `scripts/draw-cover.js` |
@@ -42,10 +42,23 @@ channel that does not exist.
 Nothing to do. Create a public repo on GitHub and it appears after the next
 nightly run, or immediately if you push to `main` or hit *Run workflow*.
 
-Forks, archived repos and anything listed in `profile.github.exclude` are
-skipped. Order is stars descending, then most recently pushed. The repo
-description becomes the body text; stars, language, commit count and last
-update fill the margin ledger.
+The survey covers `profile.github.username` and every organisation in
+`profile.github.orgs`, as one list. Forks, archived repos and anything listed in
+`profile.github.exclude` are skipped. An exclusion is a bare name to skip it
+under any owner, or `owner/name` to skip it under one; an org's `.github`
+profile repo wants the second form, since it is public, has no description and
+would otherwise draw as an empty holding.
+
+Order is `profile.github.featured` first, in the order that array lists them,
+then anything pushed in the last 45 days by push date, then the rest by stars.
+Featuring is the one hand-placed thing in the province, and it exists because
+push date is a measurement with no opinion: it will seat a meme scraper above a
+correlation engine because a cron ran that morning. A featured name that matches
+no repo is skipped, and `npm run build` prints it.
+
+The repo description becomes the body text, so a thin description is fixed on
+GitHub rather than here, and the site picks it up on the next run. Stars,
+language, commit count and last update fill the margin ledger.
 
 ## Replacing the writ (the résumé)
 

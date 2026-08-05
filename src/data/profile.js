@@ -74,11 +74,42 @@ export default {
 
   // ── GitHub ────────────────────────────────────────────────────────────────
   github: {
-    // Every public, non-forked, non-archived repo on this account is published
-    // automatically. Change the username and the whole Afon Empire changes.
+    // The personal account. Every public, non-forked, non-archived repo under
+    // it is published automatically, and the follower count in the ledger is
+    // read from this account rather than from the sum of the survey.
     username: 'Codex-Crusader',
-    // Repos never to show, by exact name. The portfolio repo itself belongs here.
-    exclude: ['Codex-Crusader.github.io', 'Codex-Crusader'],
+    // Organisations surveyed alongside it. Work done under an org is still work
+    // done, and leaving it out meant the Afon Empire quietly omitted the
+    // largest thing in it. Same rules apply: public, not a fork, not archived.
+    orgs: ['The-Pulse-Engine'],
+    // Repos never to show. A bare name matches in any owner; `owner/name`
+    // matches only there. Case is ignored either way.
+    //
+    // `.github` is an organisation's profile repo, not a project: no
+    // description, no language, and it would render as an empty holding.
+    exclude: [
+      'Codex-Crusader.github.io',
+      'Codex-Crusader',
+      'The-Pulse-Engine/.github',
+    ],
+    // The handful of repositories that should open the province, in this order.
+    // Everything else follows in the order the survey computes: recently
+    // pushed first, then stars.
+    //
+    // This is the one place the ledger is ordered by hand, and deliberately so.
+    // Push date is a measurement, not a judgement: it will happily seat a meme
+    // scraper above a correlation engine because the scraper's cron ran this
+    // morning. Keep the list short. A page where everything is featured is a
+    // page where nothing is.
+    //
+    // Names are matched exactly against the repo name. One that matches nothing
+    // is skipped, and `npm run build` prints its name on the way past.
+    featured: [
+      'Correlation-engine',
+      'Pulse-Engine_Market_Intelligence_Platform',
+      'digital-footprint-cleaner',
+      'visitor-access-project',
+    ],
   },
 
   // ── The writ · the downloadable résumé ────────────────────────────────────
@@ -109,27 +140,15 @@ export default {
     revised: 'August 2026',
   },
 
-  // ── Section I · Afon Empire · projects ────────────────────────────────────
-  projects: {
-    heading: 'Afon Empire',
-    folio: 'FOL. I',
-    // Sub-label under the province name in the mobile territory list.
-    navNote: 'github profile',
-    // Optional italic line under the heading, and a marginal mark by the ledger.
-    epigraph: 'These lands were charted by the source, not by hand.',
-    marginNote: 'triangulated from the register',
-    // First letter is set as the drop cap automatically.
-    intro:
-      'Public repositories. Everything here is open source, and most of it started as something I needed and could not find. The figures in the ledger come from the GitHub API, not from me typing them in.',
-    // This ledger is filled in from the live API. The labels are yours; the
-    // values are computed. Leave the keys alone unless you edit the layout.
-    ledgerNote: 'Figures drawn nightly from the source. Not maintained by hand.',
-  },
-
-  // ── Section II · Ponstium Empire · work history ───────────────────────────
+  // ── Section I · Ponstium Empire · work history ────────────────────────────
+  //
+  // The experience folio opens the realm. It used to be second, behind the
+  // repositories, which put the strongest argument for the work behind a list
+  // that a stranger has no way to rank yet. This one is read in the order it is
+  // written; the ledger is not.
   experience: {
     heading: 'Ponstium Empire',
-    folio: 'FOL. II',
+    folio: 'FOL. I',
     navNote: 'work history',
     epigraph: 'The paper titles and the real work are recorded apart.',
     marginNote: 'measured on foot',
@@ -206,6 +225,31 @@ export default {
       ['status', 'student'],
     ],
     ledgerNote: 'Dates are accurate to the month. Everything else is exact.',
+  },
+
+  // ── Section II · Afon Empire · projects ───────────────────────────────────
+  projects: {
+    heading: 'Afon Empire',
+    folio: 'FOL. II',
+    // Sub-label under the province name in the mobile territory list.
+    // Not "github profile" any more: the province is no longer one account's
+    // page. It is that account and every organisation in github.orgs, surveyed
+    // together, and a label naming one of them would be describing a smaller
+    // place than the one it links to.
+    navNote: 'repositories',
+    // Optional italic line under the heading, and a marginal mark by the ledger.
+    epigraph: 'These lands were charted by the source, not by hand.',
+    marginNote: 'triangulated from the register',
+    // First letter is set as the drop cap automatically.
+    intro:
+      'Public repositories, mine and The Pulse Engine\'s. Everything here is open source, and most of it started as something I needed and could not find. The figures in the ledger come from the GitHub API, not from me typing them in.',
+    // This ledger is filled in from the live API. The labels are yours; the
+    // values are computed. Leave the keys alone unless you edit the layout.
+    // The order is not computed all the way down: github.featured seats a few
+    // repositories at the head of the province, and the note says so, because
+    // the rest of this page is careful about the difference between a
+    // measurement and a decision.
+    ledgerNote: 'Figures drawn nightly from the source. The first few holdings are placed by hand; the rest are ordered by the survey.',
   },
 
   // ── Section III · Republic of Corum · photographs ─────────────────────────
