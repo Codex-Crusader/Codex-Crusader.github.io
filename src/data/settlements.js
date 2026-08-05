@@ -145,6 +145,46 @@ const CHAR = 5.4; // JetBrains Mono at 9px
 const LABEL_H = 11;
 const GAP = 9; // dot to first letter
 
+// The longest a name may be drawn on the sheet, in characters.
+//
+// A province is roughly 395 units across and a character is 5.4 of them, so a
+// 41-character repository name is 221 units: it takes up more than half the
+// country it belongs to and runs out over the border into land that is not
+// labelled at all. 26 is about 140 units, near enough a third, which is what
+// the rest of the names already sit at.
+//
+// This is a cap and not a plea to name things shorter. Repository names arrive
+// from the GitHub API and photograph captions from filenames, so the longest
+// label is not a fixed fact about this site: it is whatever gets created next.
+// The map has to survive that without being redrawn by hand.
+const LABEL_MAX = 26;
+
+// Cut at a separator rather than mid-word, so the stub still reads as a name.
+// `Pulse-Engine_Market_Intelligence_Platform` becomes `Pulse-Engine_Market…`
+// rather than `Pulse-Engine_Market_Intel…`, which is a name with a word
+// snapped in half and looks like a rendering fault rather than a decision.
+//
+// The floor stops a separator that falls early from leaving a two-letter stub:
+// `a-very-long-single-token-name` would trim back to `a…`, which identifies
+// nothing. Below the floor it takes the plain cut, on the grounds that a
+// truncated word is still more use than one letter.
+//
+// Nothing is lost by this. The <title> on each settlement carries the whole
+// name, which is both the hover tooltip and the link's accessible name, and
+// the settlement links into the folio where the name is written out in full.
+function shorten(label) {
+  if (label.length <= LABEL_MAX) return label;
+  const cut = label.slice(0, LABEL_MAX - 1);
+  const at = Math.max(
+    cut.lastIndexOf('-'),
+    cut.lastIndexOf('_'),
+    cut.lastIndexOf(' '),
+    cut.lastIndexOf('.'),
+  );
+  const stem = at >= Math.floor(LABEL_MAX * 0.55) ? cut.slice(0, at) : cut.trimEnd();
+  return `${stem}…`;
+}
+
 // Rank by standing within its own province, not against an absolute number:
 // what counts as a city among twelve repositories is not what counts as one
 // among four roads. Roughly the top sixth are cities, the next fifth towns.
@@ -267,6 +307,10 @@ export function surveyRealm(groups) {
       const [x, y] = chosen[n % chosen.length];
       const mark = {
         label: item.label,
+        // What is actually lettered on the sheet. `label` stays whole: it is
+        // the settlement's <title>, so the tooltip and the accessible name are
+        // never the truncated version.
+        short: shorten(item.label),
         href: item.href,
         note: item.note ?? '',
         x,
@@ -301,7 +345,9 @@ export function surveyRealm(groups) {
     );
 
   const site = (mark) => {
-    const w = mark.label.length * CHAR;
+    // Measured on what is drawn, not on what the settlement is called. The
+    // keep-out scan reserves the space the ink actually occupies.
+    const w = mark.short.length * CHAR;
     const preferred = mark.x > mark.midX ? 'left' : 'right';
     for (const dy of [0, -12, 12, -22, 22]) {
       for (const trial of [preferred, preferred === 'left' ? 'right' : 'left']) {
