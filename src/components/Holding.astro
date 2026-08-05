@@ -1,0 +1,85 @@
+---
+// One repository, drawn as a holding: legend mark, name, ledger figures, the
+// description, a survey of what it is built from, and its topics as banners.
+//
+// Everything here comes from the GitHub API. Nothing is typed in by hand, so a
+// new repo appears fully drawn on the next nightly run.
+import { SYMBOLS, symbolFor, materialsFor, bannersFor } from '../data/holdings.js';
+
+interface Props {
+  repo: any;
+  ago: (iso: string) => string;
+}
+
+const { repo, ago } = Astro.props;
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const mark = SYMBOLS[symbolFor(repo.name)];
+const materials = materialsFor(repo.languages ?? []);
+const { shown, rest } = bannersFor(repo.topics ?? []);
+
+// Only the figures that exist. A repo with no stars should not print "0 stars"
+// as though that were a measurement worth taking.
+const figures = [
+  repo.stargazers_count > 0 && [`${repo.stargazers_count}`, repo.stargazers_count === 1 ? 'star' : 'stars'],
+  typeof repo.commits === 'number' && [repo.commits.toLocaleString('en-IN'), 'commits'],
+  [ago(repo.pushed_at), 'surveyed'],
+].filter(Boolean);
+---
+
+<article class="holding">
+  <div class="holding-mark" aria-hidden="true">
+    <svg viewBox="0 0 40 40" width="52" height="52" fill="none" stroke="#8C3B22" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <circle cx="20" cy="20" r="18.4" stroke="#B9A87E" stroke-width="1" stroke-dasharray="2.5 3" />
+      <g set:html={mark} />
+    </svg>
+  </div>
+
+  <div class="holding-body">
+    <header class="holding-head">
+      <h3 style={`margin: 0; ${serif} font-weight: 600; font-size: clamp(21px, 2.3vw, 27px); letter-spacing: 0.4px; line-height: 1.15;`}>
+        <a href={repo.html_url}>{repo.name}</a>
+      </h3>
+      <dl class="holding-figures">
+        {figures.map(([value, label]) => (
+          <div>
+            <dt style={`${mono} font-size: 9.5px; letter-spacing: 1.4px; color: #A0906A; text-transform: uppercase;`}>{label}</dt>
+            <dd style={`margin: 0; ${mono} font-size: 13px; color: #6B5836;`}>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </header>
+
+    {repo.description && (
+      <p style="margin: 12px 0 0; font-size: 15.5px; line-height: 1.68; max-width: 62ch;">{repo.description}</p>
+    )}
+
+    {materials.length > 0 && (
+      <div class="holding-survey">
+        <div class="survey-bar" role="img" aria-label={`Built from ${materials.map((m) => `${m.pct}% ${m.lang}`).join(', ')}`}>
+          {materials.map((m) => (
+            <span style={`width: ${m.pct}%; background: ${m.colour};`}></span>
+          ))}
+        </div>
+        <ul class="survey-key">
+          {materials.map((m) => (
+            <li style={`${mono} font-size: 10.5px; color: #6B5836;`}>
+              <i style={`background: ${m.colour};`}></i>{m.lang} <span style="color: #A0906A;">{m.pct}%</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {shown.length > 0 && (
+      <ul class="holding-banners">
+        {shown.map((t) => (
+          <li style={`${mono} font-size: 10.5px;`}>{t}</li>
+        ))}
+        {rest > 0 && <li class="banner-rest" style={`${mono} font-size: 10.5px;`}>+{rest}</li>}
+      </ul>
+    )}
+  </div>
+</article>

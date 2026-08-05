@@ -35,7 +35,10 @@ export default {
     footerLine: '© 2026 b. krishnapur · built by hand · this map is not to scale',
     // A short "how this map was made" line, printed under the footer. Optional:
     // remove it and the footer simply loses the line.
-    colophon: 'drawn by hand in astro · redrawn nightly by github actions · no client-side script',
+    // This line used to end "no client-side script". The map now has one, so
+    // it says what is actually true instead. Nothing on this site is worth
+    // claiming that a visitor could disprove by opening the network tab.
+    colophon: 'drawn by hand in astro · redrawn nightly by github actions · one small script, no trackers',
   },
 
   // ── GitHub ────────────────────────────────────────────────────────────────

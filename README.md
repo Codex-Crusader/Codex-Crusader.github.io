@@ -1,7 +1,12 @@
 # The realm of Orvia
 
-Portfolio site. Astro, static output, zero client-side JavaScript, deployed to
-GitHub Pages by a workflow that runs on every push and once a night.
+Portfolio site. Astro, static output, deployed to GitHub Pages by a workflow
+that runs on every push and once a night.
+
+One small script ships, and only for the map: the pointer tilt, the sheen and
+the province cartouches. Everything else is CSS. The script is strictly
+enhancement — with it blocked the map is still a complete set of links, the
+sheen stays invisible and the cartouche stays hidden.
 
 ---
 
@@ -143,6 +148,8 @@ public/                 copied verbatim, including the writ (the résumé PDF)
 src/
   data/profile.js       ← everything about you
   data/resume.js        the writ, checked and measured against public/
+  data/holdings.js      legend marks and material colours for the repos
+  components/Holding.astro     one repository, drawn as a holding
   data/section-textures.json   per-spread parchment, from the design
   components/OrviaMap.astro    the map, one component
   components/Lorebook.astro    one lorebook spread, reused five times
@@ -176,9 +183,20 @@ print their URLs. Roles and photographs are kept off page boundaries.
 
 ## Things not to add
 
-The design is deliberately finished. No dark mode, no theme toggle, no scroll
-animations, no contact form, no CMS, no sticky nav, and no JavaScript scroll
-library: navigation is CSS anchor scrolling and nothing else.
+Still off the table: dark mode, a theme toggle, a contact form, a CMS, a sticky
+nav, and any JavaScript scroll library. Navigation is CSS anchor scrolling.
+
+Motion is allowed now, but only on these terms, which are what keep it from
+becoming the scroll-jacking the original rule was written to prevent:
+
+- **Reveals are scroll-driven CSS**, not a scroll listener. No JavaScript runs
+  as the page moves, so there is nothing to jank.
+- **Every animation is behind `@supports` and a `prefers-reduced-motion` guard**,
+  and no animation may leave content at `opacity: 0` if its timeline never
+  runs. That is why the reveals are scoped to `.reveal` — the 404 and `/resume`
+  are single cards on pages that may not scroll, and they opt out entirely.
+- **Print pins everything to its finished state.** A print job has no
+  scrollport, so an unpinned view() animation would commit opacity 0 to paper.
 
 ## A note on the map
 

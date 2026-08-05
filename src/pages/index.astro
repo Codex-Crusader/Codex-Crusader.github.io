@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import OrviaMap from '../components/OrviaMap.astro';
 import Lorebook from '../components/Lorebook.astro';
+import Holding from '../components/Holding.astro';
 import profile from '../data/profile.js';
 import resume from '../data/resume.js';
 import github from '../data/github.json';
@@ -24,15 +25,6 @@ function ago(iso) {
   if (months < 12) return months === 1 ? '1 month ago' : `${months} months ago`;
   const years = Math.round(days / 365);
   return years === 1 ? '1 year ago' : `${years} years ago`;
-}
-
-// Repo ledger line: only the facts we actually have.
-function repoLedger(r) {
-  const parts = [`★ ${r.stargazers_count.toLocaleString('en-IN')}`];
-  if (r.language) parts.push(r.language);
-  if (typeof r.commits === 'number') parts.push(`${r.commits.toLocaleString('en-IN')} commits`);
-  parts.push(`updated ${ago(r.pushed_at)}`);
-  return parts.join(' · ');
 }
 
 const repos = github.repos ?? [];
@@ -99,7 +91,19 @@ const contactRows = resume.published
     ]
   : contactLinks;
 
-// Structured data. Inert JSON, not a script that runs — the no-JS rule stands.
+// What each province actually holds, for the cartouche the map raises on hover.
+// Counted from the same data the folios are built from, so the map cannot
+// promise twelve holdings while the Afon Empire lists nine.
+const totalCommits = repos.reduce((n, r) => n + (r.commits ?? 0), 0);
+const territories = {
+  '#projects': { name: profile.projects.heading, holds: `${repos.length} holdings · ${totalCommits.toLocaleString('en-IN')} commits` },
+  '#experience': { name: profile.experience.heading, holds: `${profile.experience.roles.length} posts held` },
+  '#gallery': { name: profile.gallery.heading, holds: `${plates.length} plates kept` },
+  '#about': { name: profile.about.heading, holds: 'written by a living hand' },
+  '#contact': { name: profile.contact.heading, holds: `${contactRows.length} roads out` },
+};
+
+// Structured data. Inert JSON, not a script that runs.
 // Built from profile.js and the live API so it cannot drift from the page:
 // sameAs is whatever contact rows are actually filled in, minus the mailto.
 const personSchema = {
@@ -182,9 +186,23 @@ const personSchema = {
           <span style={`${mono} font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.tagline}</span>
         </div>
 
-        <div class="map-panel" style="width: 100%; max-width: 1440px; margin: 0 auto; background: #E9DFC4; border: 3px solid #4A3B22; border-radius: 3px; padding: 12px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5), 0 5px 12px -3px rgba(44,34,16,0.28);">
-          <OrviaMap inscription={inscription} />
+        <div class="map-stage" style="width: 100%; max-width: 1440px; margin: 0 auto;">
+          <div class="map-panel" style="background: #E9DFC4; border: 3px solid #4A3B22; border-radius: 3px; padding: 12px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5), 0 5px 12px -3px rgba(44,34,16,0.28);">
+            <OrviaMap inscription={inscription} />
+            <!-- Pointer-tracked sheen. Purely decorative, and inert until the
+                 script arms it, so it never sits as a grey film over the map
+                 for someone with JavaScript disabled. -->
+            <div class="map-sheen" aria-hidden="true"></div>
+            <!-- Filled and positioned by the script from the table below. It is
+                 a hover affordance for a link that already carries a full
+                 aria-label, so it stays out of the accessibility tree. -->
+            <div class="cartouche" aria-hidden="true" hidden>
+              <span class="cartouche-name"></span>
+              <span class="cartouche-holds"></span>
+            </div>
+          </div>
         </div>
+        <script type="application/json" id="territory-data" set:html={JSON.stringify(territories)} />
 
         <!-- MOBILE NAV (replaces map below 700px) -->
         <nav
@@ -216,18 +234,8 @@ const personSchema = {
         epigraph={profile.projects.epigraph}
         marginNote={profile.projects.marginNote}
       >
-        <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
-          {repos.map((r) => (
-            <div style="border-top: 1px solid #B9A87E; padding-top: 16px;">
-              <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 16px; margin: 0 0 8px;">
-                <h3 style={`margin: 0; ${mono} font-size: 14px; color: #3A2E19;`}>
-                  <a href={r.html_url}>{r.name}</a>
-                </h3>
-                <span style={`${mono} font-size: 11.5px; color: #6B5836; letter-spacing: 0.3px;`}>{repoLedger(r)}</span>
-              </div>
-              {r.description && <p style="margin: 0; font-size: 15px; line-height: 1.65;">{r.description}</p>}
-            </div>
-          ))}
+        <div class="holdings">
+          {repos.map((r) => <Holding repo={r} ago={ago} />)}
           {repos.length === 0 && (
             <p style={`margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
               No repositories surveyed yet. Run <code>npm run sync</code> or wait for the nightly build.
@@ -246,6 +254,7 @@ const personSchema = {
         ledgerNote={profile.experience.ledgerNote}
         epigraph={profile.experience.epigraph}
         marginNote={profile.experience.marginNote}
+        flip
       >
         <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
           {profile.experience.roles.map((role) => (
@@ -339,6 +348,7 @@ const personSchema = {
         ledgerNote={profile.about.ledgerNote}
         epigraph={profile.about.epigraph}
         marginNote={profile.about.marginNote}
+        flip
       >
         {profile.about.paragraphs.slice(1).map((para) => (
           <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.7;">{para}</p>
@@ -373,5 +383,114 @@ const personSchema = {
         <div class="return-link" style="margin-top: 6px;"><a href="#map">↑ back to the top</a></div>
       </footer>
     </div>
+
+    <script>
+      // The map, given weight. Everything below is enhancement: with the script
+      // blocked the map is still a complete, navigable set of links, which is
+      // why the sheen starts inert and the cartouche starts hidden.
+      const stage = document.querySelector('.map-stage');
+      if (stage) {
+        const panel = stage.querySelector('.map-panel');
+        const sheen = stage.querySelector('.map-sheen');
+        const cartouche = stage.querySelector('.cartouche');
+        const nameEl = cartouche.querySelector('.cartouche-name');
+        const holdsEl = cartouche.querySelector('.cartouche-holds');
+        const data = JSON.parse(document.getElementById('territory-data').textContent);
+
+        const calm = matchMedia('(prefers-reduced-motion: reduce)');
+        // Tilting on a touchscreen means tilting on tap, which reads as a bug.
+        const fine = matchMedia('(hover: hover) and (pointer: fine)');
+
+        let frame = 0;
+        let ry = 0;
+        let rx = 0;
+
+        function draw() {
+          frame = 0;
+          panel.style.transform = `perspective(1800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        }
+
+        function schedule() {
+          if (!frame) frame = requestAnimationFrame(draw);
+        }
+
+        stage.addEventListener('pointermove', (e) => {
+          if (calm.matches || !fine.matches) return;
+          const r = stage.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width;
+          const py = (e.clientY - r.top) / r.height;
+          // Deliberately small. Enough to feel like a sheet of paper catching
+          // the light, not enough to turn the survey into a carousel.
+          ry = (px - 0.5) * 2.6;
+          rx = (0.5 - py) * 1.9;
+          sheen.style.setProperty('--mx', `${px * 100}%`);
+          sheen.style.setProperty('--my', `${py * 100}%`);
+          stage.classList.add('is-live');
+          schedule();
+        });
+
+        stage.addEventListener('pointerleave', () => {
+          ry = 0;
+          rx = 0;
+          stage.classList.remove('is-live');
+          schedule();
+        });
+
+        function openCartouche(link) {
+          const t = data[link.getAttribute('href')];
+          if (!t) return;
+          nameEl.textContent = t.name;
+          holdsEl.textContent = t.holds;
+          cartouche.hidden = false;
+          const lr = link.getBoundingClientRect();
+          const pr = panel.getBoundingClientRect();
+          const w = cartouche.offsetWidth;
+          const h = cartouche.offsetHeight;
+          let x = lr.left - pr.left + lr.width / 2 - w / 2;
+          // Above the province by default; below it when there is no room.
+          let y = lr.top - pr.top - h - 12;
+          if (y < 6) y = lr.bottom - pr.top + 12;
+          x = Math.max(6, Math.min(x, pr.width - w - 6));
+          cartouche.style.transform = `translate(${x}px, ${y}px)`;
+          cartouche.classList.add('is-open');
+        }
+
+        function closeCartouche() {
+          cartouche.classList.remove('is-open');
+        }
+
+        // Delegated rather than bound per province. pointerenter/leave on an
+        // SVG <a> is unreliable across browsers, and the provinces are made of
+        // many child paths — the bubbling pair plus a relatedTarget check is
+        // the version that actually fires, and it does not flicker when the
+        // pointer crosses between paths inside the same province.
+        const linkOf = (node) => (node && node.closest ? node.closest('.region-link') : null);
+
+        stage.addEventListener('pointerover', (e) => {
+          const link = linkOf(e.target);
+          if (link && linkOf(e.relatedTarget) !== link) openCartouche(link);
+        });
+
+        stage.addEventListener('pointerout', (e) => {
+          const link = linkOf(e.target);
+          if (link && linkOf(e.relatedTarget) !== link) closeCartouche();
+        });
+
+        stage.addEventListener('focusin', (e) => {
+          const link = linkOf(e.target);
+          if (link) openCartouche(link);
+        });
+
+        stage.addEventListener('focusout', (e) => {
+          if (linkOf(e.target)) closeCartouche();
+        });
+
+        // Return it to hidden once it has faded, so it is never a stray
+        // transparent box sitting over the provinces.
+        cartouche.addEventListener('transitionend', () => {
+          if (!cartouche.classList.contains('is-open')) cartouche.hidden = true;
+        });
+      }
+    </script>
   </body>
 </html>

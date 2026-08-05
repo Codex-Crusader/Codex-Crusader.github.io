@@ -61,6 +61,27 @@ async function commitCount(name) {
   return Array.isArray(body) ? body.length : undefined;
 }
 
+// The byte breakdown behind the single /language field. A repo is rarely one
+// material, and "Python" alone throws away the fact that a project is 80%
+// notebooks. Returned as sorted percentages so the page never has to do
+// arithmetic on raw byte counts.
+//
+// Soft-fails: a repo whose breakdown cannot be read simply renders without the
+// survey bar, which is a smaller loss than failing the whole build over it.
+async function languageMix(name) {
+  const res = await fetch(`https://api.github.com/repos/${USER}/${name}/languages`, {
+    headers,
+  });
+  if (!res.ok) return undefined;
+  const bytes = await res.json();
+  const total = Object.values(bytes).reduce((n, v) => n + v, 0);
+  if (!total) return undefined;
+  return Object.entries(bytes)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([lang, n]) => ({ lang, pct: Math.round((n / total) * 1000) / 10 }));
+}
+
 // A repo counts as "recently active" if it was pushed inside this window.
 // Widen it if the front of the ledger looks too thin.
 const RECENT_DAYS = 45;
@@ -98,7 +119,12 @@ async function main() {
     (r) => !r.fork && !r.archived && !r.private && !EXCLUDE.has(r.name.toLowerCase()),
   );
 
-  const counts = await mapLimit(kept, 5, (r) => commitCount(r.name));
+  // Both per-repo lookups share one pool, so a large account still makes two
+  // requests per repo rather than two bursts of sixty.
+  const details = await mapLimit(kept, 5, async (r) => ({
+    commits: await commitCount(r.name),
+    languages: await languageMix(r.name),
+  }));
 
   const repos = kept
     .map((r, i) => {
@@ -112,7 +138,8 @@ async function main() {
         topics: (r.topics ?? []).slice().sort(),
         pushed_at: r.pushed_at,
       };
-      if (typeof counts[i] === 'number') entry.commits = counts[i];
+      if (typeof details[i].commits === 'number') entry.commits = details[i].commits;
+      if (details[i].languages) entry.languages = details[i].languages;
       return entry;
     })
     .sort((a, b) => {

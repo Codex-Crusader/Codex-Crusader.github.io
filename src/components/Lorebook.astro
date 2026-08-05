@@ -17,10 +17,17 @@ interface Props {
   // annotation under the ledger note. Absent fields render nothing.
   epigraph?: string;
   marginNote?: string;
+  // Puts the ledger on the left for this spread. Alternated down the page so
+  // five sections stop reading as five copies of one section.
+  flip?: boolean;
 }
 
-const { id, heading, folio, intro, ledger, ledgerNote, epigraph, marginNote } = Astro.props;
+const { id, heading, folio, intro, ledger, ledgerNote, epigraph, marginNote, flip } = Astro.props;
 const t = textures[id];
+
+// "FOL. III" -> "III". The numeral is set large as a mark on the page; the word
+// stays with it in the small line so the folio still reads as a folio.
+const numeral = folio.replace(/^FOL\.\s*/i, '');
 
 // The design sets the first letter of the intro as a drop cap.
 const dropCap = intro.slice(0, 1);
@@ -29,21 +36,24 @@ const rest = intro.slice(1);
 
 <section
   id={id}
-  class="spread"
+  class:list={['spread', 'reveal', { flip }]}
   style={`background: ${t.background}; border: 2px solid #4A3B22; border-radius: 5px; padding: 52px 58px 44px; box-shadow: ${t.shadow}; margin-bottom: ${t.mb}px;`}
 >
-  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #B9A87E; padding-bottom: 12px; margin-bottom: 30px;">
-    <h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 26px; letter-spacing: 5px; font-variant: small-caps; color: #3A2E19;">{heading}</h2>
-    <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #6B5836; letter-spacing: 1px;">{folio}</span>
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; border-bottom: 1px solid #B9A87E; padding-bottom: 14px; margin-bottom: 26px;">
+    <h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(30px, 5.2vw, 54px); line-height: 0.95; letter-spacing: 4px; font-variant: small-caps; color: #3A2E19;">{heading}</h2>
+    <div style="text-align: right; flex-shrink: 0;">
+      <div class="folio-mark" aria-hidden="true">{numeral}</div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A7752; letter-spacing: 1.4px; margin-top: 6px;">{folio}</div>
+    </div>
   </div>
 
   {epigraph && (
-    <p style="margin: 0 0 20px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; line-height: 1.5; color: #6B5836;">{epigraph}</p>
+    <p style="margin: 0 0 22px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(16px, 1.7vw, 19px); line-height: 1.45; color: #6B5836;">{epigraph}</p>
   )}
 
   <div class="prose-grid" style="display: grid; grid-template-columns: 1fr 210px; gap: 40px; align-items: start;">
     <div style="max-width: 68ch;">
-      <p style="margin: 0 0 22px; font-size: 16px; line-height: 1.7;"><span style="float: left; font-family: 'Cormorant Garamond', serif; font-size: 4.4em; line-height: 0.72; font-weight: 600; color: #8C3B22; margin: 6px 12px -6px 0;">{dropCap}</span>{rest}</p>
+      <p style="margin: 0 0 22px; font-size: 16.5px; line-height: 1.72;"><span class="drop-cap" style="float: left; font-family: 'Cormorant Garamond', serif; font-size: 4.4em; line-height: 0.72; font-weight: 600; color: #8C3B22; margin: 6px 12px -6px 0;">{dropCap}</span>{rest}</p>
       <slot />
     </div>
 

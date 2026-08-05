@@ -1,4 +1,6 @@
-/* Lifted verbatim from the handed-off design. Do not restyle. */
+/* The handed-off design, and the work built on top of it.
+   Everything above the "Beyond the handoff" rule is the original stylesheet and
+   should stay as it is; the section below extends it. */
 
 html,
 body {
@@ -24,10 +26,16 @@ body {
      and spills a few px past the content edge on desktop browsers with classic
      scrollbars. Clip that stray horizontal overflow site-wide. */
   overflow-x: hidden;
+  /* Grain first, then a vignette, then the two weave gradients and the ground.
+     The noise is a background layer rather than a fixed overlay on purpose: an
+     overlay would have to sit above the text to be seen, and paper grain drawn
+     over type is just type that is harder to read. */
   background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E"),
+    radial-gradient(120% 78% at 50% 32%, transparent 42%, rgba(58, 44, 20, 0.16) 84%, rgba(48, 36, 16, 0.3) 100%),
     repeating-linear-gradient(135deg, rgba(74, 59, 34, 0.035) 0 1px, transparent 1px 7px),
     repeating-linear-gradient(48deg, rgba(74, 59, 34, 0.028) 0 1px, transparent 1px 9px),
-    radial-gradient(135% 85% at 50% -5%, #d9cba4 0%, #c7b991 52%, #ad9e72 100%);
+    radial-gradient(135% 85% at 50% -5%, #ded0a8 0%, #c7b991 50%, #a4956a 100%);
   background-attachment: fixed;
 }
 
@@ -149,6 +157,319 @@ a:hover {
   .link-list a {
     overflow-wrap: anywhere;
   }
+
+  /* The legend mark keeps its place beside the name, just smaller -- stacking
+     it above would cost a whole line of vertical space per holding. */
+  .holding {
+    grid-template-columns: 42px 1fr;
+    gap: 14px;
+  }
+
+  .holding-mark svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .holding-figures {
+    gap: 16px;
+  }
+
+  /* The flipped spread puts its ledger first in source order. In one column
+     that would open the section with its own footnotes. */
+  .spread.flip .margin-col {
+    order: 0;
+    padding-right: 0 !important;
+    border-right: none !important;
+  }
+}
+
+/* ══ Beyond the handoff ═════════════════════════════════════════════════════
+   The design shipped as a static document. What follows gives it depth, weight
+   and motion without changing a single one of its colours or proportions.
+
+   One rule holds throughout: everything here is enhancement. With the script
+   blocked or the browser old, the page is exactly the document it was before —
+   the sheen starts invisible, the cartouche starts hidden, and every animation
+   is behind @supports or a reduced-motion guard. Nothing here can leave content
+   stuck at opacity 0. */
+
+/* ── The map, given weight ─────────────────────────────────────────────────
+   A sheet of paper on a table catches light and sits at a slight angle to the
+   eye. The tilt is deliberately tiny; the point is that the map stops feeling
+   like a picture of a map. */
+.map-panel {
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.5s ease;
+  will-change: transform;
+}
+
+/* While the pointer is on it the panel should track, not lag a half second
+   behind. On the way out it eases back under the slower transition above. */
+.map-stage.is-live .map-panel {
+  transition:
+    transform 0.14s linear,
+    box-shadow 0.4s ease;
+}
+
+.map-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  background: radial-gradient(
+    440px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 250, 232, 0.36),
+    rgba(255, 250, 232, 0.09) 42%,
+    transparent 66%
+  );
+  mix-blend-mode: soft-light;
+}
+
+.map-stage.is-live .map-sheen {
+  opacity: 1;
+}
+
+/* The label a province raises when you point at it. */
+.cartouche {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 15px 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  background: #f3ecd8;
+  border: 1px solid #4a3b22;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 #fffcf0 inset,
+    0 10px 22px -8px rgba(44, 34, 16, 0.55);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.cartouche.is-open {
+  opacity: 1;
+}
+
+.cartouche-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 2px;
+  font-variant: small-caps;
+  color: #3a2e19;
+}
+
+.cartouche-holds {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  color: #8a7752;
+}
+
+/* The survey arriving on the paper, bottom edge first. */
+@media (prefers-reduced-motion: no-preference) {
+  .map-panel svg {
+    animation: ink-settle 1.5s cubic-bezier(0.22, 0.7, 0.25, 1) both;
+  }
+}
+
+@keyframes ink-settle {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ── Holdings ──────────────────────────────────────────────────────────────
+   A repository, drawn the way a survey draws a settlement: a mark from the
+   legend, the figures, and what it is built from. */
+.holdings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.holding {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 22px;
+  padding: 26px 0 4px;
+  border-top: 1px solid #b9a87e;
+}
+
+.holding:first-child {
+  border-top: none;
+  padding-top: 10px;
+}
+
+.holding-mark svg {
+  display: block;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.holding-mark svg circle {
+  transition: stroke 0.35s ease;
+}
+
+.holding:hover .holding-mark svg {
+  transform: rotate(-4deg) scale(1.06);
+}
+
+.holding:hover .holding-mark svg circle {
+  stroke: #8c3b22;
+}
+
+.holding-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 26px;
+}
+
+.holding-figures {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+}
+
+.holding-figures div {
+  text-align: right;
+}
+
+/* What it is made of, measured rather than named. */
+.survey-bar {
+  display: flex;
+  height: 7px;
+  margin: 18px 0 9px;
+  overflow: hidden;
+  background: #e2d6b0;
+  border: 1px solid #b9a87e;
+  border-radius: 1px;
+}
+
+.survey-bar span {
+  display: block;
+  height: 100%;
+}
+
+.survey-key,
+.holding-banners {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.survey-key {
+  gap: 3px 18px;
+}
+
+.survey-key i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  border: 1px solid rgba(74, 59, 34, 0.35);
+}
+
+.holding-banners {
+  gap: 6px;
+  margin-top: 15px;
+}
+
+.holding-banners li {
+  padding: 3px 9px;
+  color: #6b5836;
+  background: rgba(255, 252, 240, 0.42);
+  border: 1px solid #c3b387;
+  border-radius: 2px;
+}
+
+.holding-banners .banner-rest {
+  color: #a0906a;
+  background: none;
+  border-style: dashed;
+}
+
+/* ── Spread rhythm ─────────────────────────────────────────────────────────
+   Five identical spreads down a page read as a list. Alternating which side
+   the ledger sits on turns the stack into a book that has been laid open. */
+/* The columns and the ledger's rule live in inline styles on the component, so
+   flipping them needs the same !important the phone breakpoint already uses. */
+.spread.flip .prose-grid {
+  grid-template-columns: 210px 1fr !important;
+}
+
+.spread.flip .margin-col {
+  order: -1;
+  padding-right: 30px !important;
+  padding-left: 0 !important;
+  border-right: 1px solid #b9a87e;
+  border-left: none !important;
+}
+
+/* The folio numeral, set large enough to be a mark on the page rather than a
+   caption. It is decorative here -- the accessible heading is the h2. */
+.folio-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(30px, 4.4vw, 52px);
+  font-weight: 600;
+  line-height: 0.8;
+  letter-spacing: 2px;
+  color: rgba(140, 59, 34, 0.24);
+  user-select: none;
+}
+
+/* Ink sinking into the paper, rather than a letter sitting on top of it. */
+.drop-cap {
+  text-shadow: 0 1px 1px rgba(140, 59, 34, 0.22);
+}
+
+/* ── Arrival ───────────────────────────────────────────────────────────────
+   Scroll-driven, so there is no scroll listener and nothing to jank. Browsers
+   without view() timelines simply show the content, which is why the @supports
+   guard wraps the animation rather than a fallback. */
+   Scoped to .reveal rather than every .spread on purpose. 404 and /resume are
+   single cards on pages that may not scroll at all, and an element whose
+   timeline has no scrollport is a question not worth leaving open when the
+   answer decides whether the page is blank. Only the folios opt in. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .spread.reveal,
+    .holding {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 42%;
+    }
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ── Print ──────────────────────────────────────────────────────────────────
@@ -179,10 +500,45 @@ a:hover {
   /* Navigation, and the decorative border that would repeat on every sheet. */
   .frame,
   .map-panel,
+  .map-sheen,
+  .cartouche,
   .mobile-nav,
   .return-link,
   .writ {
     display: none !important;
+  }
+
+  /* A print job has no scrollport, so a view() timeline never advances and its
+     element would be committed to paper at the animation's 0% state -- which
+     here is opacity 0. Every animated element is pinned to its finished state
+     before anything reaches the printer. */
+  .spread,
+  .holding,
+  .map-panel svg {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  /* Ink coverage: a solid bar per holding is a lot of toner for a decoration
+     that the key underneath already states in words. */
+  .survey-bar {
+    display: none !important;
+  }
+
+  .holding {
+    grid-template-columns: 1fr;
+    gap: 0;
+    break-inside: avoid;
+  }
+
+  .holding-mark {
+    display: none !important;
+  }
+
+  .holding-banners li {
+    background: none !important;
   }
 
   /* #map is full-bleed by way of 100vw and a negative margin. With the map
