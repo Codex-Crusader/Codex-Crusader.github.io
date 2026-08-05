@@ -25,6 +25,7 @@ Two things are deliberately **not** in it, because they maintain themselves:
 | Repositories (Afon Empire) | GitHub API, via `scripts/sync-github.js` |
 | Photographs (Republic of Corum) | `assets/photos/`, via `scripts/scan-photos.js` |
 | The writ's size and whether it exists | `public/`, via `src/data/resume.js` |
+| The social share card | the built map, via `scripts/draw-cover.js` |
 
 ### Unfinished rows are safe
 
@@ -71,6 +72,33 @@ Same rule as an unfinished contact row.
 
 The filename is deliberately not `resume.pdf`: it lands in a downloads folder
 under the name of the person it belongs to.
+
+## The share card
+
+Nothing to do. `scripts/draw-cover.js` runs after `astro build` and draws
+`og-cover.png` from the map in the built page, so the picture that appears when
+the link is pasted anywhere is the same sheet the site is showing that day. Add
+a repository and the card gains a town on the next run.
+
+It was a hand-exported file once. That file was committed in July, the realm
+grew settlements in August, and for two weeks every share showed a map of an
+empty country. A survey that redraws itself nightly should not have a still
+photograph of itself attached.
+
+Two details, both of which are the same problem — a rasteriser has no
+stylesheet, so anything the design hides in CSS would print at full strength:
+
+- The map carries **two hint labels**, one for a pointer and one for a thumb.
+  The card keeps the pointer wording and drops the other, or they overprint.
+- **Village labels are dropped.** On the site they stay hidden until pointed at,
+  because a dozen repository names at once is an unreadable map. Left in, they
+  rebuild the exact pile the grading exists to prevent.
+
+The card is a palette PNG: 113 KB, against 752 KB for the same image as
+truecolour, with no visible banding in the parchment. It is written into `dist/`
+and never committed. `public/og-cover.png` stays as the fallback for a build
+that cannot draw one — if the page has no map in it, the script warns, keeps
+that file and lets the build pass.
 
 ## Adding a photograph
 
@@ -144,6 +172,7 @@ scripts/
   sync-github.js        repos -> src/data/github.json
   scan-photos.js        photos -> public/photos/ + src/data/photos.json
   ensure-data.js        empty stubs so a fresh clone can build
+  draw-cover.js         the built map -> dist/og-cover.png, the share card
 public/                 copied verbatim, including the writ (the résumé PDF)
 src/
   data/profile.js       ← everything about you

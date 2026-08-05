@@ -237,6 +237,11 @@ export default {
       ['open to', 'collaboration'],
       ['nda', 'fine by me'],
     ],
-    ledgerNote: 'No contact form. Links are checked nightly.',
+    // This used to read "Links are checked nightly." Nothing checks them —
+    // check-profile.js only notices a row left blank, and the nightly run
+    // resurveys the repositories, not these three addresses. Same rule as the
+    // colophon: nothing on this site should claim what a visitor could
+    // disprove. What is actually true is that an unfinished row never ships.
+    ledgerNote: 'No contact form. A link is only listed here once it goes somewhere.',
   },
 };
