@@ -1,0 +1,72 @@
+---
+// One post held, drawn to match a holding: a mark from the legend, the figures,
+// what the work was, and where it sits on the career's timeline.
+//
+// The bar is the point. Ten roles printed as ten date strings is a list you have
+// to hold in your head; ten bars on one axis is a shape you can read at a
+// glance -- which things overlapped, which ran for years, which were a summer.
+import { SYMBOLS } from '../data/holdings.js';
+
+interface Props {
+  role: any;
+  symbol: string;
+  place: string;
+  dates: string;
+  bar: any;
+  years: { year: number; at: number }[];
+  id: string;
+}
+
+const { role, symbol, place, dates, bar, years, id } = Astro.props;
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const figures = [
+  ['term', dates],
+  ...(bar ? [['span', bar.span]] : []),
+];
+---
+
+<article class="holding post" id={id}>
+  <div class="holding-mark" aria-hidden="true">
+    <svg viewBox="0 0 40 40" width="52" height="52" fill="none" stroke="#8C3B22" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <circle cx="20" cy="20" r="18.4" stroke="#B9A87E" stroke-width="1" stroke-dasharray="2.5 3" />
+      <g set:html={SYMBOLS[symbol]} />
+    </svg>
+  </div>
+
+  <div class="holding-body">
+    <header class="holding-head">
+      <h3 style={`margin: 0; ${serif} font-weight: 600; font-size: clamp(20px, 2.2vw, 26px); letter-spacing: 0.3px; line-height: 1.15;`}>{role.title}</h3>
+      <dl class="holding-figures">
+        {figures.map(([label, value]) => (
+          <div>
+            <dt style={`${mono} font-size: 9.5px; letter-spacing: 1.4px; color: #A0906A; text-transform: uppercase;`}>{label}</dt>
+            <dd style={`margin: 0; ${mono} font-size: 12.5px; color: #6B5836; white-space: nowrap;`}>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </header>
+
+    {place && (
+      <p style={`margin: 7px 0 0; ${mono} font-size: 11px; color: #8A7752; letter-spacing: 0.4px;`}>{place}</p>
+    )}
+
+    <p style="margin: 12px 0 0; font-size: 15.5px; line-height: 1.68; max-width: 62ch;">{role.body}</p>
+
+    {bar && (
+      <div class="tenure" role="img" aria-label={`Held ${dates}, ${bar.span}`}>
+        <div class="tenure-track">
+          {years.map((y) => (
+            <span class="tenure-year" style={`left: ${y.at}%;`}></span>
+          ))}
+          <span
+            class:list={['tenure-bar', { open: bar.open }]}
+            style={`left: ${bar.left}%; width: ${bar.width}%;`}
+          ></span>
+        </div>
+      </div>
+    )}
+  </div>
+</article>

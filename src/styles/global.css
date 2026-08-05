@@ -578,6 +578,160 @@ a:hover {
   border-style: dashed;
 }
 
+/* ── Posts held ────────────────────────────────────────────────────────────
+   Ponstium Empire, built on the holding layout so the two data provinces read
+   as one design. The bar is the addition: ten date strings are a list you have
+   to hold in your head, ten bars on one axis are a shape you can see. */
+.tenure-legend {
+  padding-bottom: 4px;
+}
+
+.tenure {
+  margin-top: 16px;
+  max-width: 62ch;
+}
+
+.tenure-track {
+  position: relative;
+  height: 9px;
+  /* Belt and braces with the clamp in tenure.js: a bar is absolutely
+     positioned, so a percentage that overshoots widens the track and takes the
+     whole column with it. */
+  overflow: hidden;
+  background: #e6dab7;
+  border: 1px solid #b9a87e;
+  border-radius: 1px;
+}
+
+.tenure-year {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(74, 59, 34, 0.24);
+}
+
+.tenure-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 3px;
+  background: #8c3b22;
+  border-radius: 1px;
+}
+
+/* A post still held runs off its own end rather than stopping dead. */
+.tenure-bar.open {
+  background: linear-gradient(90deg, #8c3b22 62%, rgba(140, 59, 34, 0.35));
+}
+
+.holding.post:hover .tenure-bar {
+  background: #a2492e;
+}
+
+/* ── Roads out ─────────────────────────────────────────────────────────────
+   Phoededia. Each channel is a way to the author, so it is drawn as one. */
+.roads li + li {
+  border-top: 1px solid #b9a87e;
+}
+
+.road {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 4px 16px;
+  align-items: center;
+  padding: 15px 6px 15px 0;
+  color: #3a2e19;
+  text-decoration: none;
+  transition: background 0.25s ease;
+}
+
+.road:hover,
+.road:focus-visible {
+  text-decoration: none;
+  background: rgba(140, 59, 34, 0.05);
+}
+
+.road-mark svg {
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.road:hover .road-mark svg {
+  transform: translateX(3px);
+}
+
+.road-mark svg circle {
+  transition: stroke 0.25s ease;
+}
+
+.road:hover .road-mark svg circle {
+  stroke: #8c3b22;
+}
+
+.road-address {
+  color: #8c3b22;
+  overflow-wrap: anywhere;
+}
+
+.road:hover .road-address {
+  text-decoration: underline;
+}
+
+/* ── Plates ────────────────────────────────────────────────────────────────
+   Republic of Corum. Mounted and numbered, not just dropped on the page. */
+.plate {
+  margin: 0 0 18px;
+  padding: 7px 7px 0;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  background: rgba(255, 252, 240, 0.42);
+  border: 1px solid #c3b387;
+  border-radius: 2px;
+  box-shadow: 0 2px 7px -3px rgba(44, 34, 16, 0.32);
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.3s ease;
+}
+
+.plate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 20px -7px rgba(44, 34, 16, 0.4);
+}
+
+.plate img {
+  border: 1px solid #b9a87e;
+}
+
+.plate figcaption {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  padding: 7px 2px 8px;
+}
+
+.plate-no {
+  flex-shrink: 0;
+}
+
+/* ── The dispatch ──────────────────────────────────────────────────────────
+   Kingdom of Dequm. The one province written by a living hand, so it is set
+   like something written rather than something tabulated. */
+.dispatch p {
+  margin: 0 0 20px;
+  max-width: 58ch;
+  font-size: 16.5px;
+  line-height: 1.78;
+}
+
+.dispatch-sign {
+  margin-top: 26px !important;
+  padding-top: 16px;
+  font-size: 17px !important;
+  color: #6b5836;
+  border-top: 1px solid #b9a87e;
+}
+
 /* ── Spread rhythm ─────────────────────────────────────────────────────────
    Five identical spreads down a page read as a list. Alternating which side
    the ledger sits on turns the stack into a book that has been laid open. */
