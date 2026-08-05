@@ -3,6 +3,7 @@ import '../styles/global.css';
 import OrviaMap from '../components/OrviaMap.astro';
 import Lorebook from '../components/Lorebook.astro';
 import profile from '../data/profile.js';
+import resume from '../data/resume.js';
 import github from '../data/github.json';
 import photos from '../data/photos.json';
 
@@ -81,6 +82,23 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
     : [term, value],
 );
 
+// The writ earns a road of its own in Phoededia. It is kept out of contactLinks
+// rather than pushed onto it, because that array also feeds `sameAs` in the
+// schema below — and a PDF is a document, not a profile of the person.
+//
+// Every other road here reads as an address someone could copy off a printed
+// page, so this one does too: the short /resume route rather than the filename.
+const contactRows = resume.published
+  ? [
+      ...contactLinks,
+      [
+        profile.resume.contactLabel,
+        `${Astro.site.host}${resume.shortHref.replace(/\/$/, '')}`,
+        resume.shortHref,
+      ],
+    ]
+  : contactLinks;
+
 // Structured data. Inert JSON, not a script that runs — the no-JS rule stands.
 // Built from profile.js and the live API so it cannot drift from the page:
 // sameAs is whatever contact rows are actually filled in, minus the mailto.
@@ -114,16 +132,25 @@ const personSchema = {
          removed, so it stays even though it does nothing for visitors. -->
     <meta name="google-site-verification" content="eo34pFyJFp-2ccSkvZZySrCk_kmRi1c-_oSQL6xxYNk" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- The parchment, so a mobile browser's chrome matches the page instead of
+         framing it in white. -->
+    <meta name="theme-color" content="#C7B991" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The realm of Orvia" />
+    <meta property="og:locale" content="en_IN" />
     <meta property="og:title" content="Bhargavaram Krishnapur — software, open source, maps" />
     <meta property="og:description" content={profile.site.metaDescription} />
     <meta property="og:url" content="https://codex-crusader.github.io/" />
     <meta property="og:image" content="https://codex-crusader.github.io/og-cover.png" />
+    <!-- Declared so the card reserves the right shape before the image lands. -->
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Bhargavaram Krishnapur — software, open source, maps" />
     <meta name="twitter:description" content={profile.site.metaDescription} />
     <meta name="twitter:image" content="https://codex-crusader.github.io/og-cover.png" />
     <meta property="og:image:alt" content="A hand-drawn map of the realm of Orvia, the portfolio's five sections shown as provinces." />
+    <meta name="twitter:image:alt" content="A hand-drawn map of the realm of Orvia, the portfolio's five sections shown as provinces." />
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -134,6 +161,7 @@ const personSchema = {
   </head>
   <body>
     <div
+      class="frame"
       aria-hidden="true"
       style="position: fixed; inset: 13px; pointer-events: none; z-index: 60; border: 2px solid rgba(74,59,34,0.5); box-shadow: inset 0 0 0 5px rgba(74,59,34,0), inset 0 0 0 6px rgba(74,59,34,0.24);"
     >
@@ -221,12 +249,32 @@ const personSchema = {
       >
         <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
           {profile.experience.roles.map((role) => (
-            <div style="border-top: 1px solid #B9A87E; padding-top: 16px;">
+            <div class="entry" style="border-top: 1px solid #B9A87E; padding-top: 16px;">
               <h3 style={`margin: 0 0 4px; ${serif} font-weight: 600; font-size: 20px;`}>{role.title}</h3>
               <p style={`margin: 0 0 10px; ${mono} font-size: 11.5px; color: #8A7752;`}>{role.meta}</p>
               <p style="margin: 0; font-size: 15px; line-height: 1.65;">{role.body}</p>
             </div>
           ))}
+
+          {/* The writ. Everything above, on one sheet — a plate pressed into the
+              foot of the province rather than a button, because the rest of this
+              page is a document and a document does not have buttons. Rendered
+              only when the PDF is really in public/; see src/data/resume.js. */}
+          {resume.published && (
+            <a
+              class="writ"
+              href={resume.href}
+              download
+              style="display: block; margin-top: 10px; padding: 20px 24px; border: 1px solid #8C3B22; border-radius: 3px; background: rgba(140,59,34,0.045); color: #3A2E19; text-decoration: none;"
+            >
+              <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 16px;">
+                <span style={`${mono} font-size: 11px; color: #8C3B22; letter-spacing: 2px;`}>{profile.resume.label}</span>
+                <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 0.5px;`}>PDF · {resume.size} · revised {profile.resume.revised}</span>
+              </div>
+              <p style={`margin: 8px 0 0; ${serif} font-style: italic; font-size: 17px; line-height: 1.45; color: #6B5836;`}>{profile.resume.line}</p>
+              <span class="writ-link" style={`display: inline-block; margin-top: 10px; ${mono} font-size: 13px; color: #8C3B22;`}>↓ {profile.resume.linkText}</span>
+            </a>
+          )}
         </div>
       </Lorebook>
 
@@ -309,7 +357,7 @@ const personSchema = {
         marginNote={profile.contact.marginNote}
       >
         <ul class="link-list" style="list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px;">
-          {contactLinks.map(([label, text, href]) => (
+          {contactRows.map(([label, text, href]) => (
             <li style="border-top: 1px solid #B9A87E; padding-top: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
               <span style={`${mono} font-size: 11px; color: #8A7752; letter-spacing: 1px;`}>{label}</span>
               <a href={href} style={`${mono} font-size: 14px;`}>{text}</a>
@@ -322,7 +370,7 @@ const personSchema = {
       <footer style={`text-align: center; padding: 20px 0 56px; ${mono} font-size: 11px; color: #8A7752; letter-spacing: 0.5px; line-height: 1.9;`}>
         <div>{profile.site.footerLine}</div>
         {profile.site.colophon && <div style="margin-top: 6px; color: #A0906A;">{profile.site.colophon}</div>}
-        <div style="margin-top: 6px;"><a href="#map">↑ back to the top</a></div>
+        <div class="return-link" style="margin-top: 6px;"><a href="#map">↑ back to the top</a></div>
       </footer>
     </div>
   </body>

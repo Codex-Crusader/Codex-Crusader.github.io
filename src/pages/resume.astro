@@ -1,0 +1,74 @@
+---
+// A short road to the writ, so /resume can be written on a card or dropped in
+// an email signature without spelling out the filename.
+//
+// The hop is a plain <meta http-equiv="refresh">, which is HTML, not script —
+// the no-JavaScript rule stands. A visible link sits underneath it regardless,
+// because a page that only works by redirecting is a page that fails silently
+// for anyone whose browser has refreshes turned off.
+import '../styles/global.css';
+import profile from '../data/profile.js';
+import resume from '../data/resume.js';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const base = import.meta.env.BASE_URL;
+// Absolute, for the canonical tag. Astro.site is the configured site URL.
+const pdfUrl = new URL(resume.href, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{resume.published ? `Résumé — ${profile.site.fullName}` : `The writ is not published — ${profile.site.fullName}`}</title>
+    <meta name="theme-color" content="#C7B991" />
+    {resume.published ? (
+      <>
+        <meta http-equiv="refresh" content={`0; url=${resume.href}`} />
+        <link rel="canonical" href={pdfUrl} />
+        <meta name="description" content={`The résumé of ${profile.site.fullName}, as a PDF.`} />
+      </>
+    ) : (
+      <meta name="robots" content="noindex, follow" />
+    )}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="page" style="max-width: 1040px; margin: 0 auto; padding: 0 44px; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+      <section
+        class="spread"
+        style="width: 100%; max-width: 560px; background: #E9DFC4; border: 2px solid #4A3B22; border-radius: 5px; padding: 44px 48px 38px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5); margin: 56px 0; text-align: center;"
+      >
+        {resume.published ? (
+          <>
+            <div style={`${mono} font-size: 11px; color: #8C3B22; letter-spacing: 2px; margin-bottom: 14px;`}>{profile.resume.label}</div>
+            <p style={`margin: 0 0 22px; ${serif} font-style: italic; font-size: 18px; line-height: 1.5; color: #6B5836;`}>
+              Fetching the writ. If nothing happens, the road is just below.
+            </p>
+            <a href={resume.href} download style={`${mono} font-size: 14px; overflow-wrap: anywhere;`}>↓ {resume.file}</a>
+            <p style={`margin: 10px 0 0; ${mono} font-size: 10.5px; color: #8A7752;`}>PDF · {resume.size} · revised {profile.resume.revised}</p>
+          </>
+        ) : (
+          <>
+            <div style={`${mono} font-size: 11px; color: #8C3B22; letter-spacing: 2px; margin-bottom: 14px;`}>NO WRIT ON FILE</div>
+            <p style={`margin: 0 0 22px; ${serif} font-style: italic; font-size: 18px; line-height: 1.5; color: #6B5836;`}>
+              This road was drawn before the document was. Nothing to fetch yet.
+            </p>
+          </>
+        )}
+        <div class="return-link" style="margin-top: 28px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+          <a href={base} style={`${mono} font-size: 12px;`}>↑ return to the map</a>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

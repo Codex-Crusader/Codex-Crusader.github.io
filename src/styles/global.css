@@ -68,6 +68,25 @@ a:hover {
   stroke-width: 2;
 }
 
+/* The writ. The whole plate is one link, so it cannot signal itself the way a
+   run of text does: the inline colour and text-decoration on the element beat
+   the plain `a:hover` rule, which would otherwise underline the entire block.
+   The paper darkens instead, and only the closing line underlines. */
+.writ:hover,
+.writ:focus-visible {
+  background: rgba(140, 59, 34, 0.09) !important;
+}
+
+.writ:hover .writ-link,
+.writ:focus-visible .writ-link {
+  text-decoration: underline;
+}
+
+.writ:focus-visible {
+  outline: 2px solid #8c3b22;
+  outline-offset: 3px;
+}
+
 .mobile-nav {
   display: none;
 }
@@ -129,5 +148,107 @@ a:hover {
 
   .link-list a {
     overflow-wrap: anywhere;
+  }
+}
+
+/* ── Print ──────────────────────────────────────────────────────────────────
+   The site is already shaped like a document, so printing it should produce a
+   document rather than a screenshot of one. Almost everything here removes
+   something: the parchment (which browsers drop anyway, leaving mismatched
+   borders behind), the fixed frame (fixed positioning reprints on every sheet),
+   the map (nine hundred paths of navigation, useless on paper) and the links
+   back to it.
+
+   The layout rules need !important because the ones they override are inline
+   styles on the elements themselves, same as the phone breakpoint above. */
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  /* Navigation, and the decorative border that would repeat on every sheet. */
+  .frame,
+  .map-panel,
+  .mobile-nav,
+  .return-link,
+  .writ {
+    display: none !important;
+  }
+
+  /* #map is full-bleed by way of 100vw and a negative margin. With the map
+     itself gone, only the masthead is left, and it should sit in the text
+     column like a letterhead. */
+  #map {
+    width: auto !important;
+    min-height: 0 !important;
+    margin-left: 0 !important;
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid #999;
+  }
+
+  .page {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  /* Spreads become plain sheets: no parchment, no shadow, no rounded card. */
+  .spread {
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 0 28px !important;
+  }
+
+  /* The margin ledger has nowhere to sit once the page is a single column of
+     body text, so it prints under its section instead of beside it. */
+  .prose-grid {
+    display: block !important;
+  }
+
+  .margin-col {
+    border-left: none !important;
+    border-top: 1px solid #999;
+    padding-left: 0 !important;
+    padding-top: 14px !important;
+    margin-top: 22px !important;
+  }
+
+  a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  /* A repository name on paper is a dead end without its address. Contact rows
+     already print their destination as their own link text, so they are left
+     alone rather than made to say it twice. */
+  #projects h3 a::after {
+    content: ' · ' attr(href);
+    font-size: 9pt;
+    font-weight: 400;
+    color: #444;
+  }
+
+  /* Never strand a heading, a role or a photograph across a sheet boundary. */
+  h1,
+  h2,
+  h3 {
+    break-after: avoid-page;
+  }
+
+  .entry,
+  figure {
+    break-inside: avoid;
   }
 }

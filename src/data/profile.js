@@ -47,6 +47,28 @@ export default {
     exclude: ['Codex-Crusader.github.io', 'Codex-Crusader'],
   },
 
+  // ── The writ · the downloadable résumé ────────────────────────────────────
+  // The PDF itself lives in public/. Replace that file, keep the name, and the
+  // new one ships on the next build.
+  //
+  // Nothing here is a promise the build cannot keep: src/data/resume.js checks
+  // that the file is really on disk and measures its own size. If the PDF is
+  // missing, the whole writ disappears from both provinces rather than shipping
+  // as a broken download — the same rule as an unfinished contact row.
+  resume: {
+    file: 'bhargavaram-krishnapur-resume.pdf',
+    // Shown over the plate at the foot of Ponstium Empire.
+    label: 'THE WRIT',
+    line: 'The same service, set on one sheet and fit to print.',
+    linkText: 'download the writ',
+    // The row this earns in Phoededia's list of roads.
+    contactLabel: 'RÉSUMÉ',
+    // Typed by hand, because a file's timestamp on a build server is the time
+    // it was checked out, not the month the writ was actually redrawn. Change
+    // this when you change the PDF.
+    revised: 'August 2026',
+  },
+
   // ── Section I · Afon Empire · projects ────────────────────────────────────
   projects: {
     heading: 'Afon Empire',
@@ -94,6 +116,12 @@ export default {
           'A Udyam-registered micro-consultancy helping entrepreneurs validate business ideas before they sink months into them. Structured consultations and targeted research end in an honest, data-driven call to pursue, pivot or pause. Covers feasibility analysis, market and competitor research, strategic SWOT, financial forecasting and differentiation planning.',
       },
       {
+        title: 'Sponsorship Manager, Vijaybhoomi E-Cell',
+        meta: 'Sep 2024 — present · Karjat · on-site',
+        body:
+          'Sponsorship lead for the university\'s entrepreneurship cell. Raised ₹2L+ for Elevate 2.0, our flagship event, by building the prospect list, writing the pitch and running the conversations to close. Also worked on the roadmap planning that carried the team through to the finals of IIT Bombay\'s E-Summit.',
+      },
+      {
         title: 'Technology & Operations Intern, Sanjay Electrical Enterprises',
         meta: 'May — Jun 2026 · Navi Mumbai · on-site',
         body:
@@ -110,6 +138,12 @@ export default {
         meta: 'Jun — Dec 2025 · Mumbai',
         body:
           'Advanced and closed early-stage engagements, and built a central deal-tracker consolidating pipeline status, next actions and owners, which cut duplicate follow-ups. Standardised outreach and deal-ops with lightweight playbooks and handoff templates, sourced and qualified 30+ startups, added 250+ relevant connections, and managed legal document workflows (term sheets, NDAs, data requests) for cleaner closings. Also assembled the pitch deck leadership used at a hackathon.',
+      },
+      {
+        title: 'Operations Co-Head, Kanyathon (Mumbai Division)',
+        meta: 'Oct 2024 — Dec 2025 · Mumbai · on-site',
+        body:
+          'Co-ran operations for the Mumbai division of a charity run, leading 80 volunteers to the start line on a one-month timeline. Ran 100+ CSR outreaches that brought in ₹20L+ of sponsorship, and owned execution end to end: volunteer allocation, vendor and ground logistics, and day-of coordination across the course.',
       },
       {
         title: 'Freelance Resume Writer, Self-employed',

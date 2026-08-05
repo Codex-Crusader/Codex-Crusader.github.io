@@ -1,0 +1,95 @@
+---
+// Sailed off the edge. GitHub Pages serves dist/404.html for any path it does
+// not recognise, so without this file a wrong URL drops the visitor onto
+// GitHub's own grey error page — out of the realm entirely, with no way back.
+//
+// Same rules as the rest of the site: no client-side script, no redirect. A
+// wrong address is not an emergency, so it is answered with a page rather than
+// bounced somewhere the visitor did not ask to go.
+import '../styles/global.css';
+import profile from '../data/profile.js';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const base = import.meta.env.BASE_URL;
+
+// The five provinces, so the page is a way back in rather than a dead end.
+const provinces = [
+  ['projects', profile.projects],
+  ['experience', profile.experience],
+  ['gallery', profile.gallery],
+  ['about', profile.about],
+  ['contact', profile.contact],
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Off the map — {profile.site.fullName}</title>
+    <meta name="description" content="This address is not part of the realm of Orvia." />
+    <meta name="theme-color" content="#C7B991" />
+    <!-- A wrong address should never be indexed as if it were a page. -->
+    <meta name="robots" content="noindex, follow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div
+      class="frame"
+      aria-hidden="true"
+      style="position: fixed; inset: 13px; pointer-events: none; z-index: 60; border: 2px solid rgba(74,59,34,0.5); box-shadow: inset 0 0 0 5px rgba(74,59,34,0), inset 0 0 0 6px rgba(74,59,34,0.24);"
+    >
+      <span style="position: absolute; top: -7px; left: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+      <span style="position: absolute; top: -7px; right: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+      <span style="position: absolute; bottom: -7px; left: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+      <span style="position: absolute; bottom: -7px; right: -7px; width: 11px; height: 11px; background: #6B5836; transform: rotate(45deg);"></span>
+    </div>
+
+    <div class="page" style="max-width: 1040px; margin: 0 auto; padding: 0 44px; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+      <section
+        class="spread"
+        style="width: 100%; max-width: 660px; background: #E9DFC4; border: 2px solid #4A3B22; border-radius: 5px; padding: 52px 58px 44px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5), 0 5px 12px -3px rgba(44,34,16,0.28); margin: 56px 0;"
+      >
+        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #B9A87E; padding-bottom: 12px; margin-bottom: 30px;">
+          <h1 style={`margin: 0; ${serif} font-weight: 600; font-size: 26px; letter-spacing: 5px; font-variant: small-caps; color: #3A2E19;`}>Terra Incognita</h1>
+          <span style={`${mono} font-size: 12px; color: #6B5836; letter-spacing: 1px;`}>ERR. 404</span>
+        </div>
+
+        <p style={`margin: 0 0 20px; ${serif} font-style: italic; font-size: 15px; line-height: 1.5; color: #6B5836;`}>
+          Here the survey stops and the cartographer guesses.
+        </p>
+
+        <p style="margin: 0 0 22px; font-size: 16px; line-height: 1.7;">
+          <span style={`float: left; ${serif} font-size: 4.4em; line-height: 0.72; font-weight: 600; color: #8C3B22; margin: 6px 12px -6px 0;`}>N</span>
+          o province of Orvia sits at this address. Either the road was mistyped, or it
+          led somewhere that has since been redrawn — the realm is resurveyed nightly, and
+          the coastline does move. The five territories below are all firmly on the map.
+        </p>
+
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; clear: left;">
+          {provinces.map(([id, section]) => (
+            <li style="border-top: 1px solid #B9A87E;">
+              <a href={`${base}#${id}`} style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 13px 0; color: #8C3B22;">
+                <span style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 2px;`}>{section.heading}</span>
+                <span style={`${mono} font-size: 11px; color: #8A7752;`}>{section.navNote}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+          <a href={base} style={`${mono} font-size: 12px;`}>↑ return to the map</a>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

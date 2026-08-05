@@ -19,6 +19,7 @@ Two things are deliberately **not** in it, because they maintain themselves:
 | --- | --- |
 | Repositories (Afon Empire) | GitHub API, via `scripts/sync-github.js` |
 | Photographs (Republic of Corum) | `assets/photos/`, via `scripts/scan-photos.js` |
+| The writ's size and whether it exists | `public/`, via `src/data/resume.js` |
 
 ### Unfinished rows are safe
 
@@ -39,6 +40,32 @@ Forks, archived repos and anything listed in `profile.github.exclude` are
 skipped. Order is stars descending, then most recently pushed. The repo
 description becomes the body text; stars, language, commit count and last
 update fill the margin ledger.
+
+## Replacing the writ (the résumé)
+
+Overwrite `public/bhargavaram-krishnapur-resume.pdf`, keeping the filename, and
+update `resume.revised` in `profile.js`. That is the whole procedure.
+
+The PDF surfaces in three places, all fed from the one `resume` block in
+`profile.js`:
+
+| Where | What it is |
+| --- | --- |
+| Foot of Ponstium Empire | The writ plate — the download itself |
+| Phoededia's list of roads | A row reading `codex-crusader.github.io/resume` |
+| `/resume` | A short address for cards and signatures |
+
+`src/data/resume.js` stats the file at build time, so the size shown next to the
+link is measured rather than typed, and it cannot disagree with the file people
+actually download.
+
+If the PDF is missing the writ removes itself — from the plate, the contact row,
+the sitemap and the short page — instead of shipping a link to a 404. `npm run
+build` prints a warning naming the file it could not find, but does not fail.
+Same rule as an unfinished contact row.
+
+The filename is deliberately not `resume.pdf`: it lands in a downloads folder
+under the name of the person it belongs to.
 
 ## Adding a photograph
 
@@ -112,14 +139,40 @@ scripts/
   sync-github.js        repos -> src/data/github.json
   scan-photos.js        photos -> public/photos/ + src/data/photos.json
   ensure-data.js        empty stubs so a fresh clone can build
+public/                 copied verbatim, including the writ (the résumé PDF)
 src/
   data/profile.js       ← everything about you
+  data/resume.js        the writ, checked and measured against public/
   data/section-textures.json   per-spread parchment, from the design
   components/OrviaMap.astro    the map, one component
   components/Lorebook.astro    one lorebook spread, reused five times
   pages/index.astro     the page
-  styles/global.css     the design's stylesheet
+  pages/404.astro       Terra Incognita, for addresses that are not provinces
+  pages/resume.astro    /resume, a short road to the writ
+  styles/global.css     the design's stylesheet, screen and print
 ```
+
+## The three pages
+
+`index.astro` is the site. The other two exist because a visitor can arrive at
+an address that is not the front page:
+
+- **`404.astro`** — GitHub Pages serves `404.html` for anything it does not
+  recognise. Without it a mistyped URL drops the visitor onto GitHub's grey
+  error page, outside the realm with no way back. This one lists the five
+  provinces instead. It is `noindex`, and it is not in the sitemap.
+- **`resume.astro`** — `/resume`, hopping to the PDF via `<meta http-equiv=
+  "refresh">`. That is HTML, not script, so the no-JavaScript rule stands; a
+  visible link sits under it for anyone whose browser ignores the refresh. The
+  sitemap lists the PDF itself rather than this page — one address per document.
+
+## Printing
+
+The site is shaped like a document, so `@media print` in `global.css` lets it
+print like one: the fixed frame goes (fixed positioning reprints on every
+sheet), the parchment goes, the map and every "return to map" link go, the
+margin ledger drops below its section instead of beside it, and repository names
+print their URLs. Roles and photographs are kept off page boundaries.
 
 ## Things not to add
 
