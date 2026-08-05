@@ -2,7 +2,7 @@
 //
 // This runs in Node at build time, so a page can only ever link to a PDF that
 // is genuinely sitting in public/. Delete the file and the download vanishes
-// from every province instead of shipping as a 404 — the same rule that keeps
+// from every province instead of shipping as a 404, the same rule that keeps
 // an unfinished contact row from becoming a dead link.
 //
 // The size is measured here rather than typed into profile.js, so the figure a

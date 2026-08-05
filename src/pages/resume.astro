@@ -2,7 +2,7 @@
 // A short road to the writ, so /resume can be written on a card or dropped in
 // an email signature without spelling out the filename.
 //
-// The hop is a plain <meta http-equiv="refresh">, which is HTML, not script —
+// The hop is a plain <meta http-equiv="refresh">, which is HTML, not script,
 // the no-JavaScript rule stands. A visible link sits underneath it regardless,
 // because a page that only works by redirecting is a page that fails silently
 // for anyone whose browser has refreshes turned off.
@@ -23,7 +23,7 @@ const pdfUrl = new URL(resume.href, Astro.site).href;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{resume.published ? `Résumé — ${profile.site.fullName}` : `The writ is not published — ${profile.site.fullName}`}</title>
+    <title>{resume.published ? `Résumé, ${profile.site.fullName}` : `The writ is not published, ${profile.site.fullName}`}</title>
     <meta name="theme-color" content="#C7B991" />
     {resume.published ? (
       <>

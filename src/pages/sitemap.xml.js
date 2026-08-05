@@ -7,7 +7,7 @@
 // separate document at its own address, and it is the thing most people
 // arriving from a search are actually looking for. It is listed only when the
 // PDF is really on disk, and as the file itself rather than the /resume page
-// that hops to it — one address for one document.
+// that hops to it: one address for one document.
 //
 // 404 and /resume are deliberately absent. Neither is a destination.
 

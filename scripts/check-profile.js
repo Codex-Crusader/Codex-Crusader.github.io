@@ -17,8 +17,8 @@ if (blanks.length) {
 
 // The writ is named in profile.js but lives in public/, so the two can drift
 // apart in a way no amount of reading profile.js would reveal. The build still
-// succeeds — the download removes itself when the file is gone, so the site
-// stays correct — but silently dropping a résumé is worth a line on the way
+// succeeds. The download removes itself when the file is gone, so the site
+// stays correct, but silently dropping a résumé is worth a line on the way
 // past.
 if (!resume.published) {
   console.warn(

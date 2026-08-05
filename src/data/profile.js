@@ -19,14 +19,45 @@ export default {
     name: 'B. KRISHNAPUR',
     // Full name, used for the <title> tag and the copyright line.
     fullName: 'Bhargavaram Krishnapur',
-    // Shown top-right of the map.
+    // Shown beside the name, top-left of the map. What you do, in the words a
+    // stranger would use. The map is an argument that takes eleven screens to
+    // finish, and this is the same claim in six words on the first line.
+    //
+    // Kept lowercase and letterspaced because it is set in the mono face, as a
+    // filing annotation rather than a job title. It reads as part of the
+    // document; a title-cased line here would read as a CV pasted onto a map.
+    trade: 'software engineer · open source developer',
+    // Was the whole of the masthead's right-hand side. Now the last line of
+    // the footer, where a line about the mapmaking belongs: it is the flavour,
+    // and the flavour should not be the first thing that answers "who is
+    // this". The trade, above, answers that instead.
+    //
+    // Optional in the same way the colophon is: empty it and the footer simply
+    // loses the line. Nothing else reads it, so it costs the rest of the site
+    // nothing either way.
     tagline: 'software · open source · maps',
     // Browser tab title and meta description. The title carries the job words
     // as well as the name: on its own, a name only wins searches from people
     // who already know it.
-    metaTitle: 'Bhargavaram Krishnapur — Software Engineer & Open Source Developer',
+    metaTitle: 'Bhargavaram Krishnapur, Software Engineer & Open Source Developer',
     metaDescription:
       'Open-source software, local-first tools and photographs, laid out as a map.',
+    // Under the map, before the realm begins. Who this is, in one sentence, in
+    // plain words. The map says what is here, and this says who wrote it.
+    //
+    // It is a compression of the first paragraph of Kingdom of Dequm, not a
+    // replacement for it: that section is still where the answer is given at
+    // length. This exists because Dequm is 10,200px down the page, and a
+    // stranger should not have to travel that far to learn whose site they are
+    // standing on. Keep it to one sentence; it is a caption, not a section.
+    // It leads with the work rather than with the enrolment. An earlier draft
+    // opened "a computer science engineering student at Vijaybhoomi
+    // University, class of 2028", which spent the most valuable line on the
+    // page on the least load-bearing fact and pushed everything built into a
+    // trailing clause. The degree is still in Kingdom of Dequm, where a
+    // biography belongs; this line is for the work.
+    standfirst:
+      'I am Bhargavaram Krishnapur, founder of The Pulse Engine, building local-first open-source software: tools that run on your own machine, keep your data there, and do not ask for a subscription.',
     // The line engraved along the bottom edge of the map. {run} is replaced
     // with the real GitHub Actions run number at build time.
     mapInscription:
@@ -57,7 +88,7 @@ export default {
   // Nothing here is a promise the build cannot keep: src/data/resume.js checks
   // that the file is really on disk and measures its own size. If the PDF is
   // missing, the whole writ disappears from both provinces rather than shipping
-  // as a broken download — the same rule as an unfinished contact row.
+  // as a broken download, the same rule as an unfinished contact row.
   resume: {
     file: 'bhargavaram-krishnapur-resume.pdf',
     // Shown over the plate at the foot of Ponstium Empire.
@@ -66,6 +97,12 @@ export default {
     linkText: 'download the writ',
     // The row this earns in Phoededia's list of roads.
     contactLabel: 'RÉSUMÉ',
+    // The masthead link, on the first screen. Short: it sits beside the name
+    // and must not compete with it.
+    mastheadLink: 'résumé',
+    // The seal drawn on the map itself, in the sea off the south-west. In the
+    // map's own language, since it is lettered on the sheet beside the legend.
+    sealLabel: 'The Writ',
     // Typed by hand, because a file's timestamp on a build server is the time
     // it was checked out, not the month the writ was actually redrawn. Change
     // this when you change the PDF.
@@ -237,7 +274,7 @@ export default {
       ['open to', 'collaboration'],
       ['nda', 'fine by me'],
     ],
-    // This used to read "Links are checked nightly." Nothing checks them —
+    // This used to read "Links are checked nightly." Nothing checks them:
     // check-profile.js only notices a row left blank, and the nightly run
     // resurveys the repositories, not these three addresses. Same rule as the
     // colophon: nothing on this site should claim what a visitor could

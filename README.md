@@ -5,7 +5,7 @@ that runs on every push and once a night.
 
 One small script ships, and only for the map: the pointer tilt, the sheen and
 the province cartouches. Everything else is CSS. The script is strictly
-enhancement — with it blocked the map is still a complete set of links, the
+enhancement: with it blocked the map is still a complete set of links, the
 sheen stays invisible and the cartouche stays hidden.
 
 ---
@@ -57,7 +57,7 @@ The PDF surfaces in three places, all fed from the one `resume` block in
 
 | Where | What it is |
 | --- | --- |
-| Foot of Ponstium Empire | The writ plate — the download itself |
+| Foot of Ponstium Empire | The writ plate, the download itself |
 | Phoededia's list of roads | A row reading `codex-crusader.github.io/resume` |
 | `/resume` | A short address for cards and signatures |
 
@@ -65,8 +65,8 @@ The PDF surfaces in three places, all fed from the one `resume` block in
 link is measured rather than typed, and it cannot disagree with the file people
 actually download.
 
-If the PDF is missing the writ removes itself — from the plate, the contact row,
-the sitemap and the short page — instead of shipping a link to a 404. `npm run
+If the PDF is missing the writ removes itself, from the plate, the contact row,
+the sitemap and the short page, instead of shipping a link to a 404. `npm run
 build` prints a warning naming the file it could not find, but does not fail.
 Same rule as an unfinished contact row.
 
@@ -85,7 +85,7 @@ grew settlements in August, and for two weeks every share showed a map of an
 empty country. A survey that redraws itself nightly should not have a still
 photograph of itself attached.
 
-Two details, both of which are the same problem — a rasteriser has no
+Two details, both of which are the same problem. A rasteriser has no
 stylesheet, so anything the design hides in CSS would print at full strength:
 
 - The map carries **two hint labels**, one for a pointer and one for a thumb.
@@ -97,7 +97,7 @@ stylesheet, so anything the design hides in CSS would print at full strength:
 The card is a palette PNG: 113 KB, against 752 KB for the same image as
 truecolour, with no visible banding in the parchment. It is written into `dist/`
 and never committed. `public/og-cover.png` stays as the fallback for a build
-that cannot draw one — if the page has no map in it, the script warns, keeps
+that cannot draw one: if the page has no map in it, the script warns, keeps
 that file and lets the build pass.
 
 ## Adding a photograph
@@ -193,14 +193,14 @@ src/
 `index.astro` is the site. The other two exist because a visitor can arrive at
 an address that is not the front page:
 
-- **`404.astro`** — GitHub Pages serves `404.html` for anything it does not
+- **`404.astro`**: GitHub Pages serves `404.html` for anything it does not
   recognise. Without it a mistyped URL drops the visitor onto GitHub's grey
   error page, outside the realm with no way back. This one lists the five
   provinces instead. It is `noindex`, and it is not in the sitemap.
-- **`resume.astro`** — `/resume`, hopping to the PDF via `<meta http-equiv=
+- **`resume.astro`**: `/resume`, hopping to the PDF via `<meta http-equiv=
   "refresh">`. That is HTML, not script, so the no-JavaScript rule stands; a
   visible link sits under it for anyone whose browser ignores the refresh. The
-  sitemap lists the PDF itself rather than this page — one address per document.
+  sitemap lists the PDF itself rather than this page: one address per document.
 
 ## Printing
 
@@ -222,7 +222,7 @@ becoming the scroll-jacking the original rule was written to prevent:
   as the page moves, so there is nothing to jank.
 - **Every animation is behind `@supports` and a `prefers-reduced-motion` guard**,
   and no animation may leave content at `opacity: 0` if its timeline never
-  runs. That is why the reveals are scoped to `.reveal` — the 404 and `/resume`
+  runs. That is why the reveals are scoped to `.reveal`: the 404 and `/resume`
   are single cards on pages that may not scroll, and they opt out entirely.
 - **Print pins everything to its finished state.** A print job has no
   scrollport, so an unpinned view() animation would commit opacity 0 to paper.
@@ -247,7 +247,7 @@ the coastline, and farthest-point sampling so the settlements spread instead of
 clumping. Add a repo and the next nightly run re-surveys the province and
 redraws it to fit.
 
-Rank — city, town, village — is by standing *within its own province*, not
+Rank (city, town, village) is by standing *within its own province*, not
 against an absolute number: what counts as a city among twelve repositories is
 not what counts as one among four roads. It decides how each settlement is
 drawn, the way a real map grades one.
@@ -272,7 +272,7 @@ Two things that will bite anyone editing this:
   command would silently scatter settlements into the sea. It checks, and bails
   to no settlements rather than guessing.
 
-Zoom is pinch or ctrl+wheel only. **A bare wheel always belongs to the page** —
+Zoom is pinch or ctrl+wheel only. **A bare wheel always belongs to the page**:
 the map never takes the scroll away from someone trying to read past it.
 
 ## A note on the map

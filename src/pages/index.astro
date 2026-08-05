@@ -78,10 +78,10 @@ const postSymbols = assignSymbols(profile.experience.roles.map((r) => orgOf(r.ti
 const totalStars = repos.reduce((n, r) => n + r.stargazers_count, 0);
 const languages = {};
 for (const r of repos) if (r.language) languages[r.language] = (languages[r.language] ?? 0) + 1;
-const topLanguage = Object.entries(languages).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+const topLanguage = Object.entries(languages).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '–';
 
 const projectLedger = [
-  ['followers', String(github.profile?.followers ?? '—')],
+  ['followers', String(github.profile?.followers ?? '–')],
   ['public repos', String(repos.length)],
   ['total stars', totalStars.toLocaleString('en-IN')],
   ['top language', topLanguage],
@@ -123,7 +123,7 @@ const contactLedger = profile.contact.ledger.map(([term, value]) =>
 
 // The writ earns a road of its own in Phoededia. It is kept out of contactLinks
 // rather than pushed onto it, because that array also feeds `sameAs` in the
-// schema below — and a PDF is a document, not a profile of the person.
+// schema below, and a PDF is a document, not a profile of the person.
 //
 // Every other road here reads as an address someone could copy off a printed
 // page, so this one does too: the short /resume route rather than the filename.
@@ -236,7 +236,7 @@ const personSchema = {
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The realm of Orvia" />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:title" content="Bhargavaram Krishnapur — software, open source, maps" />
+    <meta property="og:title" content="Bhargavaram Krishnapur · software, open source, maps" />
     <meta property="og:description" content={profile.site.metaDescription} />
     <meta property="og:url" content="https://codex-crusader.github.io/" />
     <meta property="og:image" content="https://codex-crusader.github.io/og-cover.png" />
@@ -244,7 +244,7 @@ const personSchema = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Bhargavaram Krishnapur — software, open source, maps" />
+    <meta name="twitter:title" content="Bhargavaram Krishnapur · software, open source, maps" />
     <meta name="twitter:description" content={profile.site.metaDescription} />
     <meta name="twitter:image" content="https://codex-crusader.github.io/og-cover.png" />
     <meta property="og:image:alt" content="A hand-drawn map of the realm of Orvia, the portfolio's five sections shown as provinces." />
@@ -275,15 +275,43 @@ const personSchema = {
         id="map"
         style="min-height: 100vh; box-sizing: border-box; width: 100vw; margin-left: calc(50% - 50vw); display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 28px 34px;"
       >
+        <!-- The masthead says who this is before the map says where. The name,
+             then the trade in plain words, then the one road a visitor might
+             have come specifically to find. -->
         <div class="masthead" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 4px;">
-          <h1 style={`${serif} margin: 0; font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>{profile.site.name}</h1>
-          <span style={`${mono} font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.tagline}</span>
+          <div class="masthead-id" style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;">
+            <h1 style={`${serif} margin: 0; font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>{profile.site.name}</h1>
+            <!-- The trade, stated rather than implied. The map is an argument
+                 that takes eleven screens to finish; this is the same claim in
+                 six words, on the first line of the first screen. -->
+            <span style={`${mono} font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.trade}</span>
+          </div>
+          <!-- The writ, named on the first screen. It is a plate at the foot of
+               Ponstium Empire, 65% of the way down the page and behind about
+               1,800 words, which is the right place for it in a document and
+               the wrong place for the one file a visitor may have come for.
+               Rendered only when the PDF is really in public/, like every other
+               reference to it. -->
+          {resume.published && (
+            <a
+              class="masthead-writ"
+              href={resume.href}
+              download
+              style={`${mono} font-size: 11px; color: #8C3B22; letter-spacing: 1px; flex-shrink: 0;`}
+            >↓ {profile.resume.mastheadLink} <span style="color: #8A7752;">· {resume.size}</span></a>
+          )}
         </div>
 
         <div class="map-stage" style="width: 100%; max-width: 1440px; margin: 0 auto;">
           <div class="map-panel" style="background: #E9DFC4; border: 3px solid #4A3B22; border-radius: 3px; padding: 12px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5), 0 5px 12px -3px rgba(44,34,16,0.28);">
             <div class="map-viewport">
-              <OrviaMap inscription={inscription} survey={survey} />
+              <OrviaMap
+                inscription={inscription}
+                survey={survey}
+                writ={resume.published
+                  ? { href: resume.href, label: profile.resume.sealLabel, size: resume.size }
+                  : null}
+              />
             </div>
             <!-- Pointer-tracked sheen. Purely decorative, and inert until the
                  script arms it, so it never sits as a grey film over the map
@@ -328,9 +356,20 @@ const personSchema = {
             </a>
           ))}
         </nav>
+
+        <!-- The standfirst, under the map and before the realm begins.
+             The five provinces say what is here; none of them says who wrote
+             it. That answer used to live in Kingdom of Dequm, 10,200px down,
+             which is a long way to travel to find out whose site this is.
+             Set as a caption to the map rather than as a section: no heading,
+             no folio, no ledger. It is the line under the plate. -->
+        <p
+          class="standfirst"
+          style="width: 100%; max-width: 720px; margin: 4px auto 0; padding: 0 4px; text-align: center; font-size: 15px; line-height: 1.65; color: #4A3B22;"
+        >{profile.site.standfirst}</p>
       </div>
 
-      <!-- ============ SECTION I — PROJECTS ============ -->
+      <!-- ============ SECTION I · PROJECTS ============ -->
       <Lorebook
         id="projects"
         heading={profile.projects.heading}
@@ -351,7 +390,7 @@ const personSchema = {
         </div>
       </Lorebook>
 
-      <!-- ============ SECTION II — EXPERIENCE ============ -->
+      <!-- ============ SECTION II · EXPERIENCE ============ -->
       <Lorebook
         id="experience"
         heading={profile.experience.heading}
@@ -381,7 +420,7 @@ const personSchema = {
             />
           ))}
 
-          {/* The writ. Everything above, on one sheet — a plate pressed into the
+          {/* The writ. Everything above, on one sheet: a plate pressed into the
               foot of the province rather than a button, because the rest of this
               page is a document and a document does not have buttons. Rendered
               only when the PDF is really in public/; see src/data/resume.js. */}
@@ -403,7 +442,7 @@ const personSchema = {
         </div>
       </Lorebook>
 
-      <!-- ============ SECTION III — GALLERY ============ -->
+      <!-- ============ SECTION III · GALLERY ============ -->
       <Lorebook
         id="gallery"
         heading={profile.gallery.heading}
@@ -457,7 +496,7 @@ const personSchema = {
         </div>
       </Lorebook>
 
-      <!-- ============ SECTION IV — ABOUT ============ -->
+      <!-- ============ SECTION IV · ABOUT ============ -->
       <Lorebook
         id="about"
         heading={profile.about.heading}
@@ -476,11 +515,11 @@ const personSchema = {
           {profile.about.paragraphs.slice(1).map((para) => (
             <p>{para}</p>
           ))}
-          <p class="dispatch-sign" style={`${serif} font-style: italic;`}>— {profile.site.fullName}</p>
+          <p class="dispatch-sign" style={`${serif} font-style: italic;`}>– {profile.site.fullName}</p>
         </div>
       </Lorebook>
 
-      <!-- ============ SECTION V — CONTACT ============ -->
+      <!-- ============ SECTION V · CONTACT ============ -->
       <Lorebook
         id="contact"
         heading={profile.contact.heading}
@@ -514,6 +553,11 @@ const personSchema = {
       <footer style={`text-align: center; padding: 20px 0 56px; ${mono} font-size: 11px; color: #8A7752; letter-spacing: 0.5px; line-height: 1.9;`}>
         <div>{profile.site.footerLine}</div>
         {profile.site.colophon && <div style="margin-top: 6px; color: #A0906A;">{profile.site.colophon}</div>}
+        <!-- The tagline, which used to sit top-right of the map. It is the
+             flavour, and the flavour should not be the first thing that answers
+             "who is this"; the trade beside the name does that now. It keeps a
+             place here, at the end, where a line about the mapmaking belongs. -->
+        {profile.site.tagline && <div style="margin-top: 6px; color: #A0906A;">{profile.site.tagline}</div>}
         <div class="return-link" style="margin-top: 6px;"><a href="#map">↑ back to the top</a></div>
       </footer>
     </div>
@@ -598,7 +642,7 @@ const personSchema = {
 
         // Delegated rather than bound per province. pointerenter/leave on an
         // SVG <a> is unreliable across browsers, and the provinces are made of
-        // many child paths — the bubbling pair plus a relatedTarget check is
+        // many child paths. The bubbling pair plus a relatedTarget check is
         // the version that actually fires, and it does not flicker when the
         // pointer crosses between paths inside the same province.
         const linkOf = (node) => (node && node.closest ? node.closest('.region-link') : null);
@@ -650,7 +694,7 @@ const personSchema = {
 
         // The sheet's laid-out size, before any of our own transform. Read off
         // the computed style rather than a bounding rect because a transform
-        // does not change computed width and height — so this stays true at any
+        // does not change computed width and height, so this stays true at any
         // scale and never has to be unwound.
         //
         // On a desktop the sheet is laid out to the panel's width and the
@@ -672,7 +716,7 @@ const personSchema = {
         // Both axes are 1 on a desktop, so this is 1 and every rule below is
         // the one that was already there. On a phone the sheet is laid out to
         // the window's height, so the height ratio is 1 and the width ratio is
-        // about a third — taking the larger keeps the floor at 1 and the sheet
+        // about a third. Taking the larger keeps the floor at 1 and the sheet
         // always taller than the window it is read through. Never above 1: the
         // sheet is drawn at its own size, and stretching it further is a zoom.
         function coverScale() {
@@ -701,7 +745,7 @@ const personSchema = {
           //
           // The centred case is rounded and the panning case is not, on
           // purpose. At rest the sheet sits still and a sub-pixel offset only
-          // costs it crisp text — the desktop layout lands a tenth of a pixel
+          // costs it crisp text. The desktop layout lands a tenth of a pixel
           // off exact, which is where that used to be a hard zero. While a hand
           // is on it the offset changes every frame, and rounding there would
           // trade blur for a drag that moves in steps.
@@ -786,7 +830,7 @@ const personSchema = {
 
         // Whether the sheet is currently bigger than its window, in either
         // axis. This replaces the old `scale > 1.02` test, which assumed the
-        // two were the same size at rest — true on a desktop, false on a phone,
+        // two were the same size at rest: true on a desktop, false on a phone,
         // where the sheet overflows its window at the scale it opens at.
         function overflows() {
           const s = sheet();
@@ -867,7 +911,7 @@ const personSchema = {
         viewport.addEventListener('pointercancel', endDrag);
 
         // touch-action: pan-y hands vertical scrolling back to the browser,
-        // which is the whole point — one finger down the screen belongs to the
+        // which is the whole point. One finger down the screen belongs to the
         // page, exactly as a bare wheel does. Two fingers do not: left alone
         // they would scroll the page out from under a pinch, so a multi-touch
         // move is claimed outright.

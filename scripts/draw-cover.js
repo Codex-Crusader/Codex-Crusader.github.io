@@ -2,7 +2,7 @@
 //
 // The card used to be a file someone exported once. It was committed in July,
 // the realm grew settlements in August, and every share of the link kept
-// showing a map of an empty country — the one thing the site does best, absent
+// showing a map of an empty country: the one thing the site does best, absent
 // from the only picture most people ever see of it. A survey that redraws
 // itself nightly should not have a hand-made photograph of itself attached.
 //
@@ -30,16 +30,37 @@ if (!fs.existsSync(page)) {
 }
 
 const html = fs.readFileSync(page, 'utf8');
-const found = html.match(/<svg[\s\S]*?<\/svg>/);
+
+// The map's opening tag through its matching close. Finding the end by
+// counting rather than by a non-greedy match, because the sheet contains
+// nested <svg> elements of its own and a lazy `<svg[\s\S]*?</svg>` stops at the
+// first close it meets, which cut the sheet in half the moment the writ seal
+// was drawn onto it, and handed sharp an unbalanced document.
+const start = html.indexOf('<svg');
+
+function extractSvg(src, from) {
+  if (from < 0) return null;
+  const tag = /<svg\b|<\/svg>/g;
+  tag.lastIndex = from;
+  let depth = 0;
+  let m;
+  while ((m = tag.exec(src))) {
+    depth += m[0] === '</svg>' ? -1 : 1;
+    if (depth === 0) return src.slice(from, m.index + m[0].length);
+  }
+  return null; // unbalanced
+}
+
+const found = extractSvg(html, start);
 
 if (!found) {
   // The build has already succeeded at this point, and a missing card costs a
   // preview image rather than a page. Warn and leave whatever is in public/.
-  console.warn('draw-cover: no <svg> in the built page, keeping the existing cover');
+  console.warn('draw-cover: no complete <svg> in the built page, keeping the existing cover');
   process.exit(0);
 }
 
-let svg = found[0];
+let svg = found;
 
 // Two labels are drawn into the SVG and the stylesheet picks one: the pointer
 // wording and the touch wording. A rasteriser has no stylesheet, so both land
@@ -48,13 +69,19 @@ let svg = found[0];
 svg = svg.replace(/<text class="map-hint-touch"[\s\S]*?<\/text>/g, '');
 
 // Same problem, and this is the one that decides whether the card is legible.
-// Villages keep their names to themselves until pointed at — twelve repository
+// Villages keep their names to themselves until pointed at. Twelve repository
 // names at once is an unreadable map, which is the entire reason the labels are
 // graded by rank. The grading is `opacity: 0`, invisible to a rasteriser, so
 // every village name would print at full strength and rebuild the exact pile
 // the grading exists to prevent. Cities and towns stay; villages stay dots.
 const villages = (svg.match(/<text class="settlement-label minor"/g) || []).length;
 svg = svg.replace(/<text class="settlement-label minor"[\s\S]*?<\/text>/g, '');
+
+// The writ seal is a download link. On the card it would be a picture of a
+// button nobody can press, on an image that is often shown at thumbnail size,
+// competing with the legend for the one quiet corner of the sheet. The card's
+// job is to show the realm; the seal stays on the site.
+svg = svg.replace(/<a class="writ-seal"[\s\S]*?<\/a>/g, '');
 
 // The live sheet is width:100%, which a rasteriser cannot resolve. Give it the
 // viewBox's own dimensions so it draws at the proportions it was drawn in.
@@ -65,11 +92,11 @@ svg = svg.replace(
 
 // The sheet is 1536x695 and the card is 1200x630, a slightly taller shape, so
 // containing the whole sheet leaves a band top and bottom. Fill it with the
-// map's own sea colour — the same #E9DFC4 the panel is drawn on — so the card
+// map's own sea colour, the same #E9DFC4 the panel is drawn on, so the card
 // reads as a sheet of paper with a margin rather than a letterboxed screenshot.
 // A palette PNG, because of what this particular picture is: flat parchment,
 // fine linework and a dozen earth colours. Measured against the alternatives at
-// this size — 752 KB as truecolour, 349 at 256 colours, 113 at 128, and no
+// this size: 752 KB as truecolour, 349 at 256 colours, 113 at 128, and no
 // visible banding in the parchment gradients at 128. A share card is fetched by
 // a scraper on someone else's connection, so three quarters of a megabyte for
 // an image indistinguishable from a tenth of that is worth nothing.

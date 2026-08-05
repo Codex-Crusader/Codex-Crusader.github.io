@@ -146,7 +146,7 @@ async function main() {
       // "Redrawn nightly" should be visible in the ledger, not just claimed.
       // Anything pushed inside the recent window floats to the top in push
       // order; everything else keeps the old stars-first ordering. Same shape,
-      // same fields — only the order of the array changes.
+      // same fields: only the order of the array changes.
       const ra = isRecentlyActive(a);
       const rb = isRecentlyActive(b);
       if (ra !== rb) return ra ? -1 : 1;
