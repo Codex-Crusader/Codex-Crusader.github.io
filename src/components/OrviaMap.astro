@@ -6,11 +6,12 @@
 // src/data/profile.js, update the matching <text> label in here too.
 interface Props {
   inscription: string;
-  // Repositories, placed inside the Afon Empire by src/data/settlements.js.
-  // Absent or empty simply draws no settlements.
-  settlements?: any[];
+  // Every province's settlements, keyed by province href, from
+  // src/data/settlements.js. Absent or empty simply draws none.
+  survey?: Record<string, any[]>;
 }
-const { inscription, settlements = [] } = Astro.props;
+const { inscription, survey = {} } = Astro.props;
+const settlements = Object.values(survey).flat();
 
 // Rank decides how a settlement is drawn, the way a real map grades one.
 const MARK = {
@@ -56,7 +57,7 @@ const MARK = {
     <g class="settlements">
       {settlements.map((s) => (
         <a class="settlement" href={s.href}>
-          <title>{s.name} — {s.commits} commits</title>
+          <title>{s.label}</title>
           <g transform={`translate(${s.x},${s.y})`}>
             <circle class="settlement-halo" r="11" fill="transparent" />
             <g set:html={MARK[s.rank]} />
@@ -74,7 +75,7 @@ const MARK = {
                 stroke-width="3"
                 stroke-linejoin="round"
                 paint-order="stroke"
-              >{s.name}</text>
+              >{s.label}</text>
             )}
           </g>
         </a>

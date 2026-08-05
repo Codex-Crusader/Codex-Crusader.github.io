@@ -200,16 +200,31 @@ becoming the scroll-jacking the original rule was written to prevent:
 
 ## The atlas
 
-The repositories are drawn onto the map as settlements inside the Afon Empire,
-and none of it is a fixed asset. `src/data/settlements.js` reads the province's
-own border path out of `OrviaMap.astro` at build time and does the cartography:
+Every province is surveyed from the data it is actually about, and none of it is
+a fixed asset:
+
+| Province | Settlements | Label |
+| --- | --- | --- |
+| Afon Empire | repositories | repo name |
+| Ponstium Empire | posts held | the organisation |
+| Republic of Corum | photographs | the plate's caption |
+| Kingdom of Dequm | one seat | the cartographer |
+| Phoededia | roads out | the channel |
+
+`src/data/settlements.js` reads each province's own border path out of
+`OrviaMap.astro` at build time and does the cartography:
 point-in-polygon to stay inside the border, distance-to-edge so nothing crowds
 the coastline, and farthest-point sampling so the settlements spread instead of
 clumping. Add a repo and the next nightly run re-surveys the province and
 redraws it to fit.
 
-Rank comes from commit count — city, town, village — and decides how each one is
-drawn, the way a real map grades a settlement.
+Rank — city, town, village — is by standing *within its own province*, not
+against an absolute number: what counts as a city among twelve repositories is
+not what counts as one among four roads. It decides how each settlement is
+drawn, the way a real map grades one.
+
+Labelling runs across the whole realm in one pass, not province by province, so
+a name near a border clears its neighbours across that border too.
 
 **Labels are graded too, and that is the part worth understanding.** Twelve repo
 names, some 27 characters long, do not fit legibly inside a province 395 units

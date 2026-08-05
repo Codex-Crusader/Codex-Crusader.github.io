@@ -4,7 +4,7 @@ import OrviaMap from '../components/OrviaMap.astro';
 import Lorebook from '../components/Lorebook.astro';
 import Holding from '../components/Holding.astro';
 import { assignSymbols } from '../data/holdings.js';
-import { placeSettlements } from '../data/settlements.js';
+import { surveyRealm } from '../data/settlements.js';
 import profile from '../data/profile.js';
 import resume from '../data/resume.js';
 import github from '../data/github.json';
@@ -33,8 +33,42 @@ const repos = github.repos ?? [];
 // Dealt once for the whole Afon Empire rather than per holding, so every mark
 // in the legend is used before any of them is used twice.
 const holdingSymbols = assignSymbols(repos.map((r) => r.name));
-// Surveyed into the Afon Empire against its real border. Recomputed every build.
-const settlements = placeSettlements(repos);
+
+// A role's map label is the organisation, not the job title: "Technology &
+// Operations Intern, Sanjay Electrical Enterprises" is a sentence, and a
+// settlement needs a name. Trailing parentheticals go too, since "Kanyathon"
+// is the place and "(Mumbai Division)" is a footnote about it.
+const orgOf = (title) => {
+  const [role, ...rest] = title.split(',');
+  const org = rest.join(',').replace(/\([^)]*\)/g, '').trim();
+  // "Self-employed" is not a place, and two of these roles carry it, which put
+  // the same name on the map twice. Fall back to what the work was.
+  if (!org || /^self-?employed$/i.test(org)) {
+    return role.trim().split(/\s+/).slice(0, 2).join(' ').replace(/[^\w\s-]+$/, '');
+  }
+  return org;
+};
+
+const slug = (s) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+// Anchors have to be unique even if two labels are not, or the id collides and
+// the map sends both settlements to whichever one the document happens to hold
+// first.
+function uniqueSlugs(labels) {
+  const seen = new Map();
+  return labels.map((label) => {
+    const base = slug(label) || 'x';
+    const n = (seen.get(base) ?? 0) + 1;
+    seen.set(base, n);
+    return n === 1 ? base : `${base}-${n}`;
+  });
+}
+
+const roleAnchors = uniqueSlugs(profile.experience.roles.map((role) => orgOf(role.title)));
 const totalStars = repos.reduce((n, r) => n + r.stargazers_count, 0);
 const languages = {};
 for (const r of repos) if (r.language) languages[r.language] = (languages[r.language] ?? 0) + 1;
@@ -97,6 +131,53 @@ const contactRows = resume.published
       ],
     ]
   : contactLinks;
+
+const plateAnchors = uniqueSlugs(plates.map((p) => p.caption ?? p.alt ?? ''));
+
+// Every province surveyed from the data it is actually about, in one pass so
+// that names near a border clear their neighbours across it. Recomputed on
+// every build against the map's own border paths.
+const survey = surveyRealm([
+  {
+    href: '#projects',
+    items: repos.map((r) => ({
+      label: r.name,
+      href: `#holding-${r.name.toLowerCase()}`,
+      weight: r.commits ?? 0,
+    })),
+  },
+  {
+    href: '#experience',
+    // Most recent first in the list, so weight counts down from the top.
+    items: profile.experience.roles.map((role, i) => ({
+      label: orgOf(role.title),
+      href: `#post-${roleAnchors[i]}`,
+      weight: profile.experience.roles.length - i,
+    })),
+  },
+  {
+    href: '#gallery',
+    items: plates.map((p, i) => ({
+      label: p.caption ?? p.alt ?? `plate ${i + 1}`,
+      href: `#plate-${plateAnchors[i]}`,
+      weight: plates.length - i,
+    })),
+  },
+  {
+    href: '#about',
+    // One seat, not a scatter. This province is a person, and a person is a
+    // capital rather than a distribution.
+    items: [{ label: profile.site.fullName, href: '#about', weight: 1 }],
+  },
+  {
+    href: '#contact',
+    items: contactRows.map(([label], i) => ({
+      label: label.toLowerCase(),
+      href: '#contact',
+      weight: contactRows.length - i,
+    })),
+  },
+]);
 
 // What each province actually holds, for the cartouche the map raises on hover.
 // Counted from the same data the folios are built from, so the map cannot
@@ -196,7 +277,7 @@ const personSchema = {
         <div class="map-stage" style="width: 100%; max-width: 1440px; margin: 0 auto;">
           <div class="map-panel" style="background: #E9DFC4; border: 3px solid #4A3B22; border-radius: 3px; padding: 12px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5), 0 5px 12px -3px rgba(44,34,16,0.28);">
             <div class="map-viewport">
-              <OrviaMap inscription={inscription} settlements={settlements} />
+              <OrviaMap inscription={inscription} survey={survey} />
             </div>
             <!-- Pointer-tracked sheen. Purely decorative, and inert until the
                  script arms it, so it never sits as a grey film over the map
@@ -273,8 +354,8 @@ const personSchema = {
         flip
       >
         <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px;">
-          {profile.experience.roles.map((role) => (
-            <div class="entry" style="border-top: 1px solid #B9A87E; padding-top: 16px;">
+          {profile.experience.roles.map((role, i) => (
+            <div class="entry" id={`post-${roleAnchors[i]}`} style="border-top: 1px solid #B9A87E; padding-top: 16px;">
               <h3 style={`margin: 0 0 4px; ${serif} font-weight: 600; font-size: 20px;`}>{role.title}</h3>
               <p style={`margin: 0 0 10px; ${mono} font-size: 11.5px; color: #8A7752;`}>{role.meta}</p>
               <p style="margin: 0; font-size: 15px; line-height: 1.65;">{role.body}</p>
@@ -328,7 +409,7 @@ const personSchema = {
             group.length > 0 && (
               <div style="columns: 250px; column-gap: 16px;">
                 {group.map((p) => (
-                  <figure style="margin: 0 0 16px; break-inside: avoid; -webkit-column-break-inside: avoid;">
+                  <figure id={`plate-${plateAnchors[plates.indexOf(p)]}`} style="margin: 0 0 16px; break-inside: avoid; -webkit-column-break-inside: avoid;">
                     <img
                       src={p.src}
                       srcset={p.srcset}
