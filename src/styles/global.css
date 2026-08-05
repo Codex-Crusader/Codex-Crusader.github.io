@@ -1129,3 +1129,97 @@ a:hover {
     break-inside: avoid;
   }
 }
+
+/* ── A repository name cannot widen the realm ────────────────────────────────
+
+   A holding is a two-column grid, and a `1fr` track carries an implicit
+   `min-width: auto`: it refuses to shrink below the widest unbreakable run of
+   text inside it. Repository names are not prose. `Engine_Market_Intelligence_
+   Platform` has no break opportunity in it at all, because a hyphen offers one
+   and an underscore does not, so on a narrow window that single token set the
+   width of the column, then the spread, then the document. The page could be
+   dragged sideways onto blank parchment, and the further right it went the
+   more of the margin it showed.
+
+   The survey is the reason this is a rule and not a one-off: repository names
+   arrive from the GitHub API, so the longest one is not a fixed fact about
+   this site. It is whatever gets created next. A layout that holds only while
+   nobody names a repo badly is not holding.
+
+   `minmax(0, …)` releases the track from its own contents, and
+   `overflow-wrap: break-word` gives the name permission to break mid-token
+   when there is genuinely nowhere else to break. Both are needed: the first
+   stops the blowout, the second stops the name being clipped once the track is
+   free to be narrow.
+
+   The heading needs `min-width: 0` for the same reason the track needed
+   `minmax(0, …)`: it is a flex item in `.holding-head`, so it carries its own
+   `min-width: auto` and refuses to shrink below that same token, which puts
+   the floor straight back under the grid. Freeing the track without freeing
+   the item fixes nothing, and both were measured that way.
+
+   `break-word` rather than `anywhere`, and the difference is not academic.
+   Only `anywhere` counts toward min-content, and the name sits in a flex row
+   beside its figures: with `anywhere` the heading's minimum collapses to one
+   character, the figures claim their width first, and the name is broken onto
+   four lines on a phone and two on a desktop that had room for one.
+   `break-word` leaves the intrinsic measurement alone, so the row still
+   apportions itself around a whole name, and the break happens only when the
+   space it is actually given is too small to hold one. */
+.holding {
+  grid-template-columns: 56px minmax(0, 1fr);
+}
+
+.holding h3 {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* The figures are the last hard floor in the row. Three of them sit in a flex
+   line that never wrapped, so "1 star · 51 commits · surveyed today" measured
+   as one indivisible object and held the holding open by its own width no
+   matter how narrow the window got. Allowed to wrap, they stack, which is what
+   a margin ledger does on a narrow sheet anyway. */
+.holding-figures {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  /* On a phone the name takes the row and the figures drop under it. Without
+     this the two share one line, and since the heading may now shrink, it is
+     the heading that gives way: the repository name ends up broken across four
+     lines beside a column of figures that kept its full width. The name is the
+     thing being read here. It gets the line. */
+  .holding-head > h3 {
+    flex: 1 1 100%;
+  }
+
+  /* ── The flipped spreads never collapsed on a phone ──────────────────────
+
+     The breakpoint stacks the ledger under the prose with
+     `.prose-grid { grid-template-columns: 1fr !important }`. The flip rule
+     above sets `.spread.flip .prose-grid` to two columns, also `!important`,
+     and carries three classes to the breakpoint's one. Two importants of
+     unequal specificity is not a tie: the flip won at every width, and the
+     flipped spreads kept a 210px ledger beside a prose column squeezed to
+     about 130px on a 500px-wide window.
+
+     It was quiet while it was only Ponstium and Dequm, which hold prose that
+     reflows into any column you give it. Afon holds repository names, which do
+     not, and the folio swap is what moved `flip` onto Afon. The blowout that
+     dragged the whole page sideways was this rule and a long name meeting.
+
+     Restated at the same specificity, inside the breakpoint, so it wins on a
+     phone and changes nothing above it. */
+  .spread.flip .prose-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* The ledger goes back under the prose rather than before it, and gives up
+     the right-hand rule it wears when it is a genuine column. */
+  .spread.flip .margin-col {
+    order: 0;
+    padding-right: 0 !important;
+    border-right: none;
+  }
+}
