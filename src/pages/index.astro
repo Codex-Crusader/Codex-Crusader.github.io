@@ -294,7 +294,11 @@ const personSchema = {
             <div class="map-controls" hidden>
               <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
               <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
-              <button type="button" data-zoom="reset" aria-label="Fit the whole realm">⤢</button>
+              <!-- Not "fit the whole realm" any more: on a phone the sheet is
+                   taller than its window at rest, so this returns to the view
+                   the map opened at rather than to one that shows every
+                   province. On a desktop the two are the same thing. -->
+              <button type="button" data-zoom="reset" aria-label="Return to the opening view">⤢</button>
             </div>
             <!-- Filled and positioned by the script from the table below. It is
                  a hover affordance for a link that already carries a full
@@ -634,7 +638,6 @@ const personSchema = {
         const controls = stage.querySelector('.map-controls');
         const svg = viewport.querySelector('svg');
 
-        const MIN = 1;
         const MAX = 5;
         // Past this, the villages are given their names.
         const DETAIL = 1.8;
@@ -645,26 +648,79 @@ const personSchema = {
 
         controls.hidden = false;
 
+        // The sheet's laid-out size, before any of our own transform. Read off
+        // the computed style rather than a bounding rect because a transform
+        // does not change computed width and height — so this stays true at any
+        // scale and never has to be unwound.
+        //
+        // On a desktop the sheet is laid out to the panel's width and the
+        // viewport is exactly as tall as the sheet, so this returns the
+        // viewport's own size and every number below collapses to the one it
+        // was before. On a phone the stylesheet gives the sheet the window's
+        // height instead, which makes it wider than the window, and that
+        // difference is the whole of what panning and the fit scale read.
+        function sheet() {
+          const cs = getComputedStyle(svg);
+          return { w: parseFloat(cs.width) || 1, h: parseFloat(cs.height) || 1 };
+        }
+
+        // The floor for zooming out: the smallest scale at which the sheet
+        // still covers its window in at least one direction. Below this the
+        // sheet is smaller than the frame around it and the frame shows empty
+        // table down two sides, which reads as a bug rather than as a map.
+        //
+        // Both axes are 1 on a desktop, so this is 1 and every rule below is
+        // the one that was already there. On a phone the sheet is laid out to
+        // the window's height, so the height ratio is 1 and the width ratio is
+        // about a third — taking the larger keeps the floor at 1 and the sheet
+        // always taller than the window it is read through. Never above 1: the
+        // sheet is drawn at its own size, and stretching it further is a zoom.
+        function coverScale() {
+          const s = sheet();
+          return Math.min(Math.max(viewport.clientWidth / s.w, viewport.clientHeight / s.h), 1);
+        }
+
+        // Put the middle of the sheet in the middle of the window. clamp() runs
+        // straight after and pulls it back to an edge in whichever axis the
+        // sheet is smaller than its window, so this is safe at any scale.
+        function centre() {
+          const s = sheet();
+          tx = (viewport.clientWidth - s.w * scale) / 2;
+          ty = (viewport.clientHeight - s.h * scale) / 2;
+        }
+
         function clamp() {
-          // Never let the sheet be dragged off its own table.
-          const w = viewport.clientWidth;
-          const h = viewport.clientHeight;
-          const minX = w - w * scale;
-          const minY = h - h * scale;
-          tx = Math.min(0, Math.max(minX, tx));
-          ty = Math.min(0, Math.max(minY, ty));
-          if (scale <= 1) {
-            tx = 0;
-            ty = 0;
-          }
+          const vw = viewport.clientWidth;
+          const vh = viewport.clientHeight;
+          const s = sheet();
+          const w = s.w * scale;
+          const h = s.h * scale;
+          // Wider than its window: hold it against the window's edges, so the
+          // sheet is never dragged off its own table. Narrower: centre it,
+          // rather than pin it to a corner with a gap down one side.
+          //
+          // The centred case is rounded and the panning case is not, on
+          // purpose. At rest the sheet sits still and a sub-pixel offset only
+          // costs it crisp text — the desktop layout lands a tenth of a pixel
+          // off exact, which is where that used to be a hard zero. While a hand
+          // is on it the offset changes every frame, and rounding there would
+          // trade blur for a drag that moves in steps.
+          // The pixel of tolerance matters: the desktop sheet lays out a fifth
+          // of a pixel wider than its window, which is not an overflow anyone
+          // can pan and would otherwise keep the sheet permanently a tenth of a
+          // pixel off true. Same tolerance overflows() uses, for the same reason.
+          tx = w > vw + 1 ? Math.min(0, Math.max(vw - w, tx)) : Math.round((vw - w) / 2);
+          ty = h > vh + 1 ? Math.min(0, Math.max(vh - h, ty)) : Math.round((vh - h) / 2);
         }
 
         function apply() {
+          const min = coverScale();
+          scale = Math.min(MAX, Math.max(min, scale));
           clamp();
           svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-          stage.classList.toggle('is-zoomed', scale > 1.02);
+          stage.classList.toggle('is-zoomed', scale > min * 1.02);
           stage.classList.toggle('is-detailed', scale >= DETAIL);
-          controls.querySelector('[data-zoom="out"]').disabled = scale <= MIN + 0.01;
+          controls.querySelector('[data-zoom="out"]').disabled = scale <= min + 0.01;
           controls.querySelector('[data-zoom="in"]').disabled = scale >= MAX - 0.01;
         }
 
@@ -674,7 +730,7 @@ const personSchema = {
           const r = viewport.getBoundingClientRect();
           const px = clientX - r.left;
           const py = clientY - r.top;
-          const next = Math.min(MAX, Math.max(MIN, scale * factor));
+          const next = Math.min(MAX, Math.max(coverScale(), scale * factor));
           if (next === scale) return;
           tx = px - ((px - tx) / scale) * next;
           ty = py - ((py - ty) / scale) * next;
@@ -694,9 +750,13 @@ const personSchema = {
           if (kind === 'in') zoomCentre(1.5);
           else if (kind === 'out') zoomCentre(1 / 1.5);
           else {
-            scale = 1;
-            tx = 0;
-            ty = 0;
+            // Back to the view the map opened at. On a desktop that is scale 1
+            // with the whole realm in the window, exactly as before; on a phone
+            // it is the sheet at its own size, centred, which is where it
+            // started. Centred rather than reset to zero, or a phone would be
+            // sent back to the sea off the western coast instead of the realm.
+            scale = coverScale();
+            centre();
             apply();
           }
         });
@@ -714,7 +774,7 @@ const personSchema = {
         );
 
         viewport.addEventListener('dblclick', (e) => {
-          zoomAt(scale >= MAX - 0.01 ? 1 / (MAX / MIN) : 1.8, e.clientX, e.clientY);
+          zoomAt(scale >= MAX - 0.01 ? coverScale() / scale : 1.8, e.clientX, e.clientY);
         });
 
         // Drag to pan. A drag that moves more than a few pixels swallows the
@@ -724,8 +784,41 @@ const personSchema = {
         let lastX = 0;
         let lastY = 0;
 
+        // Whether the sheet is currently bigger than its window, in either
+        // axis. This replaces the old `scale > 1.02` test, which assumed the
+        // two were the same size at rest — true on a desktop, false on a phone,
+        // where the sheet overflows its window at the scale it opens at.
+        function overflows() {
+          const s = sheet();
+          return (
+            s.w * scale > viewport.clientWidth + 1 || s.h * scale > viewport.clientHeight + 1
+          );
+        }
+
+        // Two fingers scale the sheet. A trackpad pinch already arrives as
+        // ctrl+wheel and is handled above; this is the touchscreen's version of
+        // the same gesture. Without it a phone can see the map but never lean
+        // into it, which is most of what the map is for.
+        const pointers = new Map();
+        let pinchGap = 0;
+
+        const pair = () => [...pointers.values()];
+        const gapOf = ([a, b]) => Math.hypot(a.x - b.x, a.y - b.y);
+        const midOf = ([a, b]) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
         viewport.addEventListener('pointerdown', (e) => {
-          if (e.button !== 0 || scale <= 1.02) return;
+          pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+          if (pointers.size === 2) {
+            // A second finger turns a drag into a pinch. Drop the drag rather
+            // than run both, or the sheet lurches as it scales.
+            dragging = false;
+            moved = true;
+            pinchGap = gapOf(pair());
+            return;
+          }
+
+          if (e.button !== 0 || pointers.size > 2 || !overflows()) return;
           dragging = true;
           moved = false;
           lastX = e.clientX;
@@ -734,6 +827,21 @@ const personSchema = {
         });
 
         viewport.addEventListener('pointermove', (e) => {
+          if (pointers.has(e.pointerId)) {
+            pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          }
+
+          if (pointers.size === 2) {
+            const p = pair();
+            const gap = gapOf(p);
+            if (pinchGap > 0 && gap > 0) {
+              const m = midOf(p);
+              zoomAt(gap / pinchGap, m.x, m.y);
+            }
+            pinchGap = gap;
+            return;
+          }
+
           if (!dragging) return;
           const dx = e.clientX - lastX;
           const dy = e.clientY - lastY;
@@ -746,6 +854,8 @@ const personSchema = {
         });
 
         function endDrag(e) {
+          pointers.delete(e.pointerId);
+          if (pointers.size < 2) pinchGap = 0;
           if (!dragging) return;
           dragging = false;
           if (viewport.hasPointerCapture?.(e.pointerId)) {
@@ -755,6 +865,19 @@ const personSchema = {
 
         viewport.addEventListener('pointerup', endDrag);
         viewport.addEventListener('pointercancel', endDrag);
+
+        // touch-action: pan-y hands vertical scrolling back to the browser,
+        // which is the whole point — one finger down the screen belongs to the
+        // page, exactly as a bare wheel does. Two fingers do not: left alone
+        // they would scroll the page out from under a pinch, so a multi-touch
+        // move is claimed outright.
+        viewport.addEventListener(
+          'touchmove',
+          (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+          },
+          { passive: false },
+        );
 
         viewport.addEventListener(
           'click',
@@ -769,10 +892,25 @@ const personSchema = {
         );
 
         // Re-clamp when the panel changes size, or a zoomed map can be left
-        // showing a strip of empty table down one edge.
+        // showing a strip of empty table down one edge. A phone rotating also
+        // changes what "fit the whole realm" means, which apply() recomputes.
         addEventListener('resize', apply);
 
+        // Open on the middle of the sheet rather than its left edge. On a
+        // desktop the sheet fits its window and this is already where it sits,
+        // so nothing moves. On a phone it is the difference between opening on
+        // the realm and opening on the sea to the west of it.
+        centre();
+
+        // Arrival is not a movement. The transition on .map-viewport svg exists
+        // so that zooming eases; letting it run on the first placement would
+        // drag the sheet a third of its own width across the window while the
+        // ink is still settling onto it. Placed with the transition off, then
+        // handed back for every zoom and pan after this one.
+        svg.style.transition = 'none';
         apply();
+        svg.getBoundingClientRect();
+        svg.style.transition = '';
       }
     </script>
   </body>

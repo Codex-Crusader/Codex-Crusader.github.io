@@ -797,6 +797,95 @@ a:hover {
   }
 }
 
+/* ── The realm, on a phone ─────────────────────────────────────────────────
+   The breakpoint above hides the map and leaves a list of five links in its
+   place. That was the right call while the map was a fixed picture: fitted to
+   a 390px screen a 1536×695 sheet is 176px tall, and a province name inside it
+   is about three pixels. It is the wrong call now that the sheet can be moved,
+   because it means the realm — the thing the site actually is — does not exist
+   on the device most visitors arrive on.
+
+   So the map comes back, framed the way an atlas is read rather than the way a
+   picture is hung: a tall window onto a wide sheet, held at a scale where the
+   provinces are legible, and moved rather than shrunk. The list below it stays.
+   It is no longer a substitute for the map; it is the index, and it is what
+   guarantees every province is still reachable if the script never runs and the
+   sheet can only be seen a third at a time.
+
+   These override rules rather than edit the breakpoint above them, because the
+   breakpoint is above the "Beyond the handoff" line. Same specificity, later in
+   the file, so they win — and the original block stays exactly as it was. */
+@media (max-width: 700px) {
+  .map-panel {
+    display: block !important;
+  }
+
+  /* The window. Tall enough that the sheet inside it is worth reading, short
+     enough that it does not claim the whole screen and hide that there is a
+     page underneath. */
+  .map-viewport {
+    height: 54vh;
+    min-height: 300px;
+    max-height: 460px;
+  }
+
+  /* Fill the window's height and overflow its width — the sheet is wider than
+     the phone, which is the premise the panning is built on. The svg carries
+     width/height in an inline style attribute, so this needs !important to
+     reach it. */
+  .map-viewport svg {
+    width: auto !important;
+    height: 100% !important;
+    max-width: none !important;
+  }
+
+  /* The same rule the wheel follows, in the language of a hand: a finger going
+     down the page is the page's, always. Only a sideways drag moves the sheet,
+     and only a pinch scales it. pan-y hands vertical scrolling back to the
+     browser and keeps the rest for the map. */
+  .map-viewport {
+    touch-action: pan-y;
+  }
+
+  /* Room for a thumb. The desktop buttons are 28px, which is under every
+     touch-target minimum going. */
+  .map-controls {
+    right: 12px;
+    bottom: 12px;
+    gap: 7px;
+  }
+
+  .map-controls button {
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+  }
+
+  /* The index, once the map is above it, is a list of places you have just
+     seen rather than the only way to see them. Say so. */
+  .mobile-nav {
+    margin-top: 18px !important;
+  }
+}
+
+/* The hint under the map's top border is addressed to a mouse. On a touch
+   screen it names a gesture nobody there can make. Two labels, one drawn at a
+   time — the SVG carries both so this stays a media query rather than a script
+   that rewrites text after the map has already been read. */
+.map-hint-touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .map-hint-fine {
+    display: none;
+  }
+
+  .map-hint-touch {
+    display: block;
+  }
+}
+
 /* ── Print ──────────────────────────────────────────────────────────────────
    The site is already shaped like a document, so printing it should produce a
    document rather than a screenshot of one. Almost everything here removes
