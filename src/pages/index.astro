@@ -3,6 +3,7 @@ import '../styles/global.css';
 import OrviaMap from '../components/OrviaMap.astro';
 import Lorebook from '../components/Lorebook.astro';
 import Holding from '../components/Holding.astro';
+import { assignSymbols } from '../data/holdings.js';
 import profile from '../data/profile.js';
 import resume from '../data/resume.js';
 import github from '../data/github.json';
@@ -28,6 +29,9 @@ function ago(iso) {
 }
 
 const repos = github.repos ?? [];
+// Dealt once for the whole Afon Empire rather than per holding, so every mark
+// in the legend is used before any of them is used twice.
+const holdingSymbols = assignSymbols(repos.map((r) => r.name));
 const totalStars = repos.reduce((n, r) => n + r.stargazers_count, 0);
 const languages = {};
 for (const r of repos) if (r.language) languages[r.language] = (languages[r.language] ?? 0) + 1;
@@ -235,7 +239,7 @@ const personSchema = {
         marginNote={profile.projects.marginNote}
       >
         <div class="holdings">
-          {repos.map((r) => <Holding repo={r} ago={ago} />)}
+          {repos.map((r) => <Holding repo={r} ago={ago} symbol={holdingSymbols.get(r.name)} />)}
           {repos.length === 0 && (
             <p style={`margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
               No repositories surveyed yet. Run <code>npm run sync</code> or wait for the nightly build.

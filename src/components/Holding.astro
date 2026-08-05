@@ -9,14 +9,17 @@ import { SYMBOLS, symbolFor, materialsFor, bannersFor } from '../data/holdings.j
 interface Props {
   repo: any;
   ago: (iso: string) => string;
+  // Dealt across the whole set by assignSymbols so the legend stays varied.
+  // Falls back to the per-name hash when a holding is rendered on its own.
+  symbol?: string;
 }
 
-const { repo, ago } = Astro.props;
+const { repo, ago, symbol } = Astro.props;
 
 const mono = "font-family: 'JetBrains Mono', monospace;";
 const serif = "font-family: 'Cormorant Garamond', serif;";
 
-const mark = SYMBOLS[symbolFor(repo.name)];
+const mark = SYMBOLS[symbol ?? symbolFor(repo.name)];
 const materials = materialsFor(repo.languages ?? []);
 const { shown, rest } = bannersFor(repo.topics ?? []);
 

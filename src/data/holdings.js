@@ -47,6 +47,49 @@ export function symbolFor(name) {
   return SYMBOL_KEYS[hash(name) % SYMBOL_KEYS.length];
 }
 
+// Hashing each name independently is the obvious approach and it looks wrong on
+// the page: with twelve repos and eight marks, the first cut drew the port five
+// times, three of them consecutively, and never drew the keep or the forge at
+// all. A reader does not see "hash collision", they see a legend that is broken.
+//
+// So the marks are dealt across the whole set instead. Each repo still asks for
+// the mark its name hashes to, but a mark that is already in use gives way to
+// the least-used one, which means all eight appear before any repeat does.
+// Deterministic for a given list; adding a repo can reshuffle the others, which
+// is a fair price for a legend that reads as one.
+export function assignSymbols(names) {
+  const used = new Map(SYMBOL_KEYS.map((k) => [k, 0]));
+  const out = new Map();
+
+  let previous = null;
+
+  for (const name of names) {
+    const start = hash(name) % SYMBOL_KEYS.length;
+    let best = null;
+    let bestScore = Infinity;
+
+    // Lowest use count wins. The half-point penalty only ever breaks a tie, so
+    // an equally-rare mark beats repeating the one directly above it -- two
+    // identical marks in a row is the thing that reads as a bug, even when the
+    // counts underneath are perfectly even. Scanning forward from the name's
+    // own hash keeps the choice tied to the repo rather than to legend order.
+    for (let i = 0; i < SYMBOL_KEYS.length; i++) {
+      const key = SYMBOL_KEYS[(start + i) % SYMBOL_KEYS.length];
+      const score = used.get(key) + (key === previous ? 0.5 : 0);
+      if (score < bestScore) {
+        best = key;
+        bestScore = score;
+      }
+    }
+
+    used.set(best, used.get(best) + 1);
+    out.set(name, best);
+    previous = best;
+  }
+
+  return out;
+}
+
 // Six materials. Distinguishable side by side, all of them plausible as ink or
 // pigment on this paper.
 const MATERIALS = [
