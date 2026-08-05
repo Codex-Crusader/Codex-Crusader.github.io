@@ -214,20 +214,190 @@ a:hover {
     box-shadow 0.4s ease;
 }
 
+/* A lantern held over the sheet rather than a highlight painted on it: warm in
+   the middle, and the paper falling away into shadow past the edge of the
+   light. Two stacked layers because one gradient cannot both add warmth and
+   take light away. */
 .map-sheen {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.45s ease;
+  transition: opacity 0.5s ease;
+  background:
+    radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 244, 214, 0.42),
+      rgba(255, 244, 214, 0.1) 40%,
+      transparent 64%
+    ),
+    radial-gradient(
+      680px circle at var(--mx, 50%) var(--my, 50%),
+      transparent 34%,
+      rgba(60, 44, 18, 0.16) 78%,
+      rgba(48, 34, 12, 0.28) 100%
+    );
+  mix-blend-mode: multiply;
+}
+
+/* The warm core has to add light, which multiply cannot do, so it rides on its
+   own layer above the shadow. */
+.map-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: radial-gradient(
-    440px circle at var(--mx, 50%) var(--my, 50%),
-    rgba(255, 250, 232, 0.36),
-    rgba(255, 250, 232, 0.09) 42%,
-    transparent 66%
+    300px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 238, 196, 0.3),
+    transparent 62%
   );
-  mix-blend-mode: soft-light;
+  mix-blend-mode: screen;
+}
+
+/* ── The atlas ─────────────────────────────────────────────────────────────
+   The map as something you can lean into rather than only look at. */
+.map-viewport {
+  overflow: hidden;
+  /* The sheet must not slide out from under its own border while panning. */
+  border-radius: 1px;
+}
+
+.map-viewport svg {
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .map-viewport svg {
+    transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+}
+
+/* While dragging, the map must track the hand exactly -- a transition here
+   feels like the paper is stuck to the table. */
+.map-stage.is-zoomed .map-viewport {
+  cursor: grab;
+}
+
+.map-stage.is-zoomed .map-viewport:active {
+  cursor: grabbing;
+}
+
+.map-stage.is-zoomed .map-viewport:active svg {
+  transition: none;
+}
+
+.map-controls {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.map-controls button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1;
+  color: #4a3b22;
+  cursor: pointer;
+  background: #f3ecd8;
+  border: 1px solid #4a3b22;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 #fffcf0 inset;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.map-controls button:hover:not(:disabled) {
+  color: #8c3b22;
+  background: #fffcf0;
+}
+
+.map-controls button:disabled {
+  color: #b0a184;
+  cursor: default;
+  opacity: 0.55;
+}
+
+.map-controls button:focus-visible {
+  outline: 2px solid #8c3b22;
+  outline-offset: 2px;
+}
+
+/* ── Settlements ───────────────────────────────────────────────────────────
+   The repositories, drawn into the province. */
+.settlement {
+  cursor: pointer;
+}
+
+.settlement-label {
+  transition:
+    fill 0.25s ease,
+    font-size 0.25s ease,
+    opacity 0.2s ease;
+}
+
+/* Villages keep their names to themselves until pointed at. Twelve names at
+   once is an unreadable map; five named settlements and seven dots is a map. */
+.settlement-label.minor {
+  opacity: 0;
+}
+
+.settlement:hover .settlement-label.minor,
+.settlement:focus-visible .settlement-label.minor {
+  opacity: 1;
+}
+
+/* Lean in far enough and the villages give up their names -- the detail was
+   always there, it was the scale that could not hold it. */
+.map-stage.is-detailed .settlement-label.minor {
+  opacity: 1;
+}
+
+/* Whichever settlement is being pointed at is drawn last, so its name is never
+   printed underneath a neighbour's. */
+.settlement:hover,
+.settlement:focus-visible {
+  paint-order: normal;
+}
+
+.settlements:has(.settlement:hover) .settlement:hover {
+  /* SVG has no z-index; re-rendering the hovered node on top is done by the
+     browser for the :hover subtree via this isolation hint. */
+  isolation: isolate;
+}
+
+.settlement circle:not(.settlement-halo) {
+  transition:
+    stroke 0.25s ease,
+    fill 0.25s ease;
+}
+
+.settlement:hover .settlement-label,
+.settlement:focus-visible .settlement-label {
+  fill: #8c3b22;
+  font-size: 10.5px;
+}
+
+.settlement:hover circle:not(.settlement-halo),
+.settlement:focus-visible circle:not(.settlement-halo) {
+  stroke: #8c3b22;
+}
+
+.settlement:focus {
+  outline: none;
+}
+
+.settlement:focus-visible .settlement-halo {
+  fill: rgba(140, 59, 34, 0.16);
 }
 
 .map-stage.is-live .map-sheen {
@@ -445,7 +615,8 @@ a:hover {
 /* ── Arrival ───────────────────────────────────────────────────────────────
    Scroll-driven, so there is no scroll listener and nothing to jank. Browsers
    without view() timelines simply show the content, which is why the @supports
-   guard wraps the animation rather than a fallback. */
+   guard wraps the animation rather than a fallback.
+
    Scoped to .reveal rather than every .spread on purpose. 404 and /resume are
    single cards on pages that may not scroll at all, and an element whose
    timeline has no scrollport is a question not worth leaving open when the
@@ -501,6 +672,7 @@ a:hover {
   .frame,
   .map-panel,
   .map-sheen,
+  .map-controls,
   .cartouche,
   .mobile-nav,
   .return-link,

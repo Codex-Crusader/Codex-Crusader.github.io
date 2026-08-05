@@ -198,6 +198,39 @@ becoming the scroll-jacking the original rule was written to prevent:
 - **Print pins everything to its finished state.** A print job has no
   scrollport, so an unpinned view() animation would commit opacity 0 to paper.
 
+## The atlas
+
+The repositories are drawn onto the map as settlements inside the Afon Empire,
+and none of it is a fixed asset. `src/data/settlements.js` reads the province's
+own border path out of `OrviaMap.astro` at build time and does the cartography:
+point-in-polygon to stay inside the border, distance-to-edge so nothing crowds
+the coastline, and farthest-point sampling so the settlements spread instead of
+clumping. Add a repo and the next nightly run re-surveys the province and
+redraws it to fit.
+
+Rank comes from commit count — city, town, village — and decides how each one is
+drawn, the way a real map grades a settlement.
+
+**Labels are graded too, and that is the part worth understanding.** Twelve repo
+names, some 27 characters long, do not fit legibly inside a province 395 units
+wide. That is a density problem and no amount of cleverer placement solves it;
+the first version spread them perfectly and they still overprinted each other
+and the province's own name. So cities and towns are named on the sheet, and
+villages stay dots until you point at one or zoom in past 1.8×.
+
+Two things that will bite anyone editing this:
+
+- **`text-anchor` is inherited.** The province names carry no anchor attribute
+  and are centred by a parent `<g>`, which the keep-out scanner cannot see. It
+  covers both anchorings instead of parsing the group tree. Over-blocking costs
+  a few candidate sites; under-blocking put a settlement across "AFON EMPIRE".
+- **Paths must stay M/L/Z.** The parser reads raw number pairs, so a curve
+  command would silently scatter settlements into the sea. It checks, and bails
+  to no settlements rather than guessing.
+
+Zoom is pinch or ctrl+wheel only. **A bare wheel always belongs to the page** —
+the map never takes the scroll away from someone trying to read past it.
+
 ## A note on the map
 
 Province names are drawn into the SVG as `<text>`. If you rename a section in

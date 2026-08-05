@@ -4,6 +4,7 @@ import OrviaMap from '../components/OrviaMap.astro';
 import Lorebook from '../components/Lorebook.astro';
 import Holding from '../components/Holding.astro';
 import { assignSymbols } from '../data/holdings.js';
+import { placeSettlements } from '../data/settlements.js';
 import profile from '../data/profile.js';
 import resume from '../data/resume.js';
 import github from '../data/github.json';
@@ -32,6 +33,8 @@ const repos = github.repos ?? [];
 // Dealt once for the whole Afon Empire rather than per holding, so every mark
 // in the legend is used before any of them is used twice.
 const holdingSymbols = assignSymbols(repos.map((r) => r.name));
+// Surveyed into the Afon Empire against its real border. Recomputed every build.
+const settlements = placeSettlements(repos);
 const totalStars = repos.reduce((n, r) => n + r.stargazers_count, 0);
 const languages = {};
 for (const r of repos) if (r.language) languages[r.language] = (languages[r.language] ?? 0) + 1;
@@ -192,11 +195,20 @@ const personSchema = {
 
         <div class="map-stage" style="width: 100%; max-width: 1440px; margin: 0 auto;">
           <div class="map-panel" style="background: #E9DFC4; border: 3px solid #4A3B22; border-radius: 3px; padding: 12px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5), 0 5px 12px -3px rgba(44,34,16,0.28);">
-            <OrviaMap inscription={inscription} />
+            <div class="map-viewport">
+              <OrviaMap inscription={inscription} settlements={settlements} />
+            </div>
             <!-- Pointer-tracked sheen. Purely decorative, and inert until the
                  script arms it, so it never sits as a grey film over the map
                  for someone with JavaScript disabled. -->
             <div class="map-sheen" aria-hidden="true"></div>
+            <!-- Hidden until the script arms them: without it they would be
+                 three buttons that do nothing. -->
+            <div class="map-controls" hidden>
+              <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+              <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
+              <button type="button" data-zoom="reset" aria-label="Fit the whole realm">⤢</button>
+            </div>
             <!-- Filled and positioned by the script from the table below. It is
                  a hover affordance for a link that already carries a full
                  aria-label, so it stays out of the accessibility tree. -->
@@ -420,6 +432,9 @@ const personSchema = {
 
         stage.addEventListener('pointermove', (e) => {
           if (calm.matches || !fine.matches) return;
+          // Once the map is zoomed it is being read, not admired. Tilting the
+          // sheet under someone who is panning it is just motion sickness.
+          if (scale > 1.02) return;
           const r = stage.getBoundingClientRect();
           const px = (e.clientX - r.left) / r.width;
           const py = (e.clientY - r.top) / r.height;
@@ -494,6 +509,156 @@ const personSchema = {
         cartouche.addEventListener('transitionend', () => {
           if (!cartouche.classList.contains('is-open')) cartouche.hidden = true;
         });
+
+        // ── The atlas ────────────────────────────────────────────────────────
+        // Zoom and pan, with one hard rule: the page's own scrolling is never
+        // taken away. A plain wheel scrolls the page as it always did. Only a
+        // deliberate zoom gesture zooms -- ctrl+wheel, which is also exactly
+        // what a trackpad pinch sends, so pinching works without special-casing
+        // it. Everything else is drag, buttons and double-click.
+        const viewport = stage.querySelector('.map-viewport');
+        const controls = stage.querySelector('.map-controls');
+        const svg = viewport.querySelector('svg');
+
+        const MIN = 1;
+        const MAX = 5;
+        // Past this, the villages are given their names.
+        const DETAIL = 1.8;
+
+        let scale = 1;
+        let tx = 0;
+        let ty = 0;
+
+        controls.hidden = false;
+
+        function clamp() {
+          // Never let the sheet be dragged off its own table.
+          const w = viewport.clientWidth;
+          const h = viewport.clientHeight;
+          const minX = w - w * scale;
+          const minY = h - h * scale;
+          tx = Math.min(0, Math.max(minX, tx));
+          ty = Math.min(0, Math.max(minY, ty));
+          if (scale <= 1) {
+            tx = 0;
+            ty = 0;
+          }
+        }
+
+        function apply() {
+          clamp();
+          svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+          stage.classList.toggle('is-zoomed', scale > 1.02);
+          stage.classList.toggle('is-detailed', scale >= DETAIL);
+          controls.querySelector('[data-zoom="out"]').disabled = scale <= MIN + 0.01;
+          controls.querySelector('[data-zoom="in"]').disabled = scale >= MAX - 0.01;
+        }
+
+        // Zoom about a point so the map grows out from under the pointer rather
+        // than from the corner.
+        function zoomAt(factor, clientX, clientY) {
+          const r = viewport.getBoundingClientRect();
+          const px = clientX - r.left;
+          const py = clientY - r.top;
+          const next = Math.min(MAX, Math.max(MIN, scale * factor));
+          if (next === scale) return;
+          tx = px - ((px - tx) / scale) * next;
+          ty = py - ((py - ty) / scale) * next;
+          scale = next;
+          apply();
+        }
+
+        function zoomCentre(factor) {
+          const r = viewport.getBoundingClientRect();
+          zoomAt(factor, r.left + r.width / 2, r.top + r.height / 2);
+        }
+
+        controls.addEventListener('click', (e) => {
+          const button = e.target.closest('button');
+          if (!button) return;
+          const kind = button.dataset.zoom;
+          if (kind === 'in') zoomCentre(1.5);
+          else if (kind === 'out') zoomCentre(1 / 1.5);
+          else {
+            scale = 1;
+            tx = 0;
+            ty = 0;
+            apply();
+          }
+        });
+
+        viewport.addEventListener(
+          'wheel',
+          (e) => {
+            // A bare wheel belongs to the page. Only a pinch or ctrl+wheel is a
+            // zoom, and only then is the default prevented.
+            if (!e.ctrlKey) return;
+            e.preventDefault();
+            zoomAt(e.deltaY < 0 ? 1.12 : 1 / 1.12, e.clientX, e.clientY);
+          },
+          { passive: false },
+        );
+
+        viewport.addEventListener('dblclick', (e) => {
+          zoomAt(scale >= MAX - 0.01 ? 1 / (MAX / MIN) : 1.8, e.clientX, e.clientY);
+        });
+
+        // Drag to pan. A drag that moves more than a few pixels swallows the
+        // click that follows, so panning across a province never navigates.
+        let dragging = false;
+        let moved = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        viewport.addEventListener('pointerdown', (e) => {
+          if (e.button !== 0 || scale <= 1.02) return;
+          dragging = true;
+          moved = false;
+          lastX = e.clientX;
+          lastY = e.clientY;
+          viewport.setPointerCapture(e.pointerId);
+        });
+
+        viewport.addEventListener('pointermove', (e) => {
+          if (!dragging) return;
+          const dx = e.clientX - lastX;
+          const dy = e.clientY - lastY;
+          if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+          lastX = e.clientX;
+          lastY = e.clientY;
+          tx += dx;
+          ty += dy;
+          apply();
+        });
+
+        function endDrag(e) {
+          if (!dragging) return;
+          dragging = false;
+          if (viewport.hasPointerCapture?.(e.pointerId)) {
+            viewport.releasePointerCapture(e.pointerId);
+          }
+        }
+
+        viewport.addEventListener('pointerup', endDrag);
+        viewport.addEventListener('pointercancel', endDrag);
+
+        viewport.addEventListener(
+          'click',
+          (e) => {
+            if (moved) {
+              e.preventDefault();
+              e.stopPropagation();
+              moved = false;
+            }
+          },
+          true,
+        );
+
+        // Re-clamp when the panel changes size, or a zoomed map can be left
+        // showing a strip of empty table down one edge.
+        addEventListener('resize', apply);
+
+        apply();
       }
     </script>
   </body>
