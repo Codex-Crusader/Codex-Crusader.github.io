@@ -1223,3 +1223,201 @@ a:hover {
     border-right: none;
   }
 }
+
+/* ── The charters ──────────────────────────────────────────────────────────
+   The register and the project pages. They are the same document as the front
+   page, printed on the Afon Empire's own parchment and reusing its spread, so
+   nothing below restyles anything above: it only dresses the few structures
+   the map never needed, because the map had no page beneath a province.
+
+   Kept deliberately plain. A charter is a folio spread that happens to be its
+   own address, and the moment it grows its own visual language it stops being
+   part of the atlas and starts being a second website with the same colours. */
+
+/* The breadcrumb. A real list of real links, above the sheet rather than on
+   it, the way a docket sits above the page it files. */
+.trail {
+  margin: 30px 0 18px;
+}
+
+.trail ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  color: #8a7752;
+}
+
+/* The separator is drawn by CSS rather than typed into the markup, so the
+   trail reads as three items to a screen reader instead of five. */
+.trail li + li::before {
+  content: '→';
+  margin-right: 10px;
+  color: #b9a87e;
+}
+
+.trail [aria-current='page'] {
+  color: #6b5836;
+}
+
+/* A charter page is one sheet on an otherwise empty page. Give it the air the
+   front page gets from the map above it. */
+.trail + .spread {
+  margin-top: 0;
+}
+
+.page > .spread:first-child {
+  margin-top: 44px;
+}
+
+/* Subheadings inside a spread. The h2 is the province name; these are the
+   ruled divisions under it, so they take the folio's small-caps rather than a
+   second display size that would compete with the heading. */
+.charter-rule {
+  margin: 34px 0 14px;
+  padding-top: 14px;
+  border-top: 1px solid #b9a87e;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 3px;
+  font-variant: small-caps;
+  color: #6b5836;
+  clear: left;
+}
+
+/* The honest half of every charter. Marked with a keep-out rule rather than a
+   bullet, because these are the lines the reader is most likely to be looking
+   for and a bullet buries them in the body. */
+.charter-limits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 64ch;
+}
+
+.charter-limits li {
+  border-left: 2px solid #c07a4e;
+  padding-left: 16px;
+  font-size: 15.5px;
+  line-height: 1.66;
+  color: #4a3b22;
+}
+
+.charter-built li {
+  border-color: #a0906a;
+}
+
+.charter-roads {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 64ch;
+}
+
+.charter-roads li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 11px 0;
+  border-top: 1px solid #b9a87e;
+}
+
+/* The index of holdings, on the register and again as neighbours at the foot
+   of a charter. One rule, because they are the same object at two sizes. */
+.charter-index,
+.charter-neighbours {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.charter-index li {
+  border-top: 1px solid #b9a87e;
+  padding: 18px 0;
+}
+
+.charter-index li > span {
+  display: block;
+  margin-top: 8px;
+}
+
+.charter-index-plain li {
+  padding: 14px 0;
+}
+
+.charter-neighbours li {
+  border-top: 1px solid #b9a87e;
+  padding: 13px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  /* Same reasoning as the contact rows: a label and a long address on one
+     baseline have nothing to wrap at, so they overrun the column. */
+  .charter-roads li,
+  .charter-neighbours li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+@media print {
+  /* A trail is a set of controls for getting somewhere else. On paper there is
+     nowhere else, and the same rule already takes the map and every return
+     link off the sheet. */
+  .trail,
+  .charter-roads,
+  .return-link {
+    display: none !important;
+  }
+
+  /* The limits are the part of a charter most worth having on paper, so they
+     keep their rule and are not allowed to break across a page boundary. */
+  .charter-limits li,
+  .charter-index li {
+    break-inside: avoid;
+  }
+}
+
+/* ── The plain name under the place name ───────────────────────────────────
+   A province is called Phoededia and holds contact details. The heading keeps
+   the first fact and the line under it states the second, small, in the mono
+   face, the way the masthead already answers "who is this" under the name.
+
+   It is a <p> and not a heading on purpose: it is the same subject said again
+   in different words, and a second heading would put a rung on the outline
+   that the document does not actually have. */
+.spread-title {
+  min-width: 0;
+}
+
+.spread-subtitle {
+  margin: 9px 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  line-height: 1.4;
+  color: #8a7752;
+  text-transform: lowercase;
+}

@@ -20,14 +20,71 @@ interface Props {
   // Puts the ledger on the left for this spread. Alternated down the page so
   // five sections stop reading as five copies of one section.
   flip?: boolean;
+  // Off for a spread on a page that may not scroll. The reveal is a
+  // scroll-driven CSS timeline, and a timeline with no scrollport never runs,
+  // which would leave the whole spread committed to opacity 0. Same reason the
+  // 404 and /resume opt out entirely.
+  reveal?: boolean;
+  // The road out at the foot of the spread. On the front page every spread
+  // returns to the map above it; a spread that is its own page returns
+  // somewhere else, or renders no link at all and puts its own roads in the
+  // slot. Null removes it.
+  returnHref?: string | null;
+  returnLabel?: string;
+  // Which parchment to print on. Defaults to the section id, which is how the
+  // five folios have always keyed it. A charter is a page of the Afon Empire
+  // wherever it happens to be filed, so it asks for that province's sheet by
+  // name rather than by borrowing its id and losing its own anchor.
+  texture?: string;
+  // 2 on the front page, where the h1 is the name in the masthead and five
+  // spreads are five sections of one document. 1 on a page that is only this
+  // spread, because a page whose subject has no h1 has not said what it is
+  // about in the one element that is read as the answer.
+  level?: 1 | 2;
+  // The mark set large in the corner. Defaults to the folio with its "FOL."
+  // stripped, which is the whole label for a folio and the wrong half of one
+  // for anything else: "CHARTER IV" has nothing to strip, so the mark and the
+  // line under it printed the same words twice.
+  numeral?: string;
+  // The province name in plain words, set small under it.
+  //
+  // The five headings are place names, and a place name is the one thing on a
+  // spread that does not say what the spread is about: "Phoededia" is a
+  // beautiful label and an unreadable one, to a stranger and to a crawler
+  // alike. This is the same fix the masthead already makes, where the name is
+  // followed by the trade in six plain words. It is set as a filing annotation
+  // rather than a subheading, because the province keeps its name: the line
+  // under it is a translation, not a replacement.
+  subtitle?: string;
 }
 
-const { id, heading, folio, intro, ledger, ledgerNote, epigraph, marginNote, flip } = Astro.props;
-const t = textures[id];
+const {
+  id,
+  heading,
+  folio,
+  intro,
+  ledger,
+  ledgerNote,
+  epigraph,
+  marginNote,
+  flip,
+  reveal = true,
+  returnHref = '#map',
+  returnLabel = '↑ return to map',
+  texture,
+  level = 2,
+  numeral: numeralProp,
+  subtitle,
+} = Astro.props;
+const t = textures[texture ?? id];
 
 // "FOL. III" -> "III". The numeral is set large as a mark on the page; the word
 // stays with it in the small line so the folio still reads as a folio.
-const numeral = folio.replace(/^FOL\.\s*/i, '');
+const numeral = numeralProp ?? folio.replace(/^FOL\.\s*/i, '');
+
+// The heading tag, chosen rather than hard-coded. Capitalised so Astro renders
+// the variable as a component tag instead of the literal element "h".
+const H = `h${level}`;
 
 // The design sets the first letter of the intro as a drop cap.
 const dropCap = intro.slice(0, 1);
@@ -36,13 +93,16 @@ const rest = intro.slice(1);
 
 <section
   id={id}
-  class:list={['spread', 'reveal', { flip }]}
+  class:list={['spread', { reveal, flip }]}
   style={`background: ${t.background}; border: 2px solid #4A3B22; border-radius: 5px; padding: 52px 58px 44px; box-shadow: ${t.shadow}; margin-bottom: ${t.mb}px;`}
 >
   <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; border-bottom: 1px solid #B9A87E; padding-bottom: 14px; margin-bottom: 26px;">
-    <h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(30px, 5.2vw, 54px); line-height: 0.95; letter-spacing: 4px; font-variant: small-caps; color: #3A2E19;">{heading}</h2>
+    <div class="spread-title">
+      <H style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(30px, 5.2vw, 54px); line-height: 0.95; letter-spacing: 4px; font-variant: small-caps; color: #3A2E19;">{heading}</H>
+      {subtitle && <p class="spread-subtitle">{subtitle}</p>}
+    </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <div class="folio-mark" aria-hidden="true">{numeral}</div>
+      {numeral && <div class="folio-mark" aria-hidden="true">{numeral}</div>}
       <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A7752; letter-spacing: 1.4px; margin-top: 6px;">{folio}</div>
     </div>
   </div>
@@ -74,5 +134,7 @@ const rest = intro.slice(1);
     </aside>
   </div>
 
-  <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;"><a href="#map" style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">↑ return to map</a></div>
+  {returnHref && (
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;"><a href={returnHref} style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">{returnLabel}</a></div>
+  )}
 </section>

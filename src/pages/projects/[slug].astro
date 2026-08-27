@@ -1,0 +1,241 @@
+---
+// One charter: a holding of the Afon Empire, written out at length.
+//
+// The map stays what it was. These pages exist because a province anchor is
+// not an address a search engine can rank on its own, and because a repository
+// description is one sentence: neither is enough for someone who arrived
+// looking for the project by name. Everything measured still comes from the
+// survey; only the prose is written by hand, and it lives in charters.js.
+import Sheet from '../../layouts/Sheet.astro';
+import Lorebook from '../../components/Lorebook.astro';
+import profile from '../../data/profile.js';
+import charters from '../../data/charters.js';
+import github from '../../data/github.json';
+import { materialsFor } from '../../data/holdings.js';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+export async function getStaticPaths() {
+  const { default: charterList } = await import('../../data/charters.js');
+  const { default: survey } = await import('../../data/github.json');
+  const repos = survey.repos ?? [];
+
+  // A charter with no repository behind it is skipped rather than rendered as
+  // a page about nothing. Same rule as a featured name that matches nothing:
+  // the build says so on the way past and carries on.
+  return charterList
+    .map((charter) => ({ charter, repo: repos.find((r) => r.name === charter.repo) }))
+    .filter(({ charter, repo }) => {
+      if (!repo) {
+        console.warn(`charters: no repository named "${charter.repo}", skipping /projects/${charter.slug}/`);
+        return false;
+      }
+      return true;
+    })
+    .map(({ charter, repo }) => ({ params: { slug: charter.slug }, props: { charter, repo } }));
+}
+
+const { charter, repo } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const home = new URL(base, Astro.site).href;
+const here = new URL(`projects/${charter.slug}/`, home).href;
+const registerHref = `${base}projects/`;
+
+const repos = github.repos ?? [];
+const materials = materialsFor(repo.languages ?? []);
+
+function ago(iso) {
+  if (!iso) return 'unknown';
+  const days = Math.floor((Date.now() - new Date(iso)) / 86400000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 30) return `${days} days ago`;
+  const months = Math.round(days / 30);
+  if (months < 12) return months === 1 ? '1 month ago' : `${months} months ago`;
+  const years = Math.round(days / 365);
+  return years === 1 ? '1 year ago' : `${years} years ago`;
+}
+
+// Measured first, written second. The rows that come off the API sit above the
+// ones typed into the charter, so a reader can see where the numbers stop
+// being counted and start being quoted.
+const ledger = [
+  repo.stargazers_count > 0 && ['stars', String(repo.stargazers_count)],
+  typeof repo.commits === 'number' && ['commits', repo.commits.toLocaleString('en-IN')],
+  repo.language && ['language', repo.language],
+  ['surveyed', ago(repo.pushed_at)],
+  ...(charter.ledgerExtra ?? []),
+].filter(Boolean);
+
+// Neighbours, by the topics the repositories actually share. A charter that
+// links to another charter is only worth anything if the two are related, and
+// the register is the place that already knows which are: this asks it rather
+// than keeping a second hand-written list that would go stale silently.
+const myTopics = new Set(repo.topics ?? []);
+const related = charters
+  .filter((c) => c.slug !== charter.slug)
+  .map((c) => {
+    const r = repos.find((x) => x.name === c.repo);
+    const shared = (r?.topics ?? []).filter((t) => myTopics.has(t));
+    return { charter: c, shared };
+  })
+  .filter(({ shared }) => shared.length > 0)
+  .sort((a, b) => b.shared.length - a.shared.length)
+  .slice(0, 2);
+
+// Where the reader can actually go. The repository always; a live site only
+// when the survey found one, so this can never publish a demo link that the
+// repository has since taken down.
+const roads = [
+  ['SOURCE', repo.html_url.replace(/^https:\/\//, ''), repo.html_url],
+  repo.homepage && ['LIVE', repo.homepage.replace(/^https:\/\//, '').replace(/\/$/, ''), repo.homepage],
+].filter(Boolean);
+
+const trail = [
+  ['The realm of Orvia', base],
+  [profile.projects.heading, registerHref],
+  [charter.title, null],
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareSourceCode',
+      // The same id the front page gives this holding, so the two pages
+      // describe one thing rather than two things with the same name.
+      '@id': here,
+      name: charter.title,
+      alternateName: repo.name,
+      url: here,
+      codeRepository: repo.html_url,
+      description: charter.standfirst,
+      ...(repo.language ? { programmingLanguage: repo.language } : {}),
+      ...(repo.topics?.length ? { keywords: repo.topics.join(', ') } : {}),
+      author: { '@id': `${home}#person` },
+      maintainer: { '@id': `${home}#person` },
+      isPartOf: { '@id': `${home}#website` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map(([name, href], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(href ? { item: new URL(href, home).href } : {}),
+      })),
+    },
+  ],
+};
+---
+
+<Sheet
+  title={charter.seoTitle}
+  description={charter.standfirst}
+  path={`projects/${charter.slug}/`}
+  schema={schema}
+>
+  <nav class="trail" aria-label="Breadcrumb">
+    <ol>
+      {trail.map(([name, href]) => (
+        <li>{href ? <a href={href}>{name}</a> : <span aria-current="page">{name}</span>}</li>
+      ))}
+    </ol>
+  </nav>
+
+  <Lorebook
+    id={`charter-${charter.slug}`}
+    texture="projects"
+    heading={charter.title}
+    subtitle={charter.seoTitle.split(' · ').slice(1).join(' · ')}
+    folio={charter.folio}
+    numeral={charter.numeral}
+    level={1}
+    intro={charter.body[0]}
+    epigraph={charter.epigraph}
+    ledger={ledger}
+    ledgerNote={charter.standfirst}
+    marginNote="figures drawn from the register"
+    reveal={false}
+    returnHref={null}
+  >
+    {charter.body.slice(1).map((para) => (
+      <p style="margin: 0 0 22px; font-size: 16.5px; line-height: 1.72;">{para}</p>
+    ))}
+
+    {materials.length > 0 && (
+      <div class="holding-survey" style="margin-top: 30px;">
+        <div class="survey-bar" role="img" aria-label={`Built from ${materials.map((m) => `${m.pct}% ${m.lang}`).join(', ')}`}>
+          {materials.map((m) => (
+            <span style={`width: ${m.pct}%; background: ${m.colour};`}></span>
+          ))}
+        </div>
+        <ul class="survey-key">
+          {materials.map((m) => (
+            <li style={`${mono} font-size: 10.5px; color: #6B5836;`}>
+              <i style={`background: ${m.colour};`}></i>{m.lang} <span style="color: #A0906A;">{m.pct}%</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {/* Both sections are optional in the same way a contact row is: a charter
+        half written renders without them rather than failing the build. The
+        rest of this repository warns and carries on, and a page that throws
+        because a section has not been written yet would be the one place that
+        does not. */}
+    {charter.built?.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={`${serif}`}>Built from</h2>
+        <ul class="holding-banners charter-built">
+          {charter.built.map((thing) => (
+            <li style={`${mono} font-size: 11px;`}>{thing}</li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    {charter.limits?.items?.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={`${serif}`}>{charter.limits.heading}</h2>
+        <ul class="charter-limits">
+          {charter.limits.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <h2 class="charter-rule" style={`${serif}`}>Roads out</h2>
+    <ul class="link-list charter-roads">
+      {roads.map(([label, text, href]) => (
+        <li>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1.6px;`}>{label}</span>
+          <a href={href} style={`${mono} font-size: 12.5px;`}>{text}</a>
+        </li>
+      ))}
+    </ul>
+
+    {related.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={`${serif}`}>Neighbouring holdings</h2>
+        <ul class="charter-neighbours">
+          {related.map(({ charter: c, shared }) => (
+            <li>
+              <a href={`${base}projects/${c.slug}/`}>Read the charter of {c.title}</a>
+              <span style={`${mono} font-size: 10.5px; color: #8A7752;`}>shares {shared.join(', ')}</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px; display: flex; gap: 26px; flex-wrap: wrap;">
+      <a href={registerHref} style={`${mono} font-size: 12px;`}>↑ back to the {profile.projects.heading}</a>
+      <a href={`${base}#projects`} style={`${mono} font-size: 12px;`}>↑ return to the map</a>
+    </div>
+  </Lorebook>
+</Sheet>

@@ -1,0 +1,158 @@
+---
+// The register of the Afon Empire: every holding at one address.
+//
+// The province on the map is still the province. This is the index it never
+// had, which is a different job: the map answers "what is here" in one look,
+// and a register answers "is this thing here, and where do I read about it".
+// Search engines can only use the second, and a visitor who arrived at a
+// charter needs somewhere to go that is not the whole front page.
+import Sheet from '../../layouts/Sheet.astro';
+import Lorebook from '../../components/Lorebook.astro';
+import profile from '../../data/profile.js';
+import charters from '../../data/charters.js';
+import github from '../../data/github.json';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const base = import.meta.env.BASE_URL;
+const home = new URL(base, Astro.site).href;
+const here = new URL('projects/', home).href;
+
+const repos = github.repos ?? [];
+
+// Charters first, in the order charters.js lists them, because that order is a
+// judgement and the survey's is a measurement. Then everything else in the
+// order the survey already computed, which the front page uses too.
+const chartered = charters
+  .map((c) => ({ charter: c, repo: repos.find((r) => r.name === c.repo) }))
+  .filter(({ repo }) => repo);
+const charteredNames = new Set(chartered.map(({ repo }) => repo.name));
+const rest = repos.filter((r) => !charteredNames.has(r.name));
+
+const totalCommits = repos.reduce((n, r) => n + (r.commits ?? 0), 0);
+const ledger = [
+  ['holdings', String(repos.length)],
+  ['charters', String(chartered.length)],
+  ['commits', totalCommits.toLocaleString('en-IN')],
+  ['stars', String(repos.reduce((n, r) => n + r.stargazers_count, 0))],
+  ['licence', 'MIT, mostly'],
+];
+
+const trail = [
+  ['The realm of Orvia', base],
+  [profile.projects.heading, null],
+];
+
+const title = `Open source projects by ${profile.site.fullName}`;
+const description = `Every public repository by ${profile.site.fullName} and The Pulse Engine, with written charters for the ${chartered.length} largest: market intelligence, statistical honesty, privacy tooling, browser hardening and machine learning.`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'CollectionPage',
+      '@id': here,
+      url: here,
+      name: title,
+      description,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${home}#website` },
+      about: { '@id': `${home}#person` },
+      // Only the charters are listed, and each by the id its own page claims,
+      // so nothing here invents a second address for a thing that has one.
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListOrder: 'https://schema.org/ItemListOrderAscending',
+        numberOfItems: chartered.length,
+        itemListElement: chartered.map(({ charter }, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: new URL(`projects/${charter.slug}/`, home).href,
+          name: charter.title,
+        })),
+      },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map(([name, href], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(href ? { item: new URL(href, home).href } : {}),
+      })),
+    },
+  ],
+};
+---
+
+<Sheet title={title} description={description} path="projects/" schema={schema}>
+  <nav class="trail" aria-label="Breadcrumb">
+    <ol>
+      {trail.map(([name, href]) => (
+        <li>{href ? <a href={href}>{name}</a> : <span aria-current="page">{name}</span>}</li>
+      ))}
+    </ol>
+  </nav>
+
+  <Lorebook
+    id="register"
+    texture="projects"
+    heading={profile.projects.heading}
+    subtitle={profile.projects.subtitle}
+    folio={`${profile.projects.folio} · REGISTER`}
+    numeral={profile.projects.folio.split(' ').pop()}
+    level={1}
+    intro={profile.projects.intro}
+    epigraph={profile.projects.epigraph}
+    ledger={ledger}
+    ledgerNote={profile.projects.ledgerNote}
+    marginNote={profile.projects.marginNote}
+    reveal={false}
+    returnHref={null}
+  >
+    <h2 class="charter-rule" style={`${serif}`}>Charters</h2>
+    <p style="margin: 0 0 22px; font-size: 15.5px; line-height: 1.68; color: #6B5836;">
+      The holdings written out at length. Each one has its own page: what it
+      does, how it works, and what it deliberately does not do.
+    </p>
+
+    <ul class="charter-index">
+      {chartered.map(({ charter, repo }) => (
+        <li>
+          <a href={`${base}projects/${charter.slug}/`} style={`${serif} font-weight: 600; font-size: clamp(19px, 2.1vw, 24px); letter-spacing: 0.4px;`}>{charter.title}</a>
+          <p style="margin: 6px 0 0; font-size: 15.5px; line-height: 1.66; max-width: 62ch;">{charter.standfirst}</p>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>
+            {[repo.language, `${repo.stargazers_count} ${repo.stargazers_count === 1 ? 'star' : 'stars'}`, typeof repo.commits === 'number' ? `${repo.commits.toLocaleString('en-IN')} commits` : null].filter(Boolean).join(' · ')}
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    {rest.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={`${serif}`}>The rest of the survey</h2>
+        <p style="margin: 0 0 22px; font-size: 15.5px; line-height: 1.68; color: #6B5836;">
+          Everything else the survey found, described by its own repository.
+          These are drawn on the map rather than written out, and a name here
+          goes to its holding in the province.
+        </p>
+        <ul class="charter-index charter-index-plain">
+          {rest.map((repo) => (
+            <li>
+              <a href={`${base}#holding-${repo.name.toLowerCase()}`} style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{repo.name}</a>
+              {repo.description && <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.62; max-width: 62ch;">{repo.description}</p>}
+              <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>
+                <a href={repo.html_url}>{repo.html_url.replace(/^https:\/\//, '')}</a>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+      <a href={`${base}#projects`} style={`${mono} font-size: 12px;`}>↑ return to the map</a>
+    </div>
+  </Lorebook>
+</Sheet>

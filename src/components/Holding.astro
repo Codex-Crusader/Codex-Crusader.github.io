@@ -12,9 +12,14 @@ interface Props {
   // Dealt across the whole set by assignSymbols so the legend stays varied.
   // Falls back to the per-name hash when a holding is rendered on its own.
   symbol?: string;
+  // Where this holding's charter is, when one has been written. Absent for
+  // most holdings, and the line simply does not render: a description is all
+  // the province ever promised, and a "read more" that goes nowhere is worse
+  // than no link at all.
+  charterHref?: string;
 }
 
-const { repo, ago, symbol } = Astro.props;
+const { repo, ago, symbol, charterHref } = Astro.props;
 
 const mono = "font-family: 'JetBrains Mono', monospace;";
 const serif = "font-family: 'Cormorant Garamond', serif;";
@@ -74,6 +79,12 @@ const figures = [
           ))}
         </ul>
       </div>
+    )}
+
+    {charterHref && (
+      <p class="holding-charter" style={`margin: 14px 0 0; ${mono} font-size: 11.5px;`}>
+        <a href={charterHref}>Read the charter of {repo.name} →</a>
+      </p>
     )}
 
     {shown.length > 0 && (

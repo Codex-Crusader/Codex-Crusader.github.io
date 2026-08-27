@@ -10,13 +10,30 @@ sheen stays invisible and the cartouche stays hidden.
 
 ---
 
-## The only file you normally edit
+## The two files you normally edit
 
 **`src/data/profile.js`**
 
 Name, tagline, about text, work history, contact links, ledger figures and
 section headings all live in that one file. Change a string, commit, done. You
 never have to open a component to change wording.
+
+**`src/data/charters.js`**
+
+The long half. One entry per project that has earned a page of its own at
+`/projects/<slug>/`: the prose, the honest limits, the stack, and the handful
+of figures that are quoted rather than counted. It is a second file rather than
+another block in `profile.js` because six charters of prose would be four
+fifths of that file, and the one whose promise is "change a string, commit,
+done" should not need scrolling past three thousand words to reach the contact
+rows.
+
+A repository gets a page because prose exists for it here. That is the whole
+rule, and it is deliberately not `github.featured`: that list means "opens the
+province" and the map re-surveys itself around it, so a second meaning hung on
+it would move settlements every time a page was written. `repo` must match a
+surveyed repository name exactly; one that matches nothing is skipped and
+`npm run build` prints it.
 
 Two things are deliberately **not** in it, because they maintain themselves:
 
@@ -189,22 +206,52 @@ scripts/
 public/                 copied verbatim, including the writ (the résumé PDF)
 src/
   data/profile.js       ← everything about you
+  data/charters.js      ← the long half: one entry per project page
   data/resume.js        the writ, checked and measured against public/
   data/holdings.js      legend marks and material colours for the repos
   components/Holding.astro     one repository, drawn as a holding
   data/section-textures.json   per-spread parchment, from the design
   components/OrviaMap.astro    the map, one component
   components/Lorebook.astro    one lorebook spread, reused five times
+  layouts/Sheet.astro          frame, parchment and head, for the pages that
+                               are not the map
   pages/index.astro     the page
   pages/404.astro       Terra Incognita, for addresses that are not provinces
   pages/resume.astro    /resume, a short road to the writ
+  pages/projects/index.astro   the register of holdings
+  pages/projects/[slug].astro  one charter, per entry in charters.js
   styles/global.css     the design's stylesheet, screen and print
 ```
 
-## The three pages
+## The charters
 
-`index.astro` is the site. The other two exist because a visitor can arrive at
-an address that is not the front page:
+`/projects/` is the register: every repository at one address, the six with
+charters first and the rest linking back to their holding on the map. Each
+charter is `/projects/<slug>/`, and it is the same folio spread the front page
+uses, printed on the Afon Empire's own parchment.
+
+They exist because a province is an anchor, and an anchor is not an address.
+Nobody can link to one holding, no search result can point at one project, and
+a repository description is one sentence. The map is unchanged and still the
+site; these are the pages underneath it.
+
+Three things are true of every charter and worth keeping true:
+
+- **Everything measured still comes off the survey.** Stars, commits, language
+  mix, topics and the neighbouring-holdings links are all read from
+  `github.json` at build time. Only the prose is written by hand.
+- **The spread does not reveal.** Reveals are scroll-driven CSS, and a charter
+  may not scroll, so `Lorebook` takes `reveal={false}` here for the same
+  reason the 404 and `/resume` opt out entirely.
+- **One address per repository.** A holding with a charter is identified in the
+  structured data by its charter URL, on the front page as well as on its own,
+  so the graph describes one project rather than two that share a name.
+
+## The pages
+
+`index.astro` is the site. The rest exist because a visitor can arrive at an
+address that is not the front page, or wants one project rather than all of
+them:
 
 - **`404.astro`**: GitHub Pages serves `404.html` for anything it does not
   recognise. Without it a mistyped URL drops the visitor onto GitHub's grey
@@ -214,6 +261,10 @@ an address that is not the front page:
   "refresh">`. That is HTML, not script, so the no-JavaScript rule stands; a
   visible link sits under it for anyone whose browser ignores the refresh. The
   sitemap lists the PDF itself rather than this page: one address per document.
+- **`projects/index.astro`** and **`projects/[slug].astro`**: the register and
+  the charters, above. Both are in the sitemap, generated from `charters.js`
+  and the survey together, so a charter whose repository has gone leaves the
+  sitemap on the same run it leaves the site.
 
 ## Printing
 

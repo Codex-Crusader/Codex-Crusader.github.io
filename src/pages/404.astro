@@ -24,6 +24,12 @@ const provinces = [
   ['about', profile.about],
   ['contact', profile.contact],
 ];
+
+// The register is not a province, so it is not in the list above. It is still
+// the likeliest thing a visitor was reaching for when they landed here, since
+// every charter address begins with it, and a mistyped charter slug is exactly
+// the wrong address this page now has to answer.
+const register = `${base}projects/`;
 ---
 
 <!doctype html>
@@ -88,8 +94,9 @@ const provinces = [
           ))}
         </ul>
 
-        <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+        <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px; display: flex; gap: 26px; flex-wrap: wrap;">
           <a href={base} style={`${mono} font-size: 12px;`}>↑ return to the map</a>
+          <a href={register} style={`${mono} font-size: 12px;`}>↑ the register of holdings</a>
         </div>
       </section>
     </div>

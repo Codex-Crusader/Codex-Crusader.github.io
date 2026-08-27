@@ -15,8 +15,14 @@
 export default {
   // ── Masthead, sitting above the map ───────────────────────────────────────
   site: {
-    // Shown top-left of the map. Keep it short, it is letterspaced.
-    name: 'B. KRISHNAPUR',
+    // The h1, top-left of the map. It read 'B. KRISHNAPUR' once, which is how
+    // a name is set on a title page and the wrong string for the one heading a
+    // search engine reads as the subject of the page: an initial is not a name
+    // anyone searches for. Written out in full it matches the title tag, the
+    // schema and every external profile, which is what makes those four agree
+    // they are about one person. Still letterspaced, so keep it a name and let
+    // the trade beside it carry the job words.
+    name: 'Bhargavaram Krishnapur',
     // Full name, used for the <title> tag and the copyright line.
     fullName: 'Bhargavaram Krishnapur',
     // Shown beside the name, top-left of the map. What you do, in the words a
@@ -40,8 +46,13 @@ export default {
     // as well as the name: on its own, a name only wins searches from people
     // who already know it.
     metaTitle: 'Bhargavaram Krishnapur, Software Engineer & Open Source Developer',
+    // A description is a claim about the page, not a line of copy. The poetic
+    // version said what the site looks like and never said who it is about, so
+    // a search result for the name showed a sentence that could have described
+    // anyone's portfolio. This one leads with the person and the trade, then
+    // keeps the map, because the map is true and it is the reason to click.
     metaDescription:
-      'Open-source software, local-first tools and photographs, laid out as a map.',
+      'Bhargavaram Krishnapur, software engineer and open-source developer. Local-first tools, machine learning and market intelligence software, laid out as a map.',
     // Under the map, before the realm begins. Who this is, in one sentence, in
     // plain words. The map says what is here, and this says who wrote it.
     //
@@ -148,6 +159,11 @@ export default {
   // written; the ledger is not.
   experience: {
     heading: 'Ponstium Empire',
+    // The heading in plain words, set small under it. A place name says
+    // nothing to a stranger who has not read the map yet, and nothing at all
+    // to a search engine. Kept lowercase because it is set in the mono face,
+    // as a filing annotation rather than a second title.
+    subtitle: 'professional experience',
     folio: 'FOL. I',
     navNote: 'work history',
     epigraph: 'The paper titles and the real work are recorded apart.',
@@ -230,6 +246,7 @@ export default {
   // ── Section II · Afon Empire · projects ───────────────────────────────────
   projects: {
     heading: 'Afon Empire',
+    subtitle: 'open source projects',
     folio: 'FOL. II',
     // Sub-label under the province name in the mobile territory list.
     // Not "github profile" any more: the province is no longer one account's
@@ -255,6 +272,7 @@ export default {
   // ── Section III · Republic of Corum · photographs ─────────────────────────
   gallery: {
     heading: 'Republic of Corum',
+    subtitle: 'photography',
     folio: 'FOL. III',
     navNote: 'photos',
     epigraph: 'These plates were kept, not composed.',
@@ -272,6 +290,7 @@ export default {
   // ── Section IV · Kingdom of Dequm · about ─────────────────────────────────
   about: {
     heading: 'Kingdom of Dequm',
+    subtitle: 'about bhargavaram krishnapur',
     folio: 'FOL. IV',
     navNote: 'who i am',
     epigraph: 'This one province alone is written by a living hand.',
@@ -296,6 +315,7 @@ export default {
   // ── Section V · Phoededia · contact ───────────────────────────────────────
   contact: {
     heading: 'Phoededia',
+    subtitle: 'contact and links',
     folio: 'FOL. V',
     navNote: 'links + email',
     epigraph: 'Only the roads here actually reach the author.',

@@ -11,6 +11,7 @@ import profile from '../data/profile.js';
 import resume from '../data/resume.js';
 import github from '../data/github.json';
 import photos from '../data/photos.json';
+import charters from '../data/charters.js';
 
 // The workflow passes github.run_number in. Locally it falls back to 0.
 const runNumber = import.meta.env.PUBLIC_RUN_NUMBER ?? '0';
@@ -99,6 +100,22 @@ const projectLedger = [
 ];
 
 const base = import.meta.env.BASE_URL; // '/' or '/repo-name/'
+
+// Every absolute address this page publishes is built from these two, and the
+// two are built from what the config was actually deployed with. They were
+// typed literals once, which is fine on the day it is written and wrong the
+// first time SITE_URL or SITE_BASE is set: a project-page deploy would have
+// gone out with a canonical, an og:url and a schema url all pointing at the
+// user page it is not. A canonical that names another site is not a small
+// error, it is an instruction to index the other site instead.
+const home = new URL(base, Astro.site).href;
+const abs = (p) => new URL(p, home).href;
+
+// Which holdings have a page of their own. A repo appears here because prose
+// was written for it in charters.js, and the province picks that up the same
+// way it picks up a description: it asks, rather than keeping its own copy.
+const charterOf = new Map(charters.map((c) => [c.repo, c.slug]));
+const registerHref = `${base}projects/`;
 const plates = (photos.photos ?? []).map((p) => ({
   ...p,
   src: `${base}photos/${p.variants[p.variants.length - 1].name}`,
@@ -213,21 +230,136 @@ const territories = {
 // Structured data. Inert JSON, not a script that runs.
 // Built from profile.js and the live API so it cannot drift from the page:
 // sameAs is whatever contact rows are actually filled in, minus the mailto.
-const personSchema = {
-  '@context': 'https://schema.org',
+//
+// One @graph rather than four loose blocks, because the whole value of it is
+// the joins. Three unrelated objects describe three strangers who happen to
+// share a name; nodes with stable @ids say that the site is written by the
+// person, the page is about the person, and every holding in the Afon Empire
+// was authored by the same person. The ids are addresses on this site and do
+// not move, which is what lets anything else ever point at them.
+const personId = `${home}#person`;
+const siteId = `${home}#website`;
+const pageId = `${home}#webpage`;
+
+// What the survey says he works on, rather than a list of subjects typed in by
+// the person claiming them. Two sources, both measured: the languages GitHub
+// reports, and the topics the repositories carry.
+//
+// A topic has to appear on more than one repository to count. Every topic at
+// once produced ninety entries, half of them tags rather than subjects, and a
+// ninety-item knowsAbout is the keyword wall in a machine-readable coat: it
+// tells a crawler nothing except that the list was not curated. Appearing
+// twice is the cheapest honest test of a subject someone returns to. It is
+// also the feedback loop that matters here, since the way to widen this list
+// is to topic a second repository on GitHub, not to write a claim into this
+// file that no work on the page backs up.
+const topicCount = {};
+for (const r of repos) for (const t of r.topics ?? []) topicCount[t] = (topicCount[t] ?? 0) + 1;
+const knowsAbout = [];
+const seenSubject = new Set();
+for (const subject of [
+  ...repos.map((r) => r.language).filter(Boolean),
+  // Topics are slugs, and a slug is not a subject. "data-pipeline" reads as an
+  // identifier; "data pipeline" reads as a thing a person knows.
+  ...Object.entries(topicCount)
+    .filter(([, n]) => n > 1)
+    .map(([t]) => t.replace(/-/g, ' ')),
+]) {
+  // Case-folded, or the Python the language reports and the python a topic
+  // spells both land in the list.
+  const key = subject.toLowerCase();
+  if (seenSubject.has(key)) continue;
+  seenSubject.add(key);
+  knowsAbout.push(subject);
+}
+
+const person = {
   '@type': 'Person',
+  '@id': personId,
   name: profile.site.fullName,
-  url: 'https://codex-crusader.github.io/',
-  image: 'https://codex-crusader.github.io/og-cover.png',
+  // The handle, named as the alternate it is. The real name is the identity;
+  // this is the door it answers at on three other services.
+  alternateName: profile.github.username,
+  url: home,
+  image: abs('og-cover.png'),
   jobTitle: 'Software Engineer',
   description: profile.site.metaDescription,
   email: contactLinks.find(([, , href]) => href.startsWith('mailto:'))?.[1],
   address: { '@type': 'PostalAddress', addressLocality: 'Mumbai', addressCountry: 'IN' },
   alumniOf: { '@type': 'CollegeOrUniversity', name: 'Vijaybhoomi University' },
-  knowsAbout: [...new Set(repos.map((r) => r.language).filter(Boolean))],
+  // Languages the survey measured, and the topics the repositories themselves
+  // carry. Both are read off the API rather than typed here, so the way to
+  // widen this list is to topic a repository on GitHub, not to write a subject
+  // into this file that no work on the page backs up.
+  // Dropped entirely when the survey is empty, rather than published as an
+  // empty array. A fresh clone builds against stubs, and "knowsAbout: []" is a
+  // sentence that says he knows about nothing.
+  ...(knowsAbout.length ? { knowsAbout } : {}),
   sameAs: contactLinks
     .map(([, , href]) => href)
     .filter((href) => !href.startsWith('mailto:')),
+};
+
+const website = {
+  '@type': 'WebSite',
+  '@id': siteId,
+  url: home,
+  name: 'The realm of Orvia',
+  alternateName: profile.site.fullName,
+  description: profile.site.metaDescription,
+  inLanguage: 'en',
+  author: { '@id': personId },
+  publisher: { '@id': personId },
+};
+
+// ProfilePage rather than WebPage: this page has one subject and the subject
+// is a person. mainEntity says which of the nodes below is that subject, so
+// the page is not read as a page that merely mentions him.
+const webpage = {
+  '@type': 'ProfilePage',
+  '@id': pageId,
+  url: home,
+  name: profile.site.metaTitle,
+  description: profile.site.metaDescription,
+  inLanguage: 'en',
+  isPartOf: { '@id': siteId },
+  about: { '@id': personId },
+  mainEntity: { '@id': personId },
+  primaryImageOfPage: abs('og-cover.png'),
+};
+
+// One node per holding, from the same array the province is drawn from, so the
+// schema cannot list a repository the page does not show. SoftwareSourceCode
+// and not SoftwareApplication: a repository is source, and only some of these
+// are applications anyone installs. Claiming the wrong type is how a page
+// loses rich-result eligibility, and there is nothing here to gain by it.
+const holdingSchemas = repos.map((r) => {
+  // A holding with a charter is addressed by the charter, and only by it. Two
+  // nodes for one repository, one keyed to an anchor here and one keyed to a
+  // page over there, would undo the whole point of giving these ids: the graph
+  // would describe two things that happen to share a name and a source URL.
+  const slug = charterOf.get(r.name);
+  const id = slug ? abs(`projects/${slug}/`) : `${home}#holding-${r.name.toLowerCase()}`;
+  return {
+    '@type': 'SoftwareSourceCode',
+    '@id': id,
+    name: r.name,
+    url: id,
+    codeRepository: r.html_url,
+    ...(r.description ? { description: r.description } : {}),
+    ...(r.language ? { programmingLanguage: r.language } : {}),
+    ...(r.topics?.length ? { keywords: r.topics.join(', ') } : {}),
+    author: { '@id': personId },
+    // mainEntityOfPage, not isPartOf: a repository is not a component of this
+    // page, it is a thing this page is the page about. isPartOf would have
+    // been the one join in the graph that is not literally true.
+    mainEntityOfPage: { '@id': pageId },
+  };
+});
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [person, website, webpage, ...holdingSchemas],
 };
 ---
 
@@ -238,7 +370,7 @@ const personSchema = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{profile.site.metaTitle}</title>
     <meta name="description" content={profile.site.metaDescription} />
-    <link rel="canonical" href="https://codex-crusader.github.io/" />
+    <link rel="canonical" href={home} />
     <!-- Google Search Console ownership. Verification is revoked if this is
          removed, so it stays even though it does nothing for visitors. -->
     <meta name="google-site-verification" content="eo34pFyJFp-2ccSkvZZySrCk_kmRi1c-_oSQL6xxYNk" />
@@ -246,23 +378,28 @@ const personSchema = {
     <!-- The parchment, so a mobile browser's chrome matches the page instead of
          framing it in white. -->
     <meta name="theme-color" content="#C7B991" />
+    <!-- The two card titles were their own typed string once, which meant the
+         page had two titles and the one nobody edits was the one every share
+         showed. They read the same field as the <title> now: a pasted link and
+         a search result are the same promise made in two places, and there is
+         no version of this where they should disagree. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The realm of Orvia" />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:title" content="Bhargavaram Krishnapur · software, open source, maps" />
+    <meta property="og:title" content={profile.site.metaTitle} />
     <meta property="og:description" content={profile.site.metaDescription} />
-    <meta property="og:url" content="https://codex-crusader.github.io/" />
-    <meta property="og:image" content="https://codex-crusader.github.io/og-cover.png" />
+    <meta property="og:url" content={home} />
+    <meta property="og:image" content={abs('og-cover.png')} />
     <!-- Declared so the card reserves the right shape before the image lands. -->
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Bhargavaram Krishnapur · software, open source, maps" />
+    <meta name="twitter:title" content={profile.site.metaTitle} />
     <meta name="twitter:description" content={profile.site.metaDescription} />
-    <meta name="twitter:image" content="https://codex-crusader.github.io/og-cover.png" />
+    <meta name="twitter:image" content={abs('og-cover.png')} />
     <meta property="og:image:alt" content="A hand-drawn map of the realm of Orvia, the portfolio's five sections shown as provinces." />
     <meta name="twitter:image:alt" content="A hand-drawn map of the realm of Orvia, the portfolio's five sections shown as provinces." />
-    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -393,6 +530,7 @@ const personSchema = {
       <Lorebook
         id="experience"
         heading={profile.experience.heading}
+        subtitle={profile.experience.subtitle}
         folio={profile.experience.folio}
         intro={profile.experience.intro}
         ledger={profile.experience.ledger}
@@ -444,6 +582,7 @@ const personSchema = {
       <Lorebook
         id="projects"
         heading={profile.projects.heading}
+        subtitle={profile.projects.subtitle}
         folio={profile.projects.folio}
         intro={profile.projects.intro}
         ledger={projectLedger}
@@ -458,19 +597,28 @@ const personSchema = {
               recently it was pushed. sync-github.js does that sort, so
               github.json is the ledger's order and this page has no second
               opinion about it. */}
-          {repos.map((r) => <Holding repo={r} ago={ago} symbol={holdingSymbols.get(r.name)} />)}
+          {repos.map((r) => <Holding repo={r} ago={ago} symbol={holdingSymbols.get(r.name)} charterHref={charterOf.has(r.name) ? `${base}projects/${charterOf.get(r.name)}/` : undefined} />)}
           {repos.length === 0 && (
             <p style={`margin: 0; ${mono} font-size: 12px; color: #8A7752;`}>
               No repositories surveyed yet. Run <code>npm run sync</code> or wait for the nightly build.
             </p>
           )}
         </div>
+
+        {/* The province is a picture of the holdings; the register is a list of
+            them at an address of its own. The map cannot be linked to a
+            particular holding from outside, and a list can, which is the whole
+            reason the register exists. */}
+        <p class="holdings-register" style={`margin: 30px 0 0; ${mono} font-size: 12px;`}>
+          <a href={registerHref}>The register of holdings, every repository at one address →</a>
+        </p>
       </Lorebook>
 
       <!-- ============ SECTION III · GALLERY ============ -->
       <Lorebook
         id="gallery"
         heading={profile.gallery.heading}
+        subtitle={profile.gallery.subtitle}
         folio={profile.gallery.folio}
         intro={profile.gallery.intro}
         ledger={galleryLedger}
@@ -525,6 +673,7 @@ const personSchema = {
       <Lorebook
         id="about"
         heading={profile.about.heading}
+        subtitle={profile.about.subtitle}
         folio={profile.about.folio}
         intro={profile.about.paragraphs[0]}
         ledger={profile.about.ledger}
@@ -548,6 +697,7 @@ const personSchema = {
       <Lorebook
         id="contact"
         heading={profile.contact.heading}
+        subtitle={profile.contact.subtitle}
         folio={profile.contact.folio}
         intro={profile.contact.intro}
         ledger={contactLedger}
