@@ -330,6 +330,12 @@ export default {
       ['EMAIL', 'bhargavaramkrishnapur@gmail.com', 'mailto:bhargavaramkrishnapur@gmail.com'],
       ['GITHUB', 'github.com/Codex-Crusader', 'https://github.com/Codex-Crusader'],
       ['LINKEDIN', 'linkedin.com/in/bhargavaram-krishnapur', 'https://www.linkedin.com/in/bhargavaram-krishnapur/'],
+      // The handle rather than the name, because that is what the profile is
+      // actually called. Every road in this list is also a sameAs in the
+      // schema, which is the point of adding it: an identity is a set of
+      // profiles that point at each other, and the site owns the half that
+      // points back.
+      ['REDDIT', 'reddit.com/user/Codex_Crusader', 'https://www.reddit.com/user/Codex_Crusader/'],
     ],
     ledger: [
       ['response', '~2 days'],
