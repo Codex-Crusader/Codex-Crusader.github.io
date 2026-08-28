@@ -76,18 +76,18 @@ const schema = {
       isPartOf: { '@id': `${home}writing/` },
       mainEntityOfPage: here,
       ...(article.tags?.length ? { keywords: article.tags.join(', ') } : {}),
-      // What the article is about, named by the id each project already has.
-      // A project with a charter is that charter's id, which is the same id the
-      // front page gives the holding, so this points into the existing graph
-      // rather than minting a second node for the same thing.
+      // What the article is about, named by the id each project already has,
+      // and ONLY by that id.
+      //
+      // Every surveyed repository already has exactly one node in the graph:
+      // its charter URL when it has a charter, and its holding anchor on the
+      // front page when it does not. chronicle.js resolves that address for
+      // both cases, so this references it and never describes the project
+      // again. An inline node here, even a small one, would be a second thing
+      // in the graph with the same name as the first, which is the one outcome
+      // the whole id scheme exists to prevent.
       ...(article.projects.length
-        ? {
-            about: article.projects.map((p) =>
-              p.hasCharter
-                ? { '@id': new URL(p.href, Astro.site).href }
-                : { '@type': 'SoftwareSourceCode', name: p.repo },
-            ),
-          }
+        ? { about: article.projects.map((p) => ({ '@id': new URL(p.href, Astro.site).href })) }
         : {}),
     },
     {

@@ -14,17 +14,31 @@
 // so the two directions cannot disagree and there is no second list to update
 // when an article is written.
 //
-// ── On failing the build ────────────────────────────────────────────────────
+// ── On a name the survey does not know ──────────────────────────────────────
 //
-// A project name that matches no surveyed repository is a typo in a file
-// somebody just edited, and it fails the build rather than warning. That is
-// deliberately harsher than the rule charters.js keeps for a missing repo,
-// where the world changed under the site and a deploy should still go out.
+// It warns and drops the link. It does not fail the build, and an earlier
+// version of this file that did was wrong for a reason worth writing down.
 //
-// The check is skipped when the survey is empty, because `npm run build` is
-// required to work on a fresh clone with no network: ensure-data.js drops in
-// empty stubs, and a validation that cannot tell "no such repo" from "no data
-// yet" would fail every clone. An empty survey means unknown, not absent.
+// The argument for failing was that a project name matching nothing is a typo
+// in a file somebody just edited. That is one of the two ways it can happen.
+// The other is that the repository was archived, renamed or added to
+// `profile.github.exclude`, at which point the survey stops reporting it. From
+// in here those two are indistinguishable: both are a string that matches no
+// repo. Failing the build treats them identically and picks the wrong one, so a
+// repository archived on a Tuesday kills the nightly deploy on Tuesday night,
+// for a reason the author never sees because nobody is watching that run.
+//
+// That is exactly the case charters.js already decided, and it decided it the
+// other way: a missing repository is the world changing under the site, it is
+// not the author's fault, and the deploy should still go out. This follows it.
+// The build prints the name, the article keeps its prose, and only the link
+// disappears, on the same rule that keeps an unfinished contact row from
+// shipping as a dead link.
+//
+// The check is skipped entirely when the survey is empty, because `npm run
+// build` is required to work on a fresh clone with no network: ensure-data.js
+// drops in empty stubs, and a check that cannot tell "no such repo" from "no
+// data yet" would warn on every clone. An empty survey means unknown.
 
 import writing from './writing.js';
 import charters from './charters.js';
@@ -62,26 +76,32 @@ const articles = writing
   .map((article) => {
     const words = wordsIn(article);
 
-    const projects = (article.projects ?? []).map((repo) => {
-      if (surveyed.size && !surveyed.has(repo)) {
-        throw new Error(
-          `writing.js: article "${article.slug}" names project "${repo}", which is not a surveyed repository. ` +
-            `Use the exact repository name. Surveyed: ${[...surveyed].sort().join(', ')}`,
+    const projects = (article.projects ?? [])
+      .filter((repo) => {
+        if (!surveyed.size || surveyed.has(repo)) return true;
+        console.warn(
+          `chronicle: article "${article.slug}" names project "${repo}", which the survey does not ` +
+            `report. Either the name is wrong or the repository has gone. Dropping that link.`,
         );
-      }
-      const charter = charterOf.get(repo);
-      const found = repos.find((r) => r.name === repo);
-      return {
-        repo,
-        // A project with a charter is linked to its charter, which is the page
-        // written about it. One without is linked to its holding on the map,
-        // which is the only address it has. Same rule the register keeps.
-        title: charter?.title ?? repo,
-        href: charter ? `${base}projects/${charter.slug}/` : `${base}#holding-${repo.toLowerCase()}`,
-        hasCharter: Boolean(charter),
-        description: found?.description ?? null,
-      };
-    });
+        return false;
+      })
+      .map((repo) => {
+        const charter = charterOf.get(repo);
+        const found = repos.find((r) => r.name === repo);
+        return {
+          repo,
+          // A project with a charter is linked to its charter, which is the
+          // page written about it. One without is linked to its holding on the
+          // map, which is the only address it has, and which is also the id the
+          // front page gives that holding. Same rule the register keeps.
+          title: charter?.title ?? repo,
+          href: charter
+            ? `${base}projects/${charter.slug}/`
+            : `${base}#holding-${repo.toLowerCase()}`,
+          hasCharter: Boolean(charter),
+          description: found?.description ?? null,
+        };
+      });
 
     return {
       ...article,

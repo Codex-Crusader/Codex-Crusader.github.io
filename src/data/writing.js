@@ -26,12 +26,12 @@
 //  file which articles named it. There is no second list to maintain on the
 //  charter side, so the two halves cannot disagree.
 //
-//  A name here that matches no charter is a mistake, and `npm run build` fails
-//  on it rather than warning. That is a harder rule than the one charters.js
-//  keeps for a missing repository, and the difference is deliberate: a missing
-//  repository is the world changing under the site, which is not the author's
-//  fault and should not stop a deploy, while a project name that matches
-//  nothing is a typo in a file somebody just edited.
+//  A name the survey does not report is printed by `npm run build` and its link
+//  is dropped, the article keeping its prose. It does not fail the build: a name
+//  matching nothing is either a typo or a repository that has since been
+//  archived, renamed or excluded, and from inside the build those two look
+//  identical. Failing would let an archived repo kill a nightly deploy nobody is
+//  watching. Same rule charters.js already keeps for a missing repository.
 //
 //  ── Figures ────────────────────────────────────────────────────────────────
 //
