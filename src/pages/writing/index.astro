@@ -1,0 +1,127 @@
+---
+// /writing/ · the chronicles.
+//
+// The register lists what was built. This lists what was written about it, and
+// the two are deliberately linked in one direction only: an article names the
+// projects it is about, and every charter works out its own "related articles"
+// by asking chronicle.js which articles named it. One list, both directions.
+//
+// Reading times on this page are counted from the prose at build time, not
+// typed into writing.js. A reader uses that figure to decide whether to open
+// something, which is exactly the kind of number that must not be a guess
+// somebody forgot to update.
+import Sheet from '../../layouts/Sheet.astro';
+import Lorebook from '../../components/Lorebook.astro';
+import profile from '../../data/profile.js';
+import articles from '../../data/chronicle.js';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const base = import.meta.env.BASE_URL;
+const home = new URL(base, Astro.site).href;
+const here = new URL('writing/', home).href;
+
+const totalWords = articles.reduce((n, a) => n + a.words, 0);
+const linkedProjects = new Set(articles.flatMap((a) => a.projects.map((p) => p.repo)));
+
+const ledger = [
+  ['articles', String(articles.length)],
+  ['words', totalWords.toLocaleString('en-IN')],
+  ['projects covered', String(linkedProjects.size)],
+  ['newest', articles[0]?.published ?? '–'],
+  ['licence', 'read freely'],
+];
+
+const trail = [
+  ['The realm of Orvia', base],
+  ['Writing', null],
+];
+
+const title = `Writing by ${profile.site.fullName}, on software and machine learning`;
+const description = `Technical writing by ${profile.site.fullName}: local-first software, explainable market intelligence, transformers from scratch, neuroevolution, browser hardening and what deliberately bad code teaches.`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Blog',
+      '@id': here,
+      url: here,
+      name: title,
+      description,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${home}#website` },
+      author: { '@id': `${home}#person` },
+      publisher: { '@id': `${home}#person` },
+      blogPost: articles.map((a) => ({
+        '@type': 'TechArticle',
+        // The id each article's own page claims, so the graph holds one node
+        // per article rather than a listing copy and a page copy.
+        '@id': new URL(a.path, home).href,
+        headline: a.title,
+        url: new URL(a.path, home).href,
+        datePublished: a.published,
+        author: { '@id': `${home}#person` },
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map(([name, href], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(href ? { item: new URL(href, home).href } : {}),
+      })),
+    },
+  ],
+};
+---
+
+<Sheet title={title} description={description} path="writing/" schema={schema}>
+  <nav class="trail" aria-label="Breadcrumb">
+    <ol>
+      {trail.map(([name, href]) => (
+        <li>{href ? <a href={href}>{name}</a> : <span aria-current="page">{name}</span>}</li>
+      ))}
+    </ol>
+  </nav>
+
+  <Lorebook
+    id="chronicles"
+    texture="about"
+    heading="The Chronicles"
+    subtitle="technical writing"
+    folio="FOL. VI · CHRONICLES"
+    numeral="VI"
+    level={1}
+    intro="Longer pieces about the work: what I built, why it is built that way, and what went wrong on the way there. Each one is about something public, and every project it mentions has a page of its own in the register of holdings."
+    epigraph="What is written here was built first."
+    ledger={ledger}
+    ledgerNote="Reading times are counted from the prose on every build, not typed in."
+    marginNote="set down after the fact"
+    reveal={false}
+    returnHref={null}
+  >
+    <ul class="charter-index">
+      {articles.map((a) => (
+        <li>
+          <a href={a.href} style={`${serif} font-weight: 600; font-size: clamp(19px, 2.1vw, 24px); letter-spacing: 0.4px;`}>{a.title}</a>
+          <p style="margin: 6px 0 0; font-size: 15.5px; line-height: 1.66; max-width: 62ch;">{a.standfirst}</p>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>
+            {[
+              a.published,
+              `${a.readingTime} min read`,
+              a.projects.length ? `on ${a.projects.map((p) => p.title).join(', ')}` : null,
+            ].filter(Boolean).join(' · ')}
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+      <a href={`${base}projects/`} style={`${mono} font-size: 12px;`}>→ the projects these are about</a>
+      <a href={base} style={`${mono} font-size: 12px; margin-left: 18px;`}>↑ return to the map</a>
+    </div>
+  </Lorebook>
+</Sheet>

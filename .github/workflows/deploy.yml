@@ -40,6 +40,11 @@ jobs:
       - name: Scan photos
         run: npm run photos
 
+      # Resize project screenshots and strip their metadata, the same way the
+      # photographs are handled.
+      - name: Scan screenshots
+        run: npm run shots
+
       - name: Build
         run: npm run build
         env:

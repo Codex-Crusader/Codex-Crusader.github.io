@@ -1,74 +1,215 @@
 ---
-// A short road to the writ, so /resume can be written on a card or dropped in
-// an email signature without spelling out the filename.
+// /resume/ · the writ, as a document rather than a doorway.
 //
-// The hop is a plain <meta http-equiv="refresh">, which is HTML, not script,
-// the no-JavaScript rule stands. A visible link sits underneath it regardless,
-// because a page that only works by redirecting is a page that fails silently
-// for anyone whose browser has refreshes turned off.
-import '../styles/global.css';
+// This page used to be a <meta http-equiv="refresh"> hop to the PDF, with its
+// canonical pointing at the file. That made it an address rather than a page:
+// nothing to read, nothing to rank, and nothing at all for anyone who cannot
+// open a PDF comfortably, which on a phone is most people.
+//
+// It is now the résumé itself, set in HTML, with the PDF offered as the
+// download it always was. The canonical moved here with the content, which does
+// not orphan the file: a canonical is a statement about which of two documents
+// is the one to index, and the file is still linked, still downloadable, and
+// still the thing you would attach to an application.
+//
+// Everything on it is read from profile.js, which is the same source the front
+// page and /experience/ read. A résumé that has to be updated separately is a
+// résumé that will quietly disagree with the site it sits on.
+//
+// The PDF gate still matters and still applies, but only to the PDF. If the
+// file is missing the download row disappears rather than shipping a link to a
+// 404, exactly as before. The page itself no longer disappears with it, because
+// the page is now the primary document and the file is the attachment. Gating
+// the writing on the presence of its own PDF would be the wrong way round.
+import Sheet from '../layouts/Sheet.astro';
+import Lorebook from '../components/Lorebook.astro';
 import profile from '../data/profile.js';
 import resume from '../data/resume.js';
+import charters from '../data/charters.js';
+import github from '../data/github.json';
+import { parseTenure, spanLabel } from '../data/tenure.js';
 
 const mono = "font-family: 'JetBrains Mono', monospace;";
 const serif = "font-family: 'Cormorant Garamond', serif;";
 
 const base = import.meta.env.BASE_URL;
-// Absolute, for the canonical tag. Astro.site is the configured site URL.
-const pdfUrl = new URL(resume.href, Astro.site).href;
+const home = new URL(base, Astro.site).href;
+const here = new URL('resume/', home).href;
+
+const roles = profile.experience.roles;
+const page = profile.about.page;
+const repos = github.repos ?? [];
+
+const spans = roles.map((r) => {
+  const t = parseTenure(r.meta);
+  return t ? spanLabel(t) : null;
+});
+
+// The projects worth naming on a résumé are the ones with a page to send a
+// reader to, in the order charters.js already judged. A charter whose
+// repository has left the survey drops out here too, so this cannot print a
+// line pointing at a page that no longer builds.
+const projects = charters
+  .map((c) => ({ charter: c, repo: repos.find((r) => r.name === c.repo) }))
+  .filter(({ repo }) => repo);
+
+const contactLinks = profile.contact.links.filter(([, text, href]) => href && text);
+
+const ledger = [
+  ['posts held', String(roles.length)],
+  ['projects', String(projects.length)],
+  ['based in', 'Mumbai, IN'],
+  ...(resume.published ? [['pdf', resume.size]] : []),
+  ['revised', profile.resume.revised],
+];
+
+const trail = [
+  ['The realm of Orvia', base],
+  ['Résumé', null],
+];
+
+const title = `Résumé of ${profile.site.fullName}, software engineer`;
+const description = `The résumé of ${profile.site.fullName}: ${roles.length} posts, ${projects.length} written-up open-source projects, education and skills, as a readable page with the PDF available to download.`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': here,
+      url: here,
+      name: title,
+      description,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${home}#website` },
+      about: { '@id': `${home}#person` },
+      mainEntity: { '@id': `${home}#person` },
+      ...(resume.published
+        ? {
+            // The download, described as what it is: the same document in
+            // another format, not a second thing to index.
+            associatedMedia: {
+              '@type': 'MediaObject',
+              contentUrl: new URL(resume.href, Astro.site).href,
+              encodingFormat: 'application/pdf',
+              name: `${profile.site.fullName} résumé (PDF)`,
+            },
+          }
+        : {}),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map(([name, href], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(href ? { item: new URL(href, home).href } : {}),
+      })),
+    },
+  ],
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{resume.published ? `Résumé, ${profile.site.fullName}` : `The writ is not published, ${profile.site.fullName}`}</title>
-    <meta name="theme-color" content="#C7B991" />
-    {resume.published ? (
-      <>
-        <meta http-equiv="refresh" content={`0; url=${resume.href}`} />
-        <link rel="canonical" href={pdfUrl} />
-        <meta name="description" content={`The résumé of ${profile.site.fullName}, as a PDF.`} />
-      </>
-    ) : (
-      <meta name="robots" content="noindex, follow" />
+<Sheet title={title} description={description} path="resume/" schema={schema}>
+  <nav class="trail" aria-label="Breadcrumb">
+    <ol>
+      {trail.map(([name, href]) => (
+        <li>{href ? <a href={href}>{name}</a> : <span aria-current="page">{name}</span>}</li>
+      ))}
+    </ol>
+  </nav>
+
+  <Lorebook
+    id="writ"
+    texture="experience"
+    heading={profile.site.fullName}
+    subtitle="résumé"
+    folio="THE WRIT"
+    numeral="W"
+    level={1}
+    intro={profile.site.standfirst}
+    epigraph={profile.resume.line}
+    ledger={ledger}
+    ledgerNote={resume.published
+      ? `The same service set on one sheet. The PDF is ${resume.size}, revised ${profile.resume.revised}.`
+      : 'The PDF is not on file. Everything it holds is on this page.'}
+    marginNote="one sheet, fit to print"
+    reveal={false}
+    returnHref={null}
+  >
+    {resume.published && (
+      <p class="writ-download">
+        <a href={resume.href} download style={`${mono} font-size: 13px;`}>↓ Download the résumé as a PDF</a>
+        <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>
+          {resume.size} · revised {profile.resume.revised}
+        </span>
+      </p>
     )}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="page" style="max-width: 1040px; margin: 0 auto; padding: 0 44px; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
-      <section
-        class="spread"
-        style="width: 100%; max-width: 560px; background: #E9DFC4; border: 2px solid #4A3B22; border-radius: 5px; padding: 44px 48px 38px; box-shadow: 0 2px 0 #B9A87E inset, 0 18px 44px -14px rgba(44,34,16,0.5); margin: 56px 0; text-align: center;"
-      >
-        {resume.published ? (
-          <>
-            <div style={`${mono} font-size: 11px; color: #8C3B22; letter-spacing: 2px; margin-bottom: 14px;`}>{profile.resume.label}</div>
-            <p style={`margin: 0 0 22px; ${serif} font-style: italic; font-size: 18px; line-height: 1.5; color: #6B5836;`}>
-              Fetching the writ. If nothing happens, the road is just below.
-            </p>
-            <a href={resume.href} download style={`${mono} font-size: 14px; overflow-wrap: anywhere;`}>↓ {resume.file}</a>
-            <p style={`margin: 10px 0 0; ${mono} font-size: 10.5px; color: #8A7752;`}>PDF · {resume.size} · revised {profile.resume.revised}</p>
-          </>
-        ) : (
-          <>
-            <div style={`${mono} font-size: 11px; color: #8C3B22; letter-spacing: 2px; margin-bottom: 14px;`}>NO WRIT ON FILE</div>
-            <p style={`margin: 0 0 22px; ${serif} font-style: italic; font-size: 18px; line-height: 1.5; color: #6B5836;`}>
-              This road was drawn before the document was. Nothing to fetch yet.
-            </p>
-          </>
-        )}
-        <div class="return-link" style="margin-top: 28px; border-top: 1px solid #B9A87E; padding-top: 16px;">
-          <a href={base} style={`${mono} font-size: 12px;`}>↑ return to the map</a>
+
+    <h2 class="charter-rule" style={serif}>Experience</h2>
+    <ul class="charter-index charter-index-plain">
+      {roles.map((role, i) => (
+        <li>
+          <span style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{role.title}</span>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px; display: block; margin-top: 4px;`}>
+            {role.meta}{spans[i] ? ` · ${spans[i]}` : ''}
+          </span>
+          <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.62; max-width: 62ch;">{role.body}</p>
+        </li>
+      ))}
+    </ul>
+    <p style={`${mono} font-size: 11px; color: #8A7752; line-height: 1.7;`}>
+      <a href={`${base}experience/`}>Read the full work history</a>, with responsibilities and
+      achievements for each post.
+    </p>
+
+    <h2 class="charter-rule" style={serif}>Selected projects</h2>
+    <ul class="charter-index charter-index-plain">
+      {projects.map(({ charter, repo }) => (
+        <li>
+          <a href={`${base}projects/${charter.slug}/`} style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{charter.title}</a>
+          <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.62; max-width: 62ch;">{charter.standfirst}</p>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>
+            {[repo.language, charter.built?.slice(0, 4).join(' · ')].filter(Boolean).join(' · ')}
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    <h2 class="charter-rule" style={serif}>Skills</h2>
+    <dl class="skill-groups">
+      {page.skills.map((group) => (
+        <div class="skill-group">
+          <dt style={`${mono} font-size: 10.5px; letter-spacing: 1.6px; color: #8C3B22; text-transform: uppercase;`}>{group.area}</dt>
+          <dd style="margin: 7px 0 0; font-size: 15px; line-height: 1.7;">{group.items.join(' · ')}</dd>
         </div>
-      </section>
+      ))}
+    </dl>
+
+    <h2 class="charter-rule" style={serif}>Education</h2>
+    <ul class="charter-index charter-index-plain">
+      {page.education.map((entry) => (
+        <li>
+          <span style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{entry.qualification}</span>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px; display: block; margin-top: 4px;`}>{entry.institution} · {entry.meta}</span>
+        </li>
+      ))}
+    </ul>
+
+    <h2 class="charter-rule" style={serif}>Contact</h2>
+    <ul class="link-list charter-roads">
+      {contactLinks.map(([label, text, href]) => (
+        <li>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1.6px;`}>{label}</span>
+          <a href={href} style={`${mono} font-size: 12.5px;`}>{text}</a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+      <a href={`${base}about/`} style={`${mono} font-size: 12px;`}>→ about Bhargavaram Krishnapur</a>
+      <a href={`${base}projects/`} style={`${mono} font-size: 12px; margin-left: 18px;`}>→ the projects</a>
+      <a href={base} style={`${mono} font-size: 12px; margin-left: 18px;`}>↑ return to the map</a>
     </div>
-  </body>
-</html>
+  </Lorebook>
+</Sheet>

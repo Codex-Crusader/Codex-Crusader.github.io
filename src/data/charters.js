@@ -251,4 +251,76 @@ export default [
       ['javascript', 'none'],
     ],
   },
+  // ── VII ──────────────────────────────────────────────────────────────────
+  {
+    repo: 'Uni-basketball-ETL-pipeline',
+    slug: 'uni-basketball-etl-pipeline',
+    title: 'NCAA Outcome Predictor',
+    folio: 'CHARTER VII',
+    // The mark in the corner. Set apart from the folio line so the two are
+    // not printed twice over each other.
+    numeral: 'VII',
+    seoTitle: 'NCAA Outcome Predictor · a self-retraining basketball pipeline that caught itself cheating',
+    standfirst:
+      'A basketball prediction pipeline that fetches real NCAA games from ESPN, trains six models against each other, deploys the winner, and retrains itself on a schedule. Its accuracy went down when it was fixed, and that is the part worth reading.',
+    epigraph: 'The number went down. That is the correct result.',
+    body: [
+      'Most student machine-learning projects train once on a fixed dataset and stop there. This one fetches real NCAA game data from ESPN across three seasons, about 2,900 games, with no API key needed. It then trains six models in competition, keeps whichever scores best, serves it behind a web dashboard, and runs the whole cycle again on its own every six hours. It has been improving itself since the day it was deployed.',
+      'The interesting part is not the accuracy. An early version scored an AUC of 0.9666, which is the kind of number that should make you suspicious rather than pleased. It was cheating. One of the features held what a team shot during the game, so the model had learned that teams who shoot well win, and it was reading the result off the box score while calling it a forecast. That is data leakage, and it is the most common way a model looks brilliant and is worthless.',
+      'The fix was to make every feature something you could actually know before tip-off. Each field now holds a rolling average of that team’s last ten games going into that night, so a shooting percentage of 0.47 means "this team has averaged 47% over its last ten", not "this team shot 47% in the game I am pretending to predict". Games where either side has no history yet are dropped from training entirely. The AUC fell from 0.9666 to about 0.74. The lower number is the honest one.',
+      'Because that mistake is easy to make twice, the pipeline now checks for it before any model sees the data. Four validations run first: leakage detection flags any feature correlating above 0.70 with the outcome, near-zero variance features are caught, class balance has to sit between a 40% and 70% home win rate, and a sample-to-feature ratio check catches the conditions that cause overfitting. Tree depth is capped automatically from the size of the dataset, so a small dataset cannot be overfit just because a config file said it could.',
+      'The rest is built the way a pipeline in a real job would be, rather than as a notebook. Structured logging, a versioned model registry that can roll back, a REST API, deduplication, adaptive regularisation, and a background scheduler that retrains without anyone asking it to. One command runs the whole thing.',
+    ],
+    limits: {
+      heading: 'What it is not',
+      items: [
+        'Not a betting tool, and not advice. An AUC of about 0.74 means it is better than a coin toss and a long way from certain.',
+        'The public demo runs on a mix of synthetic and real NCAA data, so the metrics shown there do not represent real prediction performance. The honest figure is the one quoted here.',
+        'It predicts from form going into a game. It knows nothing about injuries, travel, or anything else that never reaches a box score.',
+      ],
+    },
+    built: ['Python', 'scikit-learn', 'Flask', 'pandas', 'ESPN API'],
+    ledgerExtra: [
+      ['games', '~2,900'],
+      ['models trained', '6'],
+      ['honest auc', '~0.74'],
+      ['retrains', 'every 6h'],
+    ],
+  },
+
+  // ── VIII ─────────────────────────────────────────────────────────────────
+  {
+    repo: 'azlite_type_chess_bot',
+    slug: 'azlite-type-chess-bot',
+    title: 'AZ-Lite',
+    folio: 'CHARTER VIII',
+    // The mark in the corner. Set apart from the folio line so the two are
+    // not printed twice over each other.
+    numeral: 'VIII',
+    seoTitle: 'AZ-Lite · an AlphaZero-style chess engine in Python that learns from self-play',
+    standfirst:
+      'A compact chess engine that learns entirely by playing itself. Monte Carlo tree search guided by a policy and value network, with the whole pipeline in the open: self-play, replay data, training loop, checkpoints, and a command line you can play against.',
+    epigraph: 'It is taught by nobody. It is only ever played against itself.',
+    body: [
+      'AZ-Lite is an AlphaZero-inspired chess engine written in Python. It is deliberately small. The point was never to build something that beats a real engine, it was to build the AlphaZero idea end to end and be able to read every part of it afterwards.',
+      'The search is Monte Carlo tree search using PUCT, which is the rule that decides which move to explore next. Left alone, tree search is a brute-force method that has to look at everything. Here it is guided: a small neural network suggests which moves are worth considering, the policy, and how good a position looks, the value. The search spends its effort where the network points, and the network gets better because the search keeps finding moves it did not expect. Move scoring is done on the fly through learned move embeddings, which is what keeps the implementation compact enough to read.',
+      'It learns from nothing but itself. The engine plays its own games, writes them out as JSONL replay data, trains on that data, and saves a checkpoint. Then it does it again, now slightly stronger, and the games it generates are slightly better than the ones it trained on. There is no opening book, no database of grandmaster games, and no human evaluation function. It is handed the rules and left with them.',
+      'The whole pipeline is driven from one command line with three modes: selfplay to generate games, train to learn from them, and play to sit down against it. That matters more than it sounds. A lot of reinforcement learning code exists as fragments that only the author can assemble, and a project you cannot run end to end in a single afternoon is a project nobody else will ever learn from.',
+    ],
+    limits: {
+      heading: 'What it is not',
+      items: [
+        'Not competitive with a real chess engine, and not trying to be. Stockfish is not the comparison; the comparison is a version of AlphaZero small enough to read in one sitting.',
+        'Strength is bounded by how much self-play you are willing to run. A demo trained on twenty games plays like an engine trained on twenty games.',
+        'Written to be readable and extensible rather than fast. Distributed self-play, a larger network and a graphical board are all left as places to extend it.',
+      ],
+    },
+    built: ['Python', 'Monte Carlo tree search', 'Neural networks', 'Self-play reinforcement learning'],
+    ledgerExtra: [
+      ['search', 'PUCT MCTS'],
+      ['learns from', 'self-play only'],
+      ['modes', 'selfplay, train, play'],
+      ['opening book', 'none'],
+    ],
+  },
 ];

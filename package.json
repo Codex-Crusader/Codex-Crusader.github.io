@@ -6,10 +6,11 @@
   "scripts": {
     "sync": "node scripts/sync-github.js",
     "photos": "node scripts/scan-photos.js",
+    "shots": "node scripts/scan-screenshots.js",
     "dev": "node scripts/ensure-data.js && astro dev",
     "build": "node scripts/ensure-data.js && node scripts/check-profile.js && astro build && node scripts/draw-cover.js && node scripts/check-typography.js",
     "preview": "astro preview",
-    "refresh": "npm run sync && npm run photos && npm run build"
+    "refresh": "npm run sync && npm run photos && npm run shots && npm run build"
   },
   "dependencies": {
     "astro": "^5.2.5",

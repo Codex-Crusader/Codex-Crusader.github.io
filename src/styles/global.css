@@ -1421,3 +1421,185 @@ a:hover {
   color: #8a7752;
   text-transform: lowercase;
 }
+
+/* ── The standalone folios ─────────────────────────────────────────────────
+   /about/, /experience/, /writing/ and /resume/ are the same spread the front
+   page uses, carrying content the map had nowhere to put: a grouped skills
+   list, a post broken into its parts, an article set as prose.
+
+   Everything here sits below the handoff rule, and none of it introduces a
+   colour, a face or a measure the design did not already use. The palette is
+   the parchment's: #4A3B22 ink, #8A7752 for the annotations, #8C3B22 for the
+   rubric, #B9A87E for a rule. */
+
+/* A term and its list, used for skills and for interests. Two columns where
+   there is room, one where there is not, and never a fixed height: the groups
+   are different lengths and pretending otherwise leaves gaps. */
+.skill-groups {
+  margin: 0 0 26px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px 34px;
+}
+
+.skill-group {
+  border-top: 1px solid #b9a87e;
+  padding-top: 10px;
+}
+
+.skill-group dt {
+  margin: 0;
+}
+
+.skill-group dd {
+  color: #4a3b22;
+  max-width: 46ch;
+}
+
+/* The line that says which figures were counted rather than claimed. Set apart
+   from the prose it qualifies, in the annotation face, because it is a note
+   about the page and not a sentence of it. */
+.measured-note {
+  margin: 0 0 30px;
+  padding: 12px 0 0;
+  border-top: 1px solid #b9a87e;
+  max-width: 68ch;
+}
+
+/* One post, unpacked. The rule above each is what separates ten of these from
+   one long undifferentiated column. */
+.post-full {
+  margin: 0 0 38px;
+  padding-top: 22px;
+  border-top: 1px solid #b9a87e;
+}
+
+.post-full:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.post-full-label {
+  margin: 20px 0 8px;
+  font-size: 10.5px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #8c3b22;
+  font-weight: 400;
+}
+
+.post-full-list {
+  margin: 0;
+  padding-left: 18px;
+  max-width: 64ch;
+}
+
+.post-full-list li {
+  margin: 0 0 7px;
+  font-size: 15px;
+  line-height: 1.66;
+}
+
+.post-full-tech {
+  margin: 0;
+  font-size: 11.5px;
+  letter-spacing: 0.6px;
+  color: #6b5836;
+  max-width: 64ch;
+}
+
+/* The download row on the writ. It is the one action on the page, so it is
+   given a plate of its own rather than being left as a link in a paragraph. */
+.writ-download {
+  margin: 0 0 28px;
+  padding: 14px 18px;
+  border: 1px solid #b9a87e;
+  border-radius: 3px;
+  background: rgba(185, 168, 126, 0.14);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+}
+
+@media print {
+  /* Same reasoning as the charters: these pages are documents, and the parts a
+     reader keeps are the ones that must not be split across a sheet. */
+  .post-full,
+  .skill-group {
+    break-inside: avoid;
+  }
+
+  /* A download button is meaningless on paper, and the address it points at is
+     already in the footer of every printed sheet. */
+  .writ-download {
+    display: none;
+  }
+}
+
+/* The list of real addresses in the footer. The map is the navigation, but
+   every province on it is an #anchor, and an anchor cannot be linked to from
+   outside or ranked on its own. These are the pages, named by what they hold. */
+.footer-roads {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 22px;
+  margin: 0 0 14px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid rgba(185, 168, 126, 0.5);
+}
+
+@media print {
+  /* On paper the footer roads are a row of URLs nobody can click. The pages
+     they point at print their own addresses when they are printed. */
+  .footer-roads {
+    display: none;
+  }
+}
+
+/* ── Screenshots on a charter ──────────────────────────────────────────────
+   Evidence, not decoration: the reader is deciding whether to click through to
+   a repository, and one picture of the thing running settles that faster than
+   another paragraph about it.
+
+   Each sits on the parchment as a plate, with the same rule and inset shadow
+   the map panel uses, so a screenshot of a dark dashboard does not read as a
+   hole cut in the page. Sized by aspect ratio from the file itself, so nothing
+   reflows when the image lands. */
+.charter-shots {
+  margin: 0 0 30px;
+  display: grid;
+  gap: 22px;
+}
+
+.charter-shots figure {
+  margin: 0;
+}
+
+.charter-shots img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #4a3b22;
+  border-radius: 3px;
+  background: #e9dfc4;
+  box-shadow: 0 2px 0 #b9a87e inset, 0 10px 26px -10px rgba(44, 34, 16, 0.45);
+}
+
+.charter-shots figcaption {
+  margin-top: 8px;
+  text-transform: lowercase;
+}
+
+@media print {
+  /* A screenshot is worth printing, its shadow is not: a soft shadow renders as
+     a grey smear on paper. The plate keeps its rule and loses the depth. */
+  .charter-shots img {
+    box-shadow: none;
+  }
+
+  .charter-shots figure {
+    break-inside: avoid;
+  }
+}

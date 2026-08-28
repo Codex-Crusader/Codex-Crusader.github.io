@@ -12,6 +12,9 @@ import profile from '../../data/profile.js';
 import charters from '../../data/charters.js';
 import github from '../../data/github.json';
 import { materialsFor } from '../../data/holdings.js';
+import { articlesAbout } from '../../data/chronicle.js';
+import { typeFor, applicationProps } from '../../data/software.js';
+import screenshots from '../../data/screenshots.json';
 
 const mono = "font-family: 'JetBrains Mono', monospace;";
 const serif = "font-family: 'Cormorant Garamond', serif;";
@@ -85,6 +88,17 @@ const related = charters
   .sort((a, b) => b.shared.length - a.shared.length)
   .slice(0, 2);
 
+// The chronicles written about this holding. The charter keeps no list of its
+// own: an article names the projects it covers, and chronicle.js inverts that
+// into this. One list, both directions, so the two can never disagree about
+// whether an article is about this project.
+const articles = articlesAbout(repo.name);
+
+// What the thing actually looks like, from assets/screenshots/<slug>/. A
+// charter with no folder simply renders no such section, on the same rule as an
+// unfinished contact row: the absence is silent, never an empty heading.
+const shots = (screenshots.screenshots ?? {})[charter.slug] ?? [];
+
 // Where the reader can actually go. The repository always; a live site only
 // when the survey found one, so this can never publish a demo link that the
 // repository has since taken down.
@@ -103,11 +117,15 @@ const schema = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'SoftwareSourceCode',
+      // Resolved from the same helper the front page uses. Both pages publish
+      // this id, so both have to agree about the type; asking one function is
+      // how they are made to.
+      '@type': typeFor(repo.name),
       // The same id the front page gives this holding, so the two pages
       // describe one thing rather than two things with the same name.
       '@id': here,
       name: charter.title,
+      ...applicationProps(repo.name),
       alternateName: repo.name,
       url: here,
       codeRepository: repo.html_url,
@@ -209,6 +227,29 @@ const schema = {
       </>
     )}
 
+    {shots.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={`${serif}`}>Screenshots</h2>
+        <div class="charter-shots">
+          {shots.map((shot) => (
+            <figure>
+              <img
+                src={`${base}screenshots/${charter.slug}/${shot.variants.at(-1).name}`}
+                srcset={shot.variants.map((v) => `${base}screenshots/${charter.slug}/${v.name} ${v.width}w`).join(', ')}
+                sizes="(max-width: 700px) 100vw, 620px"
+                width={shot.width}
+                height={shot.height}
+                loading="lazy"
+                decoding="async"
+                alt={`${charter.title}: ${shot.label.toLowerCase()}`}
+              />
+              <figcaption style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>{shot.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </>
+    )}
+
     <h2 class="charter-rule" style={`${serif}`}>Roads out</h2>
     <ul class="link-list charter-roads">
       {roads.map(([label, text, href]) => (
@@ -218,6 +259,21 @@ const schema = {
         </li>
       ))}
     </ul>
+
+    {articles.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={`${serif}`}>Related articles</h2>
+        <ul class="charter-index charter-index-plain">
+          {articles.map((a) => (
+            <li>
+              <a href={a.href} style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{a.title}</a>
+              <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.62; max-width: 62ch;">{a.standfirst}</p>
+              <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>{a.readingTime} min read · {a.published}</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
 
     {related.length > 0 && (
       <>
@@ -235,6 +291,7 @@ const schema = {
 
     <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px; display: flex; gap: 26px; flex-wrap: wrap;">
       <a href={registerHref} style={`${mono} font-size: 12px;`}>↑ back to the {profile.projects.heading}</a>
+      <a href={`${base}writing/`} style={`${mono} font-size: 12px;`}>→ read the chronicles</a>
       <a href={`${base}#projects`} style={`${mono} font-size: 12px;`}>↑ return to the map</a>
     </div>
   </Lorebook>

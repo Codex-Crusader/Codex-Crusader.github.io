@@ -1,0 +1,182 @@
+---
+// One chronicle, written out.
+//
+// The same folio spread the charters use, printed on the Kingdom of Dequm's
+// parchment rather than the Afon Empire's, because an article is written by a
+// person and a charter is written about a repository.
+//
+// Two things about the linking, both of which are the same decision:
+//
+//   · The projects an article is about are resolved in chronicle.js against the
+//     real survey, so a link here can never point at a repository that does not
+//     exist. A project with a charter links to the charter; one without links
+//     to its holding on the map, which is the only address it has.
+//   · Nothing on this page names a related article by hand. The neighbours are
+//     computed from the projects two articles have in common, which is the same
+//     shape as the charters' neighbours being computed from shared topics: a
+//     relationship worth showing is one the data can already prove.
+import Sheet from '../../layouts/Sheet.astro';
+import Lorebook from '../../components/Lorebook.astro';
+import profile from '../../data/profile.js';
+import articles from '../../data/chronicle.js';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+export async function getStaticPaths() {
+  const { default: chronicle } = await import('../../data/chronicle.js');
+  return chronicle.map((article) => ({ params: { slug: article.slug }, props: { article } }));
+}
+
+const { article } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const home = new URL(base, Astro.site).href;
+const here = new URL(article.path, home).href;
+
+// Neighbours by shared subject, not by hand. Two articles are related when they
+// are about at least one of the same projects, most overlap first.
+const mine = new Set(article.projects.map((p) => p.repo));
+const related = articles
+  .filter((a) => a.slug !== article.slug)
+  .map((a) => ({ article: a, shared: a.projects.filter((p) => mine.has(p.repo)).length }))
+  .filter(({ shared }) => shared > 0)
+  .sort((a, b) => b.shared - a.shared)
+  .slice(0, 2);
+
+const ledger = [
+  ['published', article.published],
+  ['reading time', `${article.readingTime} min`],
+  ['words', article.words.toLocaleString('en-IN')],
+  ...(article.projects.length ? [['projects', String(article.projects.length)]] : []),
+];
+
+const trail = [
+  ['The realm of Orvia', base],
+  ['Writing', `${base}writing/`],
+  [article.title, null],
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'TechArticle',
+      '@id': here,
+      url: here,
+      headline: article.title,
+      name: article.title,
+      description: article.standfirst,
+      datePublished: article.published,
+      dateModified: article.published,
+      inLanguage: 'en',
+      wordCount: article.words,
+      author: { '@id': `${home}#person` },
+      publisher: { '@id': `${home}#person` },
+      isPartOf: { '@id': `${home}writing/` },
+      mainEntityOfPage: here,
+      ...(article.tags?.length ? { keywords: article.tags.join(', ') } : {}),
+      // What the article is about, named by the id each project already has.
+      // A project with a charter is that charter's id, which is the same id the
+      // front page gives the holding, so this points into the existing graph
+      // rather than minting a second node for the same thing.
+      ...(article.projects.length
+        ? {
+            about: article.projects.map((p) =>
+              p.hasCharter
+                ? { '@id': new URL(p.href, Astro.site).href }
+                : { '@type': 'SoftwareSourceCode', name: p.repo },
+            ),
+          }
+        : {}),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map(([name, href], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(href ? { item: new URL(href, home).href } : {}),
+      })),
+    },
+  ],
+};
+---
+
+<Sheet title={article.seoTitle} description={article.standfirst} path={article.path} schema={schema}>
+  <nav class="trail" aria-label="Breadcrumb">
+    <ol>
+      {trail.map(([name, href]) => (
+        <li>{href ? <a href={href}>{name}</a> : <span aria-current="page">{name}</span>}</li>
+      ))}
+    </ol>
+  </nav>
+
+  <Lorebook
+    id={`chronicle-${article.slug}`}
+    texture="about"
+    heading={article.title}
+    subtitle={`${article.readingTime} min read · ${article.published}`}
+    folio={article.folio}
+    numeral={article.numeral}
+    level={1}
+    intro={article.sections[0].paragraphs[0]}
+    epigraph={article.epigraph}
+    ledger={ledger}
+    ledgerNote={article.standfirst}
+    marginNote="written by a living hand"
+    reveal={false}
+    returnHref={null}
+  >
+    {article.sections[0].paragraphs.slice(1).map((text) => (
+      <p style="margin: 0 0 18px; font-size: 15.5px; line-height: 1.72; max-width: 64ch;">{text}</p>
+    ))}
+
+    {article.sections.slice(1).map((section) => (
+      <>
+        {section.heading && <h2 class="charter-rule" style={serif}>{section.heading}</h2>}
+        {section.paragraphs.map((text) => (
+          <p style="margin: 0 0 18px; font-size: 15.5px; line-height: 1.72; max-width: 64ch;">{text}</p>
+        ))}
+      </>
+    ))}
+
+    {article.projects.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={serif}>The work this is about</h2>
+        <ul class="charter-index charter-index-plain">
+          {article.projects.map((p) => (
+            <li>
+              <a href={p.href} style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{p.title}</a>
+              {p.description && <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.62; max-width: 62ch;">{p.description}</p>}
+              <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>
+                {p.hasCharter ? 'has a charter of its own' : 'drawn on the map'}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    {related.length > 0 && (
+      <>
+        <h2 class="charter-rule" style={serif}>Read next</h2>
+        <ul class="charter-index charter-index-plain">
+          {related.map(({ article: a }) => (
+            <li>
+              <a href={a.href} style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{a.title}</a>
+              <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.62; max-width: 62ch;">{a.standfirst}</p>
+              <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>{a.readingTime} min read</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+      <a href={`${base}writing/`} style={`${mono} font-size: 12px;`}>↑ all the chronicles</a>
+      <a href={`${base}projects/`} style={`${mono} font-size: 12px; margin-left: 18px;`}>→ the register of holdings</a>
+      <a href={base} style={`${mono} font-size: 12px; margin-left: 18px;`}>→ return to the map</a>
+    </div>
+  </Lorebook>
+</Sheet>

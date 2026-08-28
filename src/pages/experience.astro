@@ -1,0 +1,204 @@
+---
+// /experience/ · Ponstium Empire, in full.
+//
+// The front page gives each post one paragraph, which is the right length for
+// somebody scrolling past. This is the same ten posts with the paragraph
+// unpacked: what the job actually involved, what came out of it, and what it
+// was built with.
+//
+// Both come off ONE object per role in profile.js. That is the whole reason the
+// long fields were put there rather than in a second file: a date corrected in
+// one place is corrected in both, and there is no second copy of the work
+// history to fall out of step with the first.
+//
+// A role with no `technologies` renders no such block, rather than an empty
+// heading. Several of these posts were not technical work and did not have a
+// stack, and inventing one to fill the shape of the template would be the
+// fake-detail version of a keyword wall.
+import Sheet from '../layouts/Sheet.astro';
+import Lorebook from '../components/Lorebook.astro';
+import profile from '../data/profile.js';
+import resume from '../data/resume.js';
+import { parseTenure, spanLabel } from '../data/tenure.js';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const base = import.meta.env.BASE_URL;
+const home = new URL(base, Astro.site).href;
+const here = new URL('experience/', home).href;
+
+const roles = profile.experience.roles;
+
+// The same anchor scheme the front page uses, so a link from the map's post
+// list lands on the right entry here. Kept identical rather than similar: two
+// slug functions that agree today are two slug functions that disagree later.
+const orgOf = (title) => {
+  const [role, ...rest] = title.split(',');
+  const org = rest.join(',').replace(/\([^)]*\)/g, '').trim();
+  if (!org || /^self-?employed$/i.test(org)) {
+    return role.trim().split(/\s+/).slice(0, 2).join(' ').replace(/[^\w\s-]+$/, '');
+  }
+  return org;
+};
+
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+function uniqueSlugs(labels) {
+  const seen = new Map();
+  return labels.map((label) => {
+    const b = slug(label) || 'x';
+    const n = (seen.get(b) ?? 0) + 1;
+    seen.set(b, n);
+    return n === 1 ? b : `${b}-${n}`;
+  });
+}
+
+const anchors = uniqueSlugs(roles.map((r) => orgOf(r.title)));
+// How long each post ran, read back out of the same meta string the page
+// prints. A role whose dates do not parse simply shows no span, which is the
+// rule tenure.js already keeps for the bars on the front page: the reader
+// loses a figure, never a fact.
+const spans = roles.map((r) => {
+  const t = parseTenure(r.meta);
+  return t ? spanLabel(t) : null;
+});
+
+// Counted rather than typed, on the same rule as every other figure here.
+const withTech = roles.filter((r) => r.technologies?.length);
+const allTech = [...new Set(withTech.flatMap((r) => r.technologies))];
+
+const ledger = [
+  ...profile.experience.ledger,
+  ['posts held', String(roles.length)],
+];
+
+const trail = [
+  ['The realm of Orvia', base],
+  ['Experience', null],
+];
+
+const title = `Work history of ${profile.site.fullName}`;
+const description = `The full work history of ${profile.site.fullName}: ${roles.length} posts across software, research, operations and sponsorship, each with responsibilities, achievements and the tools it was done with.`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': here,
+      url: here,
+      name: title,
+      description,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${home}#website` },
+      about: { '@id': `${home}#person` },
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListOrder: 'https://schema.org/ItemListOrderDescending',
+        numberOfItems: roles.length,
+        itemListElement: roles.map((role, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: role.title,
+          url: `${here}#post-${anchors[i]}`,
+        })),
+      },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map(([name, href], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(href ? { item: new URL(href, home).href } : {}),
+      })),
+    },
+  ],
+};
+---
+
+<Sheet title={title} description={description} path="experience/" schema={schema}>
+  <nav class="trail" aria-label="Breadcrumb">
+    <ol>
+      {trail.map(([name, href]) => (
+        <li>{href ? <a href={href}>{name}</a> : <span aria-current="page">{name}</span>}</li>
+      ))}
+    </ol>
+  </nav>
+
+  <Lorebook
+    id="experience-page"
+    texture="experience"
+    heading={profile.experience.heading}
+    subtitle={profile.experience.subtitle}
+    folio={`${profile.experience.folio} · IN FULL`}
+    numeral="I"
+    level={1}
+    intro={profile.experience.intro}
+    epigraph={profile.experience.epigraph}
+    ledger={ledger}
+    ledgerNote={profile.experience.ledgerNote}
+    marginNote={profile.experience.marginNote}
+    reveal={false}
+    returnHref={null}
+  >
+    <p style="margin: 0 0 26px; font-size: 15.5px; line-height: 1.68; color: #6B5836; max-width: 64ch;">
+      Most recent first. The front page gives each of these a paragraph; this is
+      the same history with the paragraph unpacked. Where a post produced
+      software, the project it produced is in the
+      <a href={`${base}projects/`}>register of holdings</a>.
+    </p>
+
+    {roles.map((role, i) => (
+      <article class="post-full" id={`post-${anchors[i]}`}>
+        <h2 style={`${serif} font-weight: 600; font-size: clamp(20px, 2.2vw, 25px); letter-spacing: 0.3px; margin: 0;`}>{role.title}</h2>
+        <p class="post-full-meta" style={`${mono} font-size: 10.5px; letter-spacing: 1.2px; color: #8A7752; margin: 7px 0 0;`}>
+          {role.meta}
+          {spans[i] ? ` · ${spans[i]}` : ''}
+        </p>
+        <p style="margin: 14px 0 0; font-size: 15.5px; line-height: 1.72; max-width: 64ch;">{role.body}</p>
+
+        {role.responsibilities?.length > 0 && (
+          <>
+            <h3 class="post-full-label" style={`${mono}`}>Responsibilities</h3>
+            <ul class="post-full-list">
+              {role.responsibilities.map((item) => <li>{item}</li>)}
+            </ul>
+          </>
+        )}
+
+        {role.achievements?.length > 0 && (
+          <>
+            <h3 class="post-full-label" style={`${mono}`}>Achievements</h3>
+            <ul class="post-full-list">
+              {role.achievements.map((item) => <li>{item}</li>)}
+            </ul>
+          </>
+        )}
+
+        {role.technologies?.length > 0 && (
+          <>
+            <h3 class="post-full-label" style={`${mono}`}>Technologies</h3>
+            <p class="post-full-tech" style={`${mono}`}>{role.technologies.join(' · ')}</p>
+          </>
+        )}
+      </article>
+    ))}
+
+    {allTech.length > 0 && (
+      <p class="measured-note" style={`${mono} font-size: 11px; line-height: 1.7; color: #8A7752;`}>
+        Tools named across {withTech.length} of {roles.length} posts: {allTech.join(' · ')}. The other
+        {' '}{roles.length - withTech.length} were not technical work and list none, rather than borrowing one.
+      </p>
+    )}
+
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+      {resume.published && (
+        <a href={`${base}resume/`} style={`${mono} font-size: 12px;`}>→ the same history as a résumé</a>
+      )}
+      <a href={`${base}about/`} style={`${mono} font-size: 12px; margin-left: 18px;`}>→ about Bhargavaram Krishnapur</a>
+      <a href={`${base}#experience`} style={`${mono} font-size: 12px; margin-left: 18px;`}>↑ return to the map</a>
+    </div>
+  </Lorebook>
+</Sheet>

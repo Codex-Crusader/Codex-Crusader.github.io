@@ -1,6 +1,6 @@
-// Creates empty stubs for the two generated data files if they are missing, so
-// a fresh clone can `npm run build` without first hitting the network.
-// Real data comes from `npm run sync` and `npm run photos`.
+// Creates empty stubs for the generated data files if they are missing, so a
+// fresh clone can `npm run build` without first hitting the network.
+// Real data comes from `npm run sync`, `npm run photos` and `npm run shots`.
 
 import { access, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -10,6 +10,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const stubs = [
   ['../src/data/github.json', { profile: null, repos: [] }],
   ['../src/data/photos.json', { photos: [] }],
+  ['../src/data/screenshots.json', { screenshots: {} }],
 ];
 
 for (const [rel, stub] of stubs) {

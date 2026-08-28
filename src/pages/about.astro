@@ -1,0 +1,184 @@
+---
+// /about/ · the Kingdom of Dequm, written out at length.
+//
+// The province on the front page is three paragraphs, because a stranger
+// scrolling a map should not be handed a CV. This is where somebody goes when
+// they have decided they want the long version, and it holds the things the
+// map has nowhere to put: a skills list, an education entry, and the interests
+// that make a person a person rather than a stack.
+//
+// It does not repeat the front page. profile.about.paragraphs stays on the map
+// and profile.about.page.paragraphs is written for here, in different words
+// covering more ground, because two pages carrying the same sentences are one
+// page indexed twice and the weaker copy is the one that ranks.
+//
+// The skills block is a judgement, and the page says so by printing a measured
+// list beside it: the languages the survey actually found across the
+// repositories. A reader can see which list is a claim and which is a count.
+import Sheet from '../layouts/Sheet.astro';
+import Lorebook from '../components/Lorebook.astro';
+import profile from '../data/profile.js';
+import github from '../data/github.json';
+import resume from '../data/resume.js';
+
+const mono = "font-family: 'JetBrains Mono', monospace;";
+const serif = "font-family: 'Cormorant Garamond', serif;";
+
+const base = import.meta.env.BASE_URL;
+const home = new URL(base, Astro.site).href;
+const here = new URL('about/', home).href;
+
+const page = profile.about.page;
+const repos = github.repos ?? [];
+
+// Measured, not claimed. Every language the survey found, most-used first, so
+// the hand-grouped skills above it have something honest standing next to them.
+const languageCount = {};
+for (const r of repos) if (r.language) languageCount[r.language] = (languageCount[r.language] ?? 0) + 1;
+const measuredLanguages = Object.entries(languageCount).sort((a, b) => b[1] - a[1]);
+
+const contactLinks = profile.contact.links.filter(([, text, href]) => href && text);
+
+const ledger = [
+  ...profile.about.ledger,
+  ['repositories', String(repos.length)],
+];
+
+const trail = [
+  ['The realm of Orvia', base],
+  ['About', null],
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      // AboutPage, not a second ProfilePage. The front page is the profile and
+      // keeps that type; this is a page about the same person. Both point at
+      // the one #person node rather than declaring a second copy of him, which
+      // is what stops the graph describing two people who share a name.
+      '@type': 'AboutPage',
+      '@id': here,
+      url: here,
+      name: page.metaTitle,
+      description: page.metaDescription,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${home}#website` },
+      about: { '@id': `${home}#person` },
+      mainEntity: { '@id': `${home}#person` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map(([name, href], i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name,
+        ...(href ? { item: new URL(href, home).href } : {}),
+      })),
+    },
+  ],
+};
+---
+
+<Sheet title={page.metaTitle} description={page.metaDescription} path="about/" schema={schema}>
+  <nav class="trail" aria-label="Breadcrumb">
+    <ol>
+      {trail.map(([name, href]) => (
+        <li>{href ? <a href={href}>{name}</a> : <span aria-current="page">{name}</span>}</li>
+      ))}
+    </ol>
+  </nav>
+
+  <Lorebook
+    id="about-page"
+    texture="about"
+    heading={profile.site.fullName}
+    subtitle={profile.about.subtitle}
+    folio={`${page.folio} · AT LENGTH`}
+    numeral="IV"
+    level={1}
+    intro={page.paragraphs[0]}
+    epigraph={profile.about.epigraph}
+    ledger={ledger}
+    ledgerNote={page.standfirst}
+    marginNote={profile.about.marginNote}
+    reveal={false}
+    returnHref={null}
+  >
+    {page.paragraphs.slice(1).map((text) => (
+      <p style="margin: 0 0 18px; font-size: 15.5px; line-height: 1.72; max-width: 64ch;">{text}</p>
+    ))}
+
+    <h2 class="charter-rule" style={serif}>Skills</h2>
+    <p style="margin: 0 0 22px; font-size: 15.5px; line-height: 1.68; color: #6B5836; max-width: 64ch;">
+      Grouped by hand, which makes this a claim rather than a count. Everything
+      listed is backed by something public: a repository in the
+      <a href={`${base}projects/`}>register of holdings</a>, a post in the
+      <a href={`${base}experience/`}>work history</a>, or an article in
+      <a href={`${base}writing/`}>the chronicles</a>. The measured list is
+      underneath it.
+    </p>
+
+    <dl class="skill-groups">
+      {page.skills.map((group) => (
+        <div class="skill-group">
+          <dt style={`${mono} font-size: 10.5px; letter-spacing: 1.6px; color: #8C3B22; text-transform: uppercase;`}>{group.area}</dt>
+          <dd style="margin: 7px 0 0; font-size: 15px; line-height: 1.7;">{group.items.join(' · ')}</dd>
+        </div>
+      ))}
+    </dl>
+
+    {measuredLanguages.length > 0 && (
+      <p class="measured-note" style={`${mono} font-size: 11px; line-height: 1.7; color: #8A7752;`}>
+        Counted from the survey, not typed: {measuredLanguages.map(([lang, n]) => `${lang} (${n})`).join(' · ')}.
+        These are the languages GitHub reports across {repos.length} public repositories, and they are
+        recounted on every build.
+      </p>
+    )}
+
+    <h2 class="charter-rule" style={serif}>Education</h2>
+    <ul class="charter-index charter-index-plain">
+      {page.education.map((entry) => (
+        <li>
+          <span style={`${serif} font-weight: 600; font-size: 19px; letter-spacing: 0.4px;`}>{entry.qualification}</span>
+          <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.62; max-width: 62ch;">
+            {entry.institution}. {entry.note}
+          </p>
+          <span style={`${mono} font-size: 10.5px; color: #8A7752; letter-spacing: 1px;`}>{entry.meta}</span>
+        </li>
+      ))}
+    </ul>
+
+    <h2 class="charter-rule" style={serif}>Interests</h2>
+    <dl class="skill-groups">
+      {page.interests.map(([name, note]) => (
+        <div class="skill-group">
+          <dt style={`${mono} font-size: 10.5px; letter-spacing: 1.6px; color: #8C3B22; text-transform: uppercase;`}>{name}</dt>
+          <dd style="margin: 7px 0 0; font-size: 15px; line-height: 1.7;">{note}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <h2 class="charter-rule" style={serif}>Links</h2>
+    <ul class="charter-roads">
+      {contactLinks.map(([label, text, href]) => (
+        <li>
+          <span style={`${mono} font-size: 10.5px; color: #8C3B22; letter-spacing: 1.6px;`}>{label}</span>
+          <a href={href}>{text}</a>
+        </li>
+      ))}
+      {resume.published && (
+        <li>
+          <span style={`${mono} font-size: 10.5px; color: #8C3B22; letter-spacing: 1.6px;`}>RÉSUMÉ</span>
+          <a href={`${base}resume/`}>The full work history, set on one sheet</a>
+        </li>
+      )}
+    </ul>
+
+    <div class="return-link" style="margin-top: 34px; border-top: 1px solid #B9A87E; padding-top: 16px;">
+      <a href={`${base}experience/`} style={`${mono} font-size: 12px;`}>→ read the full work history</a>
+      <a href={`${base}projects/`} style={`${mono} font-size: 12px; margin-left: 18px;`}>→ browse the projects</a>
+      <a href={`${base}#about`} style={`${mono} font-size: 12px; margin-left: 18px;`}>↑ return to the map</a>
+    </div>
+  </Lorebook>
+</Sheet>
