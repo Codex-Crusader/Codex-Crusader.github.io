@@ -1603,3 +1603,105 @@ a:hover {
     break-inside: avoid;
   }
 }
+
+/* ── The roads between pages ───────────────────────────────────────────────
+   The map is still the navigation. These are the links that leave one folio
+   for another: the row at the foot of every page, the line that sends a
+   province to the page underneath it, and the list of pages in the footer.
+
+   They were plain text in the mono face, which is correct for an annotation
+   and wrong for the one thing on the page you want a reader to press. They are
+   plates now, the same plate the writ already uses: a rule, a wash of the
+   parchment's own shadow colour, and the rubric red the design reserves for
+   anything that acts.
+
+   No new colour enters here. #B9A87E is the rule the folios are already ruled
+   with, #8C3B22 is the rubric on every folio number, and the wash is that same
+   rule colour at low alpha. */
+.footer-roads a,
+.holdings-register a,
+.page-roads a {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid #b9a87e;
+  border-radius: 3px;
+  background: rgba(185, 168, 126, 0.16);
+  color: #8c3b22;
+  text-decoration: none;
+  line-height: 1.35;
+}
+
+/* Hover and keyboard focus land on the same state, so the affordance is not
+   something only a mouse can find. */
+.footer-roads a:hover,
+.holdings-register a:hover,
+.page-roads a:hover,
+.footer-roads a:focus-visible,
+.holdings-register a:focus-visible,
+.page-roads a:focus-visible {
+  background: rgba(140, 59, 34, 0.1);
+  border-color: #8c3b22;
+}
+
+/* One rule owns the spacing in these rows, so a link can never be given a
+   margin that fights the gap. */
+.page-roads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+.footer-roads {
+  gap: 10px 12px;
+}
+
+/* The province-to-page line is a sentence with a plate in it, so it needs room
+   above the plate rather than around the text. */
+.holdings-register {
+  line-height: 2.4;
+}
+
+@supports (transition: background-color 120ms) {
+  @media (prefers-reduced-motion: no-preference) {
+    .footer-roads a,
+    .holdings-register a,
+    .page-roads a {
+      transition: background-color 120ms ease, border-color 120ms ease;
+    }
+  }
+}
+
+@media print {
+  /* On paper a button is just a box around some words. The border and the wash
+     go; the text stays, because these still name the other pages. */
+  .footer-roads a,
+  .holdings-register a,
+  .page-roads a {
+    padding: 0;
+    border: none;
+    background: none;
+  }
+}
+
+/* The footer is the one row of these that sits on the OUTER parchment rather
+   than on a folio sheet, and that ground is the same family as the wash above,
+   so the plate vanished into it. Out here they take the folio's own cream as
+   their stock, which is the material the rest of the site prints its documents
+   on, and they read as plates against the darker sheet behind them. */
+.footer-roads a {
+  background: #e9dfc4;
+  box-shadow: 0 1px 0 rgba(185, 168, 126, 0.8) inset;
+}
+
+.footer-roads a:hover,
+.footer-roads a:focus-visible {
+  background: #f0e8d3;
+  border-color: #8c3b22;
+}
+
+@media print {
+  .footer-roads a {
+    background: none;
+    box-shadow: none;
+  }
+}
