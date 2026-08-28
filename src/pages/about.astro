@@ -53,10 +53,11 @@ const schema = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      // AboutPage, not a second ProfilePage. The front page is the profile and
-      // keeps that type; this is a page about the same person. Both point at
-      // the one #person node rather than declaring a second copy of him, which
-      // is what stops the graph describing two people who share a name.
+      // AboutPage: a WebPage whose subject is stated. The front page carries
+      // the same claim through mainEntity without a special type, and both
+      // point at the one #person node rather than declaring a second copy of
+      // him, which is what stops the graph describing two people who share a
+      // name. Nothing here opts into a rich result with a schema of its own.
       '@type': 'AboutPage',
       '@id': here,
       url: here,

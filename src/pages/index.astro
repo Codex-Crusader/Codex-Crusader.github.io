@@ -313,11 +313,31 @@ const website = {
   publisher: { '@id': personId },
 };
 
-// ProfilePage rather than WebPage: this page has one subject and the subject
-// is a person. mainEntity says which of the nodes below is that subject, so
-// the page is not read as a page that merely mentions him.
+// WebPage, and it was ProfilePage until Search Console rejected it.
+//
+// The reasoning for ProfilePage was sound and the type was wrong anyway. This
+// page has one subject and the subject is a person, which is what `about` and
+// `mainEntity` below already say; ProfilePage was meant to say it louder. What
+// it actually did was opt the page into a rich result with a narrow schema of
+// its own, and that validator rejects every nested object it does not
+// recognise. It found fifteen: the PostalAddress, the Country inside it and the
+// CollegeOrUniversity, once for each of the four places the Person is
+// referenced, plus the page image and the WebSite. The whole item was marked
+// invalid, which is worse than not claiming the type at all.
+//
+// The type was also not the right one on the merits. Google's profile page
+// result is built for sites where people post: forum profiles, social accounts,
+// creator pages, and it feeds Discussions and Perspectives. A portfolio is not
+// that, and the correct reading of "add ProfilePage where appropriate" is that
+// here it is not.
+//
+// Nothing is lost by dropping it. ProfilePage is a subtype of WebPage, and the
+// claim that carried the meaning was never the type: it is mainEntity naming
+// which node this page is about. That still stands, the Person node keeps every
+// field the narrow schema would have made us strip, and the seven software
+// items on this page still validate.
 const webpage = {
-  '@type': 'ProfilePage',
+  '@type': 'WebPage',
   '@id': pageId,
   url: home,
   name: profile.site.metaTitle,
@@ -326,7 +346,16 @@ const webpage = {
   isPartOf: { '@id': siteId },
   about: { '@id': personId },
   mainEntity: { '@id': personId },
-  primaryImageOfPage: abs('og-cover.png'),
+  // An ImageObject with a url, not a bare string. Passed as a string, Google
+  // coerces it into an ImageObject and files the address under `name`, which
+  // leaves a picture whose only stated property is a name that happens to look
+  // like a URL. Say what it is.
+  primaryImageOfPage: {
+    '@type': 'ImageObject',
+    url: abs('og-cover.png'),
+    width: 1200,
+    height: 630,
+  },
 };
 
 // One node per holding, from the same array the province is drawn from, so the
