@@ -1,6 +1,22 @@
-// Written as an endpoint rather than a file in public/ so lastmod is stamped at
-// build time and stays honest with the nightly run, instead of freezing on the
-// day someone remembered to edit it.
+// Written as an endpoint rather than a file in public/ so the list of URLs is
+// derived from the same arrays the pages are generated from, instead of being
+// typed a second time and drifting.
+//
+// It carries no <lastmod> and no <changefreq>, and that is deliberate.
+//
+// This used to stamp `new Date()` into every entry on every build. The comment
+// here called that "honest with the nightly run". It was the opposite. The
+// nightly run rebuilds whether or not anything changed, so every URL claimed to
+// have been modified today, every day, including pages untouched for months.
+// Google's documented response to a lastmod it cannot corroborate is to stop
+// believing lastmod for the whole site, which costs the signal on the one page
+// that genuinely did change. A date that is always today carries no more
+// information than no date at all, and it costs credibility that no date does
+// not. <changefreq> is ignored by Google outright and was never read by
+// anything.
+//
+// If a real lastmod is ever wanted, it has to come from the commit that last
+// touched the page's source, not from the clock at build time.
 //
 // The five sections of the front page are #anchors, not URLs, so they do not
 // belong here. Listing them would be padding. What belongs is anything that is
@@ -38,33 +54,28 @@ import github from '../data/github.json';
 
 export async function GET({ site }) {
   const url = new URL(import.meta.env.BASE_URL, site).href;
-  const lastmod = new Date().toISOString().slice(0, 10);
 
   const names = new Set((github.repos ?? []).map((r) => r.name));
 
   const entries = [
-    ['', 'daily'],
-    ['about/', 'monthly'],
-    ['experience/', 'monthly'],
-    ['projects/', 'weekly'],
-    ...charters
-      .filter((c) => names.has(c.repo))
-      .map((c) => [`projects/${c.slug}/`, 'weekly']),
-    ['writing/', 'weekly'],
-    ...articles.map((a) => [a.path, 'monthly']),
+    '',
+    'about/',
+    'experience/',
+    'projects/',
+    ...charters.filter((c) => names.has(c.repo)).map((c) => `projects/${c.slug}/`),
+    'writing/',
+    ...articles.map((a) => a.path),
     // The page exists whether or not the PDF does: it is the work history set
     // as a document, and the download is one row on it. resume.js still gates
     // the download itself, which is the thing that can actually go missing.
-    ['resume/', 'monthly'],
+    'resume/',
   ];
 
   const body = entries
     .map(
-      ([path, changefreq]) => `
+      (path) => `
   <url>
     <loc>${new URL(path, url).href}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
   </url>`,
     )
     .join('');

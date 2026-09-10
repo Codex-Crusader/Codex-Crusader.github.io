@@ -463,13 +463,19 @@ const schema = {
              then the trade in plain words, then the one road a visitor might
              have come specifically to find. -->
         <div class="masthead" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 4px;">
-          <div class="masthead-id" style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;">
-            <h1 style={`${serif} margin: 0; font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>{profile.site.name}</h1>
+          <!-- The trade is inside the h1, not beside it, for the reason the
+               province translations are inside theirs: the h1 is the one
+               element read as the page's answer to "what is this", and a name
+               on its own does not answer it. The h1 is the flex row that the
+               wrapper used to be, so the two sit on one baseline exactly as
+               before and the phone breakpoint still stacks them by class. -->
+          <h1 class="masthead-id" style={`${serif} display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 0; font-weight: 600; font-size: 20px; letter-spacing: 3px; color: #3A2E19;`}>
+            {profile.site.name}
             <!-- The trade, stated rather than implied. The map is an argument
                  that takes eleven screens to finish; this is the same claim in
                  six words, on the first line of the first screen. -->
-            <span style={`${mono} font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.trade}</span>
-          </div>
+            <span style={`${mono} font-weight: 400; font-size: 11px; color: #6B5836; letter-spacing: 1px;`}>{profile.site.trade}</span>
+          </h1>
           <!-- The writ, named on the first screen. It is a plate at the foot of
                Ponstium Empire, 65% of the way down the page and behind about
                1,800 words, which is the right place for it in a document and

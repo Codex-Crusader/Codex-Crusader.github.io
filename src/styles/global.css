@@ -1405,17 +1405,29 @@ a:hover {
    the first fact and the line under it states the second, small, in the mono
    face, the way the masthead already answers "who is this" under the name.
 
-   It is a <p> and not a heading on purpose: it is the same subject said again
-   in different words, and a second heading would put a rung on the outline
-   that the document does not actually have. */
+   It sits INSIDE the heading, as a span, and not beside it as its own <p>.
+   The reason is the outline. A crawler reading the front page as a document
+   used to see five headings that were only place names, so the outline said
+   "Bhargavaram Krishnapur" and then five invented empires, and the plain words
+   that say what each province holds were a paragraph it had no reason to tie
+   to them. Joined to the heading they are part of the same accessible name,
+   which is what both a screen reader and a search engine read the section by.
+   It is still one heading and still one rung: the same subject said twice in
+   different words, said in one breath. */
 .spread-title {
   min-width: 0;
 }
 
 .spread-subtitle {
+  /* A span inside the heading, so it has to undo what the heading sets: it is
+     block so it still falls onto its own line, and the weight, the small caps
+     and the serif face are all reset to what the <p> used to get for free. */
+  display: block;
   margin: 9px 0 0;
   font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
   font-size: 11px;
+  font-variant: normal;
   letter-spacing: 1.6px;
   line-height: 1.4;
   color: #8a7752;

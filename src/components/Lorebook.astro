@@ -55,7 +55,17 @@ interface Props {
   // followed by the trade in six plain words. It is set as a filing annotation
   // rather than a subheading, because the province keeps its name: the line
   // under it is a translation, not a replacement.
+  //
+  // It renders inside the heading, so the translation is part of the name the
+  // section is read by rather than a paragraph sitting next to it.
   subtitle?: string;
+  // Keeps the subtitle outside the heading, as its own line.
+  //
+  // Only for a subtitle that is not a translation of the heading but a caption
+  // on it: a reading time and a date say nothing about what an article is
+  // about, and folding them into its h1 would make the title of the piece
+  // read "Local-first software 9 min read". A caption stays a caption.
+  subtitleAside?: boolean;
 }
 
 const {
@@ -75,6 +85,7 @@ const {
   level = 2,
   numeral: numeralProp,
   subtitle,
+  subtitleAside,
 } = Astro.props;
 const t = textures[texture ?? id];
 
@@ -98,8 +109,8 @@ const rest = intro.slice(1);
 >
   <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; border-bottom: 1px solid #B9A87E; padding-bottom: 14px; margin-bottom: 26px;">
     <div class="spread-title">
-      <H style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(30px, 5.2vw, 54px); line-height: 0.95; letter-spacing: 4px; font-variant: small-caps; color: #3A2E19;">{heading}</H>
-      {subtitle && <p class="spread-subtitle">{subtitle}</p>}
+      <H style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(30px, 5.2vw, 54px); line-height: 0.95; letter-spacing: 4px; font-variant: small-caps; color: #3A2E19;">{heading}{subtitle && !subtitleAside && <span class="spread-subtitle">{subtitle}</span>}</H>
+      {subtitle && subtitleAside && <p class="spread-subtitle">{subtitle}</p>}
     </div>
     <div style="text-align: right; flex-shrink: 0;">
       {numeral && <div class="folio-mark" aria-hidden="true">{numeral}</div>}

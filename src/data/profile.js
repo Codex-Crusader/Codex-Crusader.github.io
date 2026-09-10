@@ -450,6 +450,10 @@ export default {
   about: {
     heading: 'Kingdom of Dequm',
     subtitle: 'about bhargavaram krishnapur',
+    // /about/ heads itself with the name rather than the province, so the line
+    // under it cannot be the name a second time. It says the two facts a
+    // stranger searching the name is actually after instead.
+    folioSubtitle: 'software engineer in mumbai',
     folio: 'FOL. IV',
     navNote: 'who i am',
     epigraph: 'This one province alone is written by a living hand.',
