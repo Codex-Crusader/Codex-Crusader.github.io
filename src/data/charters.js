@@ -225,30 +225,31 @@ export default [
     // The mark in the corner. Set apart from the folio line so the two are
     // not printed twice over each other.
     numeral: 'VI',
-    seoTitle: 'Campus Visitor Access · a UX research study of a university entry system',
+    seoTitle: 'Campus Visitor Access · a UX study and prototype for a university entry system',
     standfirst:
-      'A product ideation study of visitor entry at Vijaybhoomi University: three interviews, eight card sorts and five tree tests, ending at a modelling problem rather than at a redesigned form.',
-    epigraph: 'The form is genuinely irritating. It is not the problem.',
+      'A product ideation study of visitor entry at Vijaybhoomi University. Three interviews, eight card sorts and five tree tests found where entry breaks, and sixteen wireframes and a clickable prototype show a fix.',
+    epigraph: 'A request needs someone in charge of answering it.',
     body: [
-      'A parent travelled three hours to visit her son, started the check-in form an hour before she arrived so she would not be caught out, and still ended up standing in the rain outside the gate. She got in when somebody inside the university made a phone call. The system had nothing to do with it. This study is about why that happens.',
-      'Entry runs through a third-party visitor management system. A visitor fills in six screens at the gate, then waits for a host to approve the request before a pass arrives over WhatsApp. Fixing the form moves the emotion line on the journey map from minus one to zero while the trough stays at minus five, which is the finding that decided the rest of the work.',
-      'The approval step has no accountable owner, no time bound and no failure path. If the named person does not act, nothing is rejected: the request is held, then silently cancelled, and the visitor begins again. The guards cannot rescue anyone either, because they do not know who the correct approver is; they call a shortlist and hope somebody answers. Silence is the failure mode, and silence has no recovery path.',
-      'Underneath that sits a modelling problem. The system knows about visitors and it knows about approvers, but it does not know about the relationship that motivated the visit, so the person you came to see has no standing to let you in. The recommendation is a timer: if the first approver has not responded inside an agreed window the request reassigns itself to a named fallback, with the visitor doing nothing and re-entering nothing. It is the one state the current system does not have, and it is already what the guards improvise over the phone.',
-      'Fieldwork ran from 31 July to 5 August 2026 and every participant is anonymised. The study site is plain HTML and CSS with no JavaScript, no dependencies and no build step, which is the same reason this portfolio is built the way it is.',
+      'A mother drove three hours to visit her son. She filled in the entry form an hour early, from the car, so she would not have to wait in the rain. She still stood at the gate for twenty minutes. She got in only after a guard phoned someone. This study looks at why that happens, and how to fix it.',
+      'Every visitor fills in a six-screen form made by an outside company, at a gate with no mobile signal. Then someone inside the university has to approve it before a pass arrives on WhatsApp. The long form turned out to be a small part of the trouble. On the journey map, a shorter form lifts one early step from minus one to zero. Her worst moment, at minus five, came from the approval step.',
+      'After a visitor sends the form, nobody has to answer it. There is no time limit and no backup plan. If the approver does not act, the request is cancelled and the visitor starts again. The guards do not know who should approve either. They phone a few people and hope someone picks up.',
+      'A card sort with eight people and a paper tree test with five more shaped the menu. The tree test proved one prediction wrong and broke a section the study had invented, and both results are reported. A MoSCoW list and a DFV matrix then cut 27 ideas down to four must-haves. The most important one is a timer: if the first approver does not answer in 30 minutes, the request moves to a backup person by itself.',
+      'The last phase turned those four features into sixteen grey wireframes. A heuristic inspection against Nielsen’s heuristics found three problems in the first sketches, and each fix is shown. The screens are linked into a Figma prototype that works inside the study page. The site itself is plain HTML and CSS with no JavaScript of its own.',
     ],
     limits: {
       heading: 'Scope',
       items: [
-        'Research, sensemaking and information architecture. No interface was designed, deliberately: the work was to find where the system breaks and show the reasoning that got there.',
-        'A small sample, stated plainly rather than generalised: three interviews, eight valid card sorts, five tree tests.',
+        'Research, information architecture, prioritisation and low-fidelity design. The prototype has not been tested with users yet, and the study names that as the next step.',
+        'A small sample, stated plainly: three interviews, eight card sorts and five tree tests. Most participants were students.',
       ],
     },
-    built: ['HTML', 'CSS', 'Card sorting', 'Tree testing', 'Journey mapping'],
+    built: ['HTML', 'CSS', 'Figma', 'Card sorting', 'Tree testing', 'Journey mapping', 'Wireframing', 'Prototyping'],
     ledgerExtra: [
       ['interviews', '3'],
       ['card sorts', '8'],
       ['tree tests', '5'],
-      ['javascript', 'none'],
+      ['wireframes', '16'],
+      ['own javascript', 'none'],
     ],
   },
   // ── VII ──────────────────────────────────────────────────────────────────

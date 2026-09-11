@@ -547,7 +547,7 @@ export default {
             'Docker',
             'CI as free infrastructure',
             'Technical writing and documentation',
-            'UX research: interviews, card sorts, tree tests',
+            'UX research and design: interviews, card sorts, tree tests, wireframes, prototypes',
           ],
         },
       ],

@@ -1589,10 +1589,16 @@ a:hover {
   margin: 0;
 }
 
+/* A plate is read at a glance or not at all, so none may be taller than the
+   screen. Width follows the height cap rather than stretching past it, and the
+   plate sits centred in the column; the file behind it is still the full size. */
 .charter-shots img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: calc(100vh - 6rem);
+  margin: 0 auto;
   border: 1px solid #4a3b22;
   border-radius: 3px;
   background: #e9dfc4;
