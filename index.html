@@ -433,12 +433,14 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 .flash { animation: flashy 1.8s ease; }
 @keyframes flashy { 0%, 60% { box-shadow: 0 0 0 3px var(--gold-hi), 0 0 60px var(--gold); } }
 
-/* Touch screens: live blur behind moving layers flickers on phones, so use solid tints instead */
-@media (pointer: coarse) {
-  .bar { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(10, 8, 6, 0.94); }
-  .plate { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(13, 10, 7, 0.92); }
-  .fog { filter: none; mix-blend-mode: normal; }
-}
+/* Touch screens (html.lite, set by the script): live blur, always-on layers and animated glows flicker on phones */
+.lite .bar { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(10, 8, 6, 0.94); }
+.lite .plate { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(13, 10, 7, 0.92); }
+.lite .fog { filter: none; mix-blend-mode: normal; }
+.lite .stage .painting img { animation: none; }
+.lite .stage .painting, .lite .btn, .lite .gallery figure, .lite .slot, .lite .relic .art img,
+.lite .portrait .ring, .lite .raven, .lite .marquee .track { will-change: auto; }
+.lite .moon { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -1129,6 +1131,9 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   var root = document.documentElement;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var finePointer = window.matchMedia("(pointer: fine)").matches;
+  // Touch devices get lighter motion: no per-letter 3D, no hidden layers animating. ?lite forces it for testing.
+  var lite = window.matchMedia("(pointer: coarse)").matches || /[?&]lite\b/.test(location.search);
+  root.classList.toggle("lite", lite);
   var hasGsap = !!(window.gsap && window.ScrollTrigger);
   var EMAIL = "bhargavaramkrishnapur@gmail.com";
   var EXCLUDE = ["pay-off"]; // org repos that are not mine
@@ -1378,6 +1383,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 
   // Split text into characters
   function splitChars(el) {
+    if (lite) return [el];
     var text = el.textContent.trim(), words = text.split(/\s+/);
     el.innerHTML = '<span class="sr">' + text + "</span>" + words.map(function (w) {
       return '<span class="word" aria-hidden="true">' + w.split("").map(function (c) { return '<span class="ch">' + c + "</span>"; }).join("") + "</span>";
@@ -1397,18 +1403,18 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     var target = $('.stage .painting[data-for="' + id + '"]');
     if (target) {
       paintings.forEach(function (p) {
-        gsap.to(p, { opacity: p === target ? 1 : 0, duration: 1.6, ease: "power2.inOut", overwrite: "auto" });
+        gsap.to(p, { autoAlpha: p === target ? 1 : 0, duration: 1.6, ease: "power2.inOut", overwrite: "auto" });
       });
     }
     moteTheme = themes[id] || "gold";
     $("#astro-numeral").textContent = numerals[id] || "";
     navLinks.forEach(function (a) { a.setAttribute("aria-current", a.getAttribute("href") === "#" + id ? "true" : "false"); });
   }
-  gsap.set(paintings, { opacity: 0 });
-  gsap.set(paintings[0], { opacity: 1 });
+  gsap.set(paintings, { autoAlpha: 0 });
+  gsap.set(paintings[0], { autoAlpha: 1 });
   current = "top";
   // Every painting slowly zooms and rises with the whole page
-  gsap.fromTo(paintings, { scale: 1, yPercent: 2 }, {
+  if (!lite) gsap.fromTo(paintings, { scale: 1, yPercent: 2 }, {
     scale: 1.12, yPercent: -3, ease: "none",
     scrollTrigger: { trigger: document.body, start: "top top", end: "bottom bottom", scrub: 1.2 }
   });
@@ -1456,13 +1462,19 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   var intro = gsap.timeline({ delay: 0.15 });
   intro.from(".ridges .layer", { yPercent: 40, duration: 1.8, stagger: 0.12, ease: "expo.out" }, 0)
        .from("#moon", { y: 140, opacity: 0, scale: 0.6, duration: 2.2, ease: "expo.out" }, 0.1)
-       .from(heroChars, { yPercent: 110, rotateX: -95, opacity: 0, filter: "blur(8px)", duration: 1.3, stagger: 0.045, ease: "expo.out" }, 0.35)
+       .from(heroChars, lite
+         ? { y: 40, opacity: 0, duration: 1.2, stagger: 0.15, ease: "expo.out" }
+         : { yPercent: 110, rotateX: -95, opacity: 0, filter: "blur(8px)", duration: 1.3, stagger: 0.045, ease: "expo.out" }, 0.35)
        .from(".hero-el", { y: 36, opacity: 0, duration: 1.1, stagger: 0.14 }, 0.9);
+  // Start once the fonts are in (at most 1 s), so the font swap happens while the letters are still hidden
+  intro.pause();
+  Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise(function (r) { setTimeout(r, 1000); })])
+    .then(function () { intro.play(); });
 
   intro.eventCallback("onComplete", buildHeroScroll);
   function buildHeroScroll() {
   var heroScroll = gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1 } });
-  heroChars.forEach(function (c) {
+  if (!lite) heroChars.forEach(function (c) {
     heroScroll.to(c, { y: -60 - Math.random() * 220, x: (Math.random() - 0.5) * 80, rotation: (Math.random() - 0.5) * 50, opacity: 0.15, ease: "none" }, 0);
   });
   heroScroll.to(".ridges .layer[data-depth='1']", { yPercent: 8, ease: "none" }, 0)
@@ -1481,19 +1493,21 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     if (Math.abs(velocity) > 0.2) dir = velocity > 0 ? 1 : -1;
     marqueeX -= 0.025 * dir * (1 + Math.min(Math.abs(velocity) * 0.35, 12));
     gsap.set(track, { xPercent: wrapX(marqueeX) });
-    skewTo(clamp(-velocity * 0.6, -14, 14));
+    if (!lite) skewTo(clamp(-velocity * 0.6, -14, 14));
   });
 
   // ---------- Chapter headings ----------
   $all(".chapter-head").forEach(function (head) {
     var h2 = head.querySelector("h2.split");
-    var tl = gsap.timeline({ scrollTrigger: { trigger: head, start: "top 82%", toggleActions: "play none none reverse" } });
+    var tl = gsap.timeline({ scrollTrigger: { trigger: head, start: "top 82%", toggleActions: lite ? "play none none none" : "play none none reverse" } });
     tl.from(head.querySelector(".eyebrow"), { letterSpacing: "0.9em", opacity: 0, duration: 1.2 }, 0);
-    if (h2) tl.from(splitChars(h2), { yPercent: 120, rotateX: -90, opacity: 0, duration: 1.1, stagger: 0.035, ease: "back.out(1.7)" }, 0.1);
+    if (h2) tl.from(splitChars(h2), lite
+      ? { y: 30, opacity: 0, duration: 1, ease: "expo.out" }
+      : { yPercent: 120, rotateX: -90, opacity: 0, duration: 1.1, stagger: 0.035, ease: "back.out(1.7)" }, 0.1);
     var rule = head.querySelector(".rule"); if (rule) tl.from(rule, { scaleX: 0, duration: 1.2, ease: "expo.out" }, 0.4);
     $all(".lede, .legend", head).forEach(function (el) { tl.from(el, { y: 30, opacity: 0, duration: 1 }, 0.5); });
     var roman = head.querySelector(".roman");
-    if (roman) gsap.fromTo(roman, { yPercent: 40, rotation: -6, opacity: 0 }, { yPercent: -40, rotation: 4, opacity: 1, ease: "none", scrollTrigger: { trigger: head, start: "top bottom", end: "bottom top", scrub: true } });
+    if (roman && !lite) gsap.fromTo(roman, { yPercent: 40, rotation: -6, opacity: 0 }, { yPercent: -40, rotation: 4, opacity: 1, ease: "none", scrollTrigger: { trigger: head, start: "top bottom", end: "bottom top", scrub: true } });
   });
   // The contact heading sits inside the letter
   var ravenTitle = $("#contact-title");
@@ -1531,7 +1545,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 
   // ---------- Hall of relics ----------
   var mm = gsap.matchMedia();
-  $all(".relic .art img").forEach(function (img, i) {
+  if (!lite) $all(".relic .art img").forEach(function (img, i) {
     gsap.set(img, { z: 40 });
     gsap.to(img, { y: -12, rotation: i % 2 ? 2 : -2, duration: 2.6 + (i % 5) * 0.4, ease: "sine.inOut", yoyo: true, repeat: -1, delay: i * 0.17 });
   });
