@@ -8,7 +8,13 @@
 
   // Always open a page at the top (or at its #section). Some hosts carry the old scroll position over.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  // Once the reader has scrolled, never pull them back. On a phone "load" fires late.
+  var readerMoved = false;
+  ["touchstart", "wheel", "keydown", "pointerdown"].forEach(function (ev) {
+    window.addEventListener(ev, function () { readerMoved = true; }, { passive: true, capture: true });
+  });
   function toStart() {
+    if (readerMoved) return;
     var id = location.hash.slice(1);
     var target = id && document.getElementById(decodeURIComponent(id));
     if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
@@ -17,7 +23,7 @@
   toStart();
   document.addEventListener("DOMContentLoaded", toStart);
   window.addEventListener("load", function () { toStart(); setTimeout(toStart, 60); setTimeout(toStart, 300); });
-  window.addEventListener("pageshow", function (e) { if (e.persisted) toStart(); });
+  window.addEventListener("pageshow", function (e) { if (e.persisted) { readerMoved = false; toStart(); } });
 
   // Toast
   var toastEl = $("#toast"), t;

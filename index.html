@@ -56,7 +56,7 @@ button { font: inherit; color: inherit; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Stage: paintings behind everything */
-.stage { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--ink); }
+.stage { position: fixed; top: 0; left: 0; right: 0; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; background: var(--ink); }
 .stage .painting { position: absolute; inset: -6%; opacity: 0; will-change: opacity, transform; }
 .stage .painting.on { opacity: 1; }
 .stage .painting img { width: 100%; height: 100%; object-fit: cover; animation: drift 38s ease-in-out infinite alternate; }
@@ -74,7 +74,7 @@ button { font: inherit; color: inherit; }
 .fog.f1 { bottom: -10%; animation: fogmove 60s linear infinite; }
 .fog.f2 { bottom: 15%; opacity: .32; animation: fogmove 95s linear infinite reverse; }
 @keyframes fogmove { to { transform: translateX(25%); } }
-#motes { position: fixed; inset: 0; z-index: 1; pointer-events: none; width: 100%; height: 100%; }
+#motes { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; width: 100%; height: 100vh; }
 main, footer, .bar { position: relative; z-index: 2; }
 main { overflow-x: clip; }
 
@@ -432,6 +432,13 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 .flash { animation: flashy 1.8s ease; }
 @keyframes flashy { 0%, 60% { box-shadow: 0 0 0 3px var(--gold-hi), 0 0 60px var(--gold); } }
+
+/* Touch screens: live blur behind moving layers flickers on phones, so use solid tints instead */
+@media (pointer: coarse) {
+  .bar { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(10, 8, 6, 0.94); }
+  .plate { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(13, 10, 7, 0.92); }
+  .fog { filter: none; mix-blend-mode: normal; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -1322,7 +1329,13 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 
   // ---------- Open at the top, or at the #chapter in the link ----------
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  // Once the reader has scrolled, never pull them back. On a phone "load" fires late.
+  var readerMoved = false;
+  ["touchstart", "wheel", "keydown", "pointerdown"].forEach(function (ev) {
+    window.addEventListener(ev, function () { readerMoved = true; }, { passive: true, capture: true });
+  });
   function toStart() {
+    if (readerMoved) return;
     var id = location.hash.slice(1);
     var target = id && document.getElementById(decodeURIComponent(id));
     if (lenis) {
@@ -1332,7 +1345,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }
   window.addEventListener("load", function () { toStart(); setTimeout(toStart, 60); setTimeout(toStart, 300); });
-  window.addEventListener("pageshow", function (e) { if (e.persisted) toStart(); });
+  window.addEventListener("pageshow", function (e) { if (e.persisted) { readerMoved = false; toStart(); } });
 
   // ---------- Static fallback ----------
   var paintings = $all(".stage .painting");
@@ -1345,6 +1358,8 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   // ================= Motion =================
   root.classList.add("js");
   gsap.registerPlugin(ScrollTrigger);
+  // A phone's address bar resizes the viewport height on every scroll. Do not re-measure for that.
+  ScrollTrigger.config({ ignoreMobileResize: true });
   gsap.defaults({ ease: "power3.out" });
 
   // Smooth scroll + velocity
@@ -1648,7 +1663,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   var COUNT = window.innerWidth < 700 ? 45 : 110;
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
+    W = canvas.clientWidth || window.innerWidth; H = canvas.clientHeight || window.innerHeight;
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
@@ -1658,7 +1673,11 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   }
   resize();
   for (var i = 0; i < COUNT; i++) motes.push(newMote(true));
-  window.addEventListener("resize", function () { resize(); });
+  var moteW = window.innerWidth;
+  window.addEventListener("resize", function () {
+    if (window.innerWidth === moteW) return;
+    moteW = window.innerWidth; resize();
+  });
   function spark(x, y, n, power) {
     for (var k = 0; k < n; k++) {
       var ang = Math.random() * Math.PI * 2, sp = Math.random() * power;
@@ -1721,7 +1740,13 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   function refreshAll() { buildRoad(); ScrollTrigger.sort(); ScrollTrigger.refresh(); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(refreshAll);
   window.addEventListener("load", refreshAll);
-  var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(refreshAll, 250); });
+  // Re-measure only when the width changes. A height-only resize is the phone's address bar.
+  var rt, lastW = window.innerWidth;
+  window.addEventListener("resize", function () {
+    if (window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
+    clearTimeout(rt); rt = setTimeout(refreshAll, 250);
+  });
 })();
 
 </script>
