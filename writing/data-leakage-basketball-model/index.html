@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data leakage in machine learning: how my NCAA model cheated</title>
+<meta name="description" content="An NCAA basketball predictor reached an AUC of 0.9666 because it trained on stats from the games it was predicting. How the leak happened, how I found it, and the checks that stop it now.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/data-leakage-basketball-model/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Data leakage in machine learning: how my NCAA model cheated">
+<meta property="og:description" content="An NCAA basketball predictor reached an AUC of 0.9666 because it trained on stats from the games it was predicting. How the leak happened, how I found it, and the checks that stop it now.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/data-leakage-basketball-model/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/data-leakage-basketball-model.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="My basketball model scored 0.97 AUC. It was cheating.">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-09-29">
+<meta property="article:modified_time" content="2026-09-29">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Machine learning">
+<meta property="article:tag" content="data leakage"><meta property="article:tag" content="machine learning"><meta property="article:tag" content="scikit-learn"><meta property="article:tag" content="MLOps"><meta property="article:tag" content="ROC-AUC"><meta property="article:tag" content="sports analytics">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Data leakage in machine learning: how my NCAA model cheated">
+<meta name="twitter:description" content="An NCAA basketball predictor reached an AUC of 0.9666 because it trained on stats from the games it was predicting. How the leak happened, how I found it, and the checks that stop it now.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/data-leakage-basketball-model.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/burning.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/data-leakage-basketball-model/#post", "headline": "My basketball model scored 0.97 AUC. It was cheating.", "name": "Data leakage in machine learning: how my NCAA model cheated", "description": "An NCAA basketball predictor reached an AUC of 0.9666 because it trained on stats from the games it was predicting. How the leak happened, how I found it, and the checks that stop it now.", "url": "https://codex-crusader.github.io/writing/data-leakage-basketball-model/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/data-leakage-basketball-model/", "image": ["https://codex-crusader.github.io/writing/og/data-leakage-basketball-model.jpg", "https://codex-crusader.github.io/art/stage/burning.webp"], "datePublished": "2026-09-29", "dateModified": "2026-09-29", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 685, "keywords": "data leakage, machine learning, scikit-learn, MLOps, ROC-AUC, sports analytics", "articleSection": "Machine learning", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "NCAA Basketball Predictor", "codeRepository": "https://github.com/Codex-Crusader/Uni-basketball-ETL-pipeline", "description": "A self-improving pipeline. It pulls game data from ESPN, trains 6 models, and deploys the best one. It is built to stop data leakage."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "My basketball model scored 0.97 AUC. It was cheating.", "item": "https://codex-crusader.github.io/writing/data-leakage-basketball-model/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/burning.webp" alt="" width="2000" height="1485" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>My basketball model scored 0.97 AUC. It was cheating.</h1>
+      <p class="dek">When a result looks too good, suspect a leak before you suspect genius.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><a class="tag" href="../?tag=Machine learning">Machine learning</a><a class="tag" href="../?tag=Data">Data</a></p>
+    </div>
+    <p class="painting-credit">Painting: Joseph Mallord William Turner, <a href="https://clevelandart.org/art/1942.647">The Burning of the Houses of Lords and Commons, 16 October 1834</a>, 1835. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+
+<p>Early versions of my NCAA basketball predictor had an ROC-AUC of 0.9666. For a sports model, that is not impressive. It is suspicious. Nobody predicts college basketball that well, because the games are not that predictable.</p>
+<p>The model was not predicting anything. It was reading the answer.</p>
+<h2 id="how-the-leak-worked">How the leak worked</h2>
+<p>One feature was <code>home_fg_pct</code>, the home team's field goal percentage. The problem was which field goal percentage. The data stored what the home team shot during the game itself. So the model learned that teams that shoot well win. That is true, and it is useless, because you do not know how a team will shoot until the game is over.</p>
+<p>This is data leakage: the model trains on information that it will not have at the moment it must make a prediction. It is the same mistake as a wrong attention mask in a transformer, where the model can see the next word it is supposed to guess. Different field, same failure.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:560px"><svg viewBox="0 0 640 252" role="img" aria-label="Bar chart of ROC-AUC: version 2.4 with the leak scored 0.9666, version 2.5 without the leak scored about 0.74. 0.5 is a coin flip."><defs><marker id="ah6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-ah"/></marker></defs><line x1="170.0" y1="20" x2="170.0" y2="200" class="dg-grid"/><text x="170.0" y="222" class="dg-s" text-anchor="middle" font-size="13">0.5</text><line x1="258.0" y1="20" x2="258.0" y2="200" class="dg-grid"/><text x="258.0" y="222" class="dg-s" text-anchor="middle" font-size="13">0.6</text><line x1="346.0" y1="20" x2="346.0" y2="200" class="dg-grid"/><text x="346.0" y="222" class="dg-s" text-anchor="middle" font-size="13">0.7</text><line x1="434.0" y1="20" x2="434.0" y2="200" class="dg-grid"/><text x="434.0" y="222" class="dg-s" text-anchor="middle" font-size="13">0.8</text><line x1="522.0" y1="20" x2="522.0" y2="200" class="dg-grid"/><text x="522.0" y="222" class="dg-s" text-anchor="middle" font-size="13">0.9</text><line x1="610.0" y1="20" x2="610.0" y2="200" class="dg-grid"/><text x="610.0" y="222" class="dg-s" text-anchor="middle" font-size="13">1.0</text><text x="170.0" y="244" class="dg-s" text-anchor="middle" font-size="12">coin flip</text><text x="390.0" y="244" class="dg-s" text-anchor="middle" font-size="12">ROC-AUC</text><text x="158" y="71" class="dg-t" text-anchor="end" font-size="15">v2.4: leaked</text><rect x="170" y="40" width="410.6" height="46" class="dg-bar2"/><text x="590.6" y="70" class="dg-t" font-size="15">0.9666</text><text x="158" y="161" class="dg-t" text-anchor="end" font-size="15">v2.5: honest</text><rect x="170" y="130" width="211.2" height="46" class="dg-bar"/><text x="391.2" y="160" class="dg-t" font-size="15">about 0.74</text></svg></div></div><figcaption>The AUC before and after the fix. The axis starts at 0.5, the score of a coin flip. Bars drawn to scale.</figcaption></figure>
+<h2 id="the-fix">The fix</h2>
+<p>Every feature now stores a rolling average of the team's last 10 games going into that night. <code>home_fg_pct = 0.47</code> now means that this team has averaged 47% from the field over its last 10 games. That is information you have before tip-off.</p>
+<p>The enrich step walks through every game in date order and builds these averages only from earlier games. If either team has no history yet, the game is dropped from training. I also removed four features completely: points per game and an efficiency score for each team. Both come from the final score, which is the thing the model must predict.</p>
+<p>The AUC fell from 0.9666 to about 0.74. That is the correct result. An honest 0.74 is worth more than a dishonest 0.97.</p>
+<h2 id="checks-that-run-before-any-model-sees-data">Checks that run before any model sees data</h2>
+<p>A leak that happened once can happen again, so the pipeline now looks for it on every run. Before training, it runs four checks:</p>
+<ul>
+<li><strong>Leakage detection.</strong> A feature that correlates with the outcome above 0.70 is flagged as suspicious.</li>
+<li><strong>Near-zero variance.</strong> A feature that barely changes carries no information.</li>
+<li><strong>Class balance.</strong> The home win rate must sit between 40% and 70%. Outside that range, the data is probably wrong.</li>
+<li><strong>Sample-to-feature ratio.</strong> Too few games for the number of features is a condition for overfitting, and the pipeline catches it early.</li>
+</ul>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/ncaa-predictor-dashboard.webp" alt="The NCAA predictor dashboard with a matchup form showing rolling averages for the home team." width="1400" height="638" loading="lazy" decoding="async"></button></div><figcaption>The prediction screen. Every number in the form is a rolling average from games before this one.</figcaption></figure>
+<h2 id="six-models-one-winner">Six models, one winner</h2>
+<p>Each training run is a competition. Gradient boosting, random forest, extra trees, an SVM, a small neural network and, if it is installed, XGBoost all train on the same data. Each model sits in a scikit-learn pipeline with a StandardScaler that fits only on the training set, so no information leaks through the scaling either. Each model is scored on a held-out test set and with 5-fold cross-validation, and the one with the best ROC-AUC is registered as the new version.</p>
+<p>Tree depth adapts to the size of the data: <code>max_depth = log2(n_samples / (10 × n_features))</code>, with a floor of 3. With about 2,300 training samples and 14 features, the ceiling is 4, whatever the configuration says. A small dataset cannot support a deep tree.</p>
+<h2 id="it-keeps-learning-on-its-own">It keeps learning on its own</h2>
+<p>When the server runs, a background thread checks for new games every six hours. If there are 15 or more new games, it runs a full training cycle. The new model replaces the old one only if its AUC is at least 0.002 higher. Otherwise the run is logged as skipped, with the reason. This threshold stops the registry from filling up with versions that differ only by noise. Every version stays in the registry, so a bad release can be rolled back.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/ncaa-predictor-model-comparison.webp" alt="A second screen of the NCAA predictor dashboard." width="1400" height="640" loading="lazy" decoding="async"></button></div><figcaption>The dashboard also shows the model comparison, the feature list, the registry and the auto-learn log.</figcaption></figure>
+<p>The data comes from ESPN's unofficial API: about 2,900 games across three seasons, with no API key. The live demo runs on a mix of synthetic and real data, so its metrics do not show real prediction performance.</p>
+<h2 id="the-lesson">The lesson</h2>
+<p>The high score was the bug. When a model looks too good, the first question is not "how did I do this?" It is "what can the model see that it should not?"</p>
+
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#how-the-leak-worked">How the leak worked</a></li><li><a href="#the-fix">The fix</a></li><li><a href="#checks-that-run-before-any-model-sees-data">Checks that run before any model sees data</a></li><li><a href="#six-models-one-winner">Six models, one winner</a></li><li><a href="#it-keeps-learning-on-its-own">It keeps learning on its own</a></li><li><a href="#the-lesson">The lesson</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/data-leakage-basketball-model/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/st-george.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/Uni-basketball-ETL-pipeline">NCAA Basketball Predictor</a></b><span>A self-improving pipeline. It pulls game data from ESPN, trains 6 models, and deploys the best one. It is built to stop data leakage. <a href="../../#p-ncaa-predictor">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Data|Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/melencolia.webp" alt="" width="602" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><span>Data · Machine learning</span></p>
+    <h3><a href="../../writing/explainable-market-intelligence/">Making a market signal explain itself</a></h3>
+    <p>A reading is worth nothing if it cannot say how it was taken.</p>
+  </div>
+</article><article class="card rv" data-tags="Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/chess-mirror.webp" alt="" width="762" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning</span></p>
+    <h3><a href="../../writing/alphazero-chess-engine-python/">Building an AlphaZero-style chess engine in Python</a></h3>
+    <p>No opening book and no human games. It plays itself, and it learns from the result.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

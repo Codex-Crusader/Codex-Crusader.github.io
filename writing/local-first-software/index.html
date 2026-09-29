@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Local-first software: why your tools should run on your own machine</title>
+<meta name="description" content="Most software you use today runs on someone else’s computer. Local-first software runs on yours. Here is what that changes, what it costs, and why nearly everything I build works this way.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/local-first-software/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Local-first software: why your tools should run on your own machine">
+<meta property="og:description" content="Most software you use today runs on someone else’s computer. Local-first software runs on yours. Here is what that changes, what it costs, and why nearly everything I build works this way.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/local-first-software/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/local-first-software.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Local-first software">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-08-28">
+<meta property="article:modified_time" content="2026-08-28">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Software engineering">
+<meta property="article:tag" content="local-first"><meta property="article:tag" content="privacy"><meta property="article:tag" content="software design">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Local-first software: why your tools should run on your own machine">
+<meta name="twitter:description" content="Most software you use today runs on someone else’s computer. Local-first software runs on yours. Here is what that changes, what it costs, and why nearly everything I build works this way.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/local-first-software.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/landers-peak.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/local-first-software/#post", "headline": "Local-first software", "name": "Local-first software: why your tools should run on your own machine", "description": "Most software you use today runs on someone else’s computer. Local-first software runs on yours. Here is what that changes, what it costs, and why nearly everything I build works this way.", "url": "https://codex-crusader.github.io/writing/local-first-software/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/local-first-software/", "image": ["https://codex-crusader.github.io/writing/og/local-first-software.jpg", "https://codex-crusader.github.io/art/stage/landers-peak.webp"], "datePublished": "2026-08-28", "dateModified": "2026-08-28", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 908, "keywords": "local-first, privacy, software design", "articleSection": "Software engineering", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "StackSight", "codeRepository": "https://github.com/Codex-Crusader/Stack-Sight", "description": "A local-only Chrome extension. It groups sites into stacks, tracks use, and shows subscriptions you pay for but do not open."}, {"@type": "SoftwareSourceCode", "name": "bruhswer", "codeRepository": "https://github.com/Codex-Crusader/bruhswer-the-homebrew-pseudo-browser", "description": "A hardened wrapper around Microsoft Edge on Windows. It checks its protections before launch and stops if one fails. When it cannot enforce a check, it says NOT ENFORCEABLE."}, {"@type": "SoftwareSourceCode", "name": "Digital Footprint Cleaner", "codeRepository": "https://github.com/Codex-Crusader/digital-footprint-cleaner", "description": "Finds your personal data on public websites and helps you remove it. Privacy-first and fully open source."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Local-first software", "item": "https://codex-crusader.github.io/writing/local-first-software/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/landers-peak.webp" alt="" width="2000" height="1199" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Local-first software</h1>
+      <p class="dek">A tool you cannot run offline is a tool somebody can switch off.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><a class="tag" href="../?tag=Software engineering">Software engineering</a><a class="tag" href="../?tag=Security">Security</a></p>
+    </div>
+    <p class="painting-credit">Painting: Albert Bierstadt, <a href="https://www.metmuseum.org/art/collection/search/10154">The Rocky Mountains, Lander&#x27;s Peak</a>, 1863. The Metropolitan Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>Think about the apps you opened today. Your notes, your email, your to-do list, the thing you track your money in. Almost all of them work the same way. You type something in, it goes over the internet to a company’s computer, and that computer sends back what you see on screen. Your data lives there. The program lives there. You are renting access to both.</p>
+<p>That arrangement is so normal now that it is easy to forget it is a choice. Local-first software makes the other choice. The program runs on your machine. Your files sit on your disk. The internet is something the software can use when it is there, not something it needs in order to start.</p>
+<h2 id="what-actually-goes-wrong-with-the-other-way">What actually goes wrong with the other way</h2>
+<p>This is not really about privacy, although privacy is part of it. It is about who is in control, and there are four specific things that can be taken away from you.</p>
+<p>The company can shut down. When it does, the software stops working. Not "stops getting updates", stops working, because the part that did the thinking was never on your computer. People have lost years of notes this way.</p>
+<p>The price can change. You did not buy the tool, you are renting it, and rent goes up. If your work is inside it, moving out is expensive enough that most people just pay.</p>
+<p>The software can change under you. A feature you depended on gets removed and there is no old version to stay on. You did not install it, so you cannot decline the update.</p>
+<p>And your data is somewhere you cannot reach. You can usually ask for a copy. Whether you get it in a format anything else can open is a different question.</p>
+<p>None of this requires anyone to behave badly. A company can be entirely well-meaning and still get bought, run out of money, or decide your use case is not worth supporting any more.</p>
+<h2 id="what-local-first-actually-means">What local-first actually means</h2>
+<p>The name is doing a lot of work, so it is worth being precise. Local-first does not mean offline-only, and it does not mean anti-internet. It means the local copy is the real one.</p>
+<p>Your machine holds the actual data, not a cached view of data that really lives elsewhere. The software opens and works with no network. If it syncs, syncing is a feature that makes it better, not a requirement that makes it run. And if every server involved vanished overnight, you would still have your files and a program that opens them.</p>
+<p>That last one is the test I actually use. Delete the company, and ask what you are left with. If the answer is nothing, it was never your software.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:560px"><svg viewBox="0 0 640 290" role="img" aria-label="Diagram comparing cloud-first software, where the real copy is on a company server, with local-first software, where the real copy is on your device and sync is optional."><defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-ah"/></marker></defs><text x="150" y="22" class="dg-h" text-anchor="middle" font-size="17">Cloud-first</text><text x="490" y="22" class="dg-h" text-anchor="middle" font-size="17">Local-first</text><line x1="320" y1="0" x2="320" y2="300" class="dg-rule"/><rect x="40" y="40" width="220" height="70" rx="3" class="dg-box"/><text x="150.0" y="65.0" class="dg-t" text-anchor="middle" font-size="16">Your device</text><text x="150.0" y="87.0" class="dg-s" text-anchor="middle" font-size="13">a window onto the data</text><path d="M150 112 V186" class="dg-line" marker-end="url(#ah2)"/><text x="160" y="154" class="dg-s" font-size="13">every action crosses the network</text><rect x="40" y="190" width="220" height="80" rx="3" class="dg-box2"/><text x="150.0" y="212.0" class="dg-t" text-anchor="middle" font-size="16">Company server</text><text x="150.0" y="234.0" class="dg-s" text-anchor="middle" font-size="13">the real copy lives here</text><text x="150.0" y="251.0" class="dg-s" text-anchor="middle" font-size="13">it can shut down or change</text><rect x="380" y="40" width="220" height="80" rx="3" class="dg-box2"/><text x="490.0" y="62.0" class="dg-t" text-anchor="middle" font-size="16">Your device</text><text x="490.0" y="84.0" class="dg-s" text-anchor="middle" font-size="13">the real copy lives here</text><text x="490.0" y="101.0" class="dg-s" text-anchor="middle" font-size="13">works with no network</text><path d="M490 122 V186" class="dg-line" stroke-dasharray="5 5" marker-end="url(#ah2)"/><text x="500" y="154" class="dg-s" font-size="13">optional sync</text><rect x="380" y="190" width="220" height="80" rx="3" class="dg-box"/><text x="490.0" y="212.0" class="dg-t" text-anchor="middle" font-size="16">Other devices</text><text x="490.0" y="234.0" class="dg-s" text-anchor="middle" font-size="13">a convenience,</text><text x="490.0" y="251.0" class="dg-s" text-anchor="middle" font-size="13">not a requirement</text></svg></div></div><figcaption>Where the real copy of your data lives decides who controls it.</figcaption></figure>
+<h2 id="what-it-costs">What it costs</h2>
+<p>I would rather be honest about this than sell it, because local-first is genuinely harder in three places.</p>
+<p>Syncing between devices is difficult. When a server owns the data it also decides what is true. Without one, two devices can each change the same thing while apart, and something has to work out what happened when they meet. There are good techniques for this now, but it is real work.</p>
+<p>Installing is harder than opening a tab. A web app runs anywhere with a browser. Local software has to be built for each operating system, and someone has to be willing to install it.</p>
+<p>Some things genuinely need a server. Anything where people collaborate live, or where the heavy computation cannot fit on a laptop, is not a good fit. Pretending otherwise gets you a worse version of a web app.</p>
+<p>So the honest position is not that local-first is always right. It is that it is right far more often than it is used, and the reason it is not used more has more to do with business models than with engineering.</p>
+<h2 id="how-this-shows-up-in-what-i-build">How this shows up in what I build</h2>
+<p>Nearly everything I have written follows this rule, and it shapes the architecture rather than sitting on top of it as a feature.</p>
+<p>Stack-Sight is a Chrome extension that organises your browsing into stacks and tells you which subscriptions you are paying for and never opening. Working that out requires knowing what you visit, which is about as sensitive as data gets. It never leaves your browser. There is no account, and there is nothing for me to see even if I wanted to.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/stack-sight-popup.webp" alt="The StackSight popup: sites grouped into stacks, with monthly costs and a renewal warning." width="480" height="748" loading="lazy" decoding="async"></button></div><figcaption>StackSight. It knows what you visit and what you pay for, and none of it leaves your browser.</figcaption></figure>
+<p>The Digital Footprint Cleaner helps you find and remove your personal information from public websites. A cloud version of that tool would need you to hand over the exact information you are trying to get rid of, which is a strange thing to ask.</p>
+<p>Bruhswer is a hardened browser for Windows that enforces its protections on your machine, with your firewall. A privacy tool that phones home is not a privacy tool.</p>
+<p>And the Pulse Engine, which reads markets and news, does its whole analysis on your computer and keeps its history as files on your disk. That was not a philosophical decision at the start so much as a practical one: it meant there was no server to rent and no database to pay for, which is what let it be free and stay free.</p>
+<p>That is the pattern I keep finding. The constraint that looks like a limitation is usually the thing that makes the project survivable. Software that needs no money to run does not need to start charging you later.</p>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#what-actually-goes-wrong-with-the-other-way">What actually goes wrong with the other way</a></li><li><a href="#what-local-first-actually-means">What local-first actually means</a></li><li><a href="#what-it-costs">What it costs</a></li><li><a href="#how-this-shows-up-in-what-i-build">How this shows up in what I build</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/local-first-software/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/spider-helmet.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/Stack-Sight">StackSight</a></b><span>A local-only Chrome extension. It groups sites into stacks, tracks use, and shows subscriptions you pay for but do not open. <a href="../../#p-stack-sight">See it in the hall.</a></span></div></li><li><img src="../../art/relics/close-helmet.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/bruhswer-the-homebrew-pseudo-browser">bruhswer</a></b><span>A hardened wrapper around Microsoft Edge on Windows. It checks its protections before launch and stops if one fails. When it cannot enforce a check, it says NOT ENFORCEABLE. <a href="../../#p-bruhswer">See it in the hall.</a></span></div></li><li><img src="../../art/relics/rondache.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/digital-footprint-cleaner">Digital Footprint Cleaner</a></b><span>Finds your personal data on public websites and helps you remove it. Privacy-first and fully open source. <a href="../../#p-digital-footprint-cleaner">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Security">
+  <div class="thumb"><img src="../../writing/img/bruhswer-main-window.webp" alt="" width="1298" height="907" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>4 min read</span><span>Security</span></p>
+    <h3><a href="../../writing/browser-hardening/">Browser hardening, and saying what you cannot enforce</a></h3>
+    <p>A green tick you have not earned is worse than no tick at all.</p>
+  </div>
+</article><article class="card rv" data-tags="Software engineering">
+  <div class="thumb relic"><img src="../../art/relics/executioners-sword.webp" alt="" width="487" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>4 min read</span><span>Software engineering</span></p>
+    <h3><a href="../../writing/coding-war-crimes/">Coding war crimes: learning from deliberately terrible code</a></h3>
+    <p>A rule you have only been told is a rule you will break under pressure.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

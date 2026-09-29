@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Correlation Engine: testing every finding against pure noise</title>
+<meta name="description" content="The Correlation Engine runs about 4,875 hypothesis tests a day across news, markets and government data. How it separates real patterns from chance, and why it shows the noise result next to the real one.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/correlation-engine-noise-baseline/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Correlation Engine: testing every finding against pure noise">
+<meta property="og:description" content="The Correlation Engine runs about 4,875 hypothesis tests a day across news, markets and government data. How it separates real patterns from chance, and why it shows the noise result next to the real one.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/correlation-engine-noise-baseline/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/correlation-engine-noise-baseline.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Testing every finding against pure noise">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-09-29">
+<meta property="article:modified_time" content="2026-09-29">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Data">
+<meta property="article:tag" content="statistics"><meta property="article:tag" content="false discovery rate"><meta property="article:tag" content="time series"><meta property="article:tag" content="GitHub Actions"><meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Correlation Engine: testing every finding against pure noise">
+<meta name="twitter:description" content="The Correlation Engine runs about 4,875 hypothesis tests a day across news, markets and government data. How it separates real patterns from chance, and why it shows the noise result next to the real one.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/correlation-engine-noise-baseline.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/island-of-the-dead.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/correlation-engine-noise-baseline/#post", "headline": "Testing every finding against pure noise", "name": "Correlation Engine: testing every finding against pure noise", "description": "The Correlation Engine runs about 4,875 hypothesis tests a day across news, markets and government data. How it separates real patterns from chance, and why it shows the noise result next to the real one.", "url": "https://codex-crusader.github.io/writing/correlation-engine-noise-baseline/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/correlation-engine-noise-baseline/", "image": ["https://codex-crusader.github.io/writing/og/correlation-engine-noise-baseline.jpg", "https://codex-crusader.github.io/art/stage/island-of-the-dead.webp"], "datePublished": "2026-09-29", "dateModified": "2026-09-29", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 784, "keywords": "statistics, false discovery rate, time series, GitHub Actions, Python", "articleSection": "Data", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "Correlation Engine", "codeRepository": "https://github.com/Codex-Crusader/Correlation-engine", "description": "A daily scan across news, market and government data. It shows every finding next to what pure noise produces, so a lucky match cannot pass as a real one."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Testing every finding against pure noise", "item": "https://codex-crusader.github.io/writing/correlation-engine-noise-baseline/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/island-of-the-dead.webp" alt="" width="2000" height="1229" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Testing every finding against pure noise</h1>
+      <p class="dek">Run enough tests and you will always find something. The honest move is to show what noise finds too.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><a class="tag" href="../?tag=Data">Data</a></p>
+    </div>
+    <p class="painting-credit">Painting: Arnold Böcklin, <a href="https://www.metmuseum.org/art/collection/search/435683">Island of the Dead</a>, 1880. The Metropolitan Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+
+<p>Most correlation dashboards have the same flaw. They test many pairs of numbers, and they show you the pairs that pass. If you test enough pairs, some always pass. That is not a discovery. That is arithmetic.</p>
+<p>The Correlation Engine runs that search on purpose, and then it does one more thing. It runs the identical search on data that has no real relationships in it, and it shows both results side by side with the same visual weight. If the real result and the noise result look alike, you should trust neither.</p>
+<h2 id="the-size-of-the-problem">The size of the problem</h2>
+<p>The engine watches 26 daily time series from four free sources: the Federal Register (presidential documents per day), GDELT (the share of global news coverage per topic), FRED (yields, the VIX, currencies and oil) and Wikipedia page views with bots excluded. It tests every pair of series at every lag from minus seven to plus seven days.</p>
+<p>That is about 4,875 hypothesis tests a day. At the usual threshold of p &lt; 0.05, about 244 of them pass by pure chance. That is not a fault in the method. It is exactly what p &lt; 0.05 means.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:560px"><svg viewBox="0 0 600 240" role="img" aria-label="Bar chart: 4,875 tests a day, about 244 pass by chance. Then four filters: stationarity, FDR and effect size, stability, placebo panel."><defs><marker id="ah1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-ah"/></marker></defs><text x="0" y="22" class="dg-s" font-size="14">Tests run each day</text><rect x="0" y="32" width="600" height="34" class="dg-bar"/><text x="590" y="55" class="dg-dark" text-anchor="end" font-size="16">4,875</text><text x="0" y="98" class="dg-s" font-size="14">Pass p &lt; 0.05 by chance alone</text><rect x="0" y="108" width="30.0" height="34" class="dg-bar2"/><text x="40.0" y="131" class="dg-t" font-size="16">about 244</text><text x="0" y="178" class="dg-s" font-size="14">So an edge must survive four filters, in this order</text><rect x="0" y="190" width="140" height="44" rx="3" class="dg-box"/><text x="70.0" y="217.0" class="dg-t" text-anchor="middle" font-size="14">1. Stationarity</text><path d="M141 212 H152" class="dg-line" marker-end="url(#ah1)"/><rect x="153" y="190" width="140" height="44" rx="3" class="dg-box"/><text x="223.0" y="217.0" class="dg-t" text-anchor="middle" font-size="14">2. FDR + effect size</text><path d="M294 212 H305" class="dg-line" marker-end="url(#ah1)"/><rect x="306" y="190" width="140" height="44" rx="3" class="dg-box"/><text x="376.0" y="217.0" class="dg-t" text-anchor="middle" font-size="14">3. Stability</text><path d="M447 212 H458" class="dg-line" marker-end="url(#ah1)"/><rect x="459" y="190" width="140" height="44" rx="3" class="dg-box"/><text x="529.0" y="217.0" class="dg-t" text-anchor="middle" font-size="14">4. Placebo panel</text></svg></div></div><figcaption>About 4,875 tests run every day, and about 244 pass at p &lt; 0.05 by chance alone. Bars drawn to scale. Numbers from the project README.</figcaption></figure>
+<h2 id="four-filters">Four filters</h2>
+<p>The engine calls a pattern an <em>edge</em>: two series of daily changes that move together, possibly with a lag, across two weeks of runs. To be published, an edge must pass four filters.</p>
+<ol>
+<li><strong>Stationarity.</strong> Two things that both trend upward correlate strongly for no reason. So each series is differenced until an ADF test passes, the weekday cycle is removed, and the engine uses Spearman correlation on the changes, not on the levels.</li>
+<li><strong>False discovery rate and effect size.</strong> The Benjamini-Hochberg procedure runs across all tests together, with q &lt; 0.05. A surviving pair must also have |ρ| ≥ 0.20, so a tiny but "significant" effect does not count.</li>
+<li><strong>Stability.</strong> The same pair, with the same sign, must appear in at least 10 of the last 14 runs. Most survivors of the first two filters are one-day flukes, and this filter removes them.</li>
+<li><strong>The placebo panel.</strong> The identical pipeline runs on IAAFT surrogates 20 times a day. A surrogate keeps the values and the wiggle of each series, but it destroys any real relationship between series. Whatever the pipeline finds there, it found in noise.</li>
+</ol>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/correlation-engine-live-site.webp" alt="The Correlation Engine live site: tests run today, hits expected from chance, and the signal panel next to the noise panel." width="1400" height="875" loading="lazy" decoding="async"></button></div><figcaption>The live site. The real result (left) and the placebo panel (right) get the same space and the same weight.</figcaption></figure>
+<h2 id="why-the-noise-panel-matters-most">Why the noise panel matters most</h2>
+<p>The first three filters are standard statistics. The fourth one keeps the tool honest. The statistics make assumptions, and real data does not always follow them. For example, the 15 lags of one pair are not independent of each other, so the q-values are only approximate.</p>
+<p>The placebo panel does not depend on those assumptions. It measures, every day, how many edges this exact pipeline produces when there is nothing to find. The live site puts that number next to the real result. You do not have to trust my statistics. You can compare the two panels and decide.</p>
+<p>Published edges also carry a note about a common driver. The engine computes a partial Spearman correlation with the changes in the VIX removed. If the edge holds, the note says so. If it fades, the two series were probably both reacting to the same crisis. This note is context. It is not a fifth filter.</p>
+<h2 id="what-it-will-not-say">What it will not say</h2>
+<p>An edge is never a causal claim, and the site never uses causal language. Government announcements usually respond to events, so even a clean lead and lag can point backwards. Most co-movement in this pool comes from a third thing, such as an election or a news cycle, that touches both series.</p>
+<p>The correct reading of an edge is narrow: out of about 4,875 searches today, this pattern was one of the most persistent, and here is what pure noise produces under the same search. Nothing more.</p>
+<p>Zero published edges is also a valid result. A new fork shows an empty graph for about two weeks, because the stability filter needs 10 runs before anything can publish. An empty graph is the correct output until the data earns a full one.</p>
+<h2 id="no-servers">No servers</h2>
+<p>The engine runs without a server, a database or a paid API. A GitHub Actions job fetched the data each morning at 06:30 UTC, committed every observation to the repository as CSV files, ran the analysis and rebuilt a static site on GitHub Pages. Because every observation and every claim is in git, the full track record can be audited in the commit history.</p>
+<p>I have since paused the daily job, because it used too much of my free Actions time. The static site is still online, and anyone can fork the repository and run it. A free FRED key is optional.</p>
+
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#the-size-of-the-problem">The size of the problem</a></li><li><a href="#four-filters">Four filters</a></li><li><a href="#why-the-noise-panel-matters-most">Why the noise panel matters most</a></li><li><a href="#what-it-will-not-say">What it will not say</a></li><li><a href="#no-servers">No servers</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/correlation-engine-noise-baseline/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/urania.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/Correlation-engine">Correlation Engine</a></b><span>A daily scan across news, market and government data. It shows every finding next to what pure noise produces, so a lucky match cannot pass as a real one. <a href="../../#p-correlation-engine">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Machine learning|Data">
+  <div class="thumb"><img src="../../writing/img/ncaa-predictor-dashboard.webp" alt="" width="1400" height="638" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning · Data</span></p>
+    <h3><a href="../../writing/data-leakage-basketball-model/">My basketball model scored 0.97 AUC. It was cheating.</a></h3>
+    <p>When a result looks too good, suspect a leak before you suspect genius.</p>
+  </div>
+</article><article class="card rv" data-tags="Data|Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/melencolia.webp" alt="" width="602" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><span>Data · Machine learning</span></p>
+    <h3><a href="../../writing/explainable-market-intelligence/">Making a market signal explain itself</a></h3>
+    <p>A reading is worth nothing if it cannot say how it was taken.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

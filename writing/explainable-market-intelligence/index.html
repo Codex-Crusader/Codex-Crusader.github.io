@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explainable market intelligence: building a signal that shows its working</title>
+<meta name="description" content="The Pulse Engine reads prices and news and prints one number. The number was the easy part. Making it say how it got there took far longer, and that is the part that makes it worth anything.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/explainable-market-intelligence/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Explainable market intelligence: building a signal that shows its working">
+<meta property="og:description" content="The Pulse Engine reads prices and news and prints one number. The number was the easy part. Making it say how it got there took far longer, and that is the part that makes it worth anything.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/explainable-market-intelligence/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/explainable-market-intelligence.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Making a market signal explain itself">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-08-28">
+<meta property="article:modified_time" content="2026-08-28">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Data">
+<meta property="article:tag" content="market intelligence"><meta property="article:tag" content="explainability"><meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Explainable market intelligence: building a signal that shows its working">
+<meta name="twitter:description" content="The Pulse Engine reads prices and news and prints one number. The number was the easy part. Making it say how it got there took far longer, and that is the part that makes it worth anything.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/explainable-market-intelligence.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/burning.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/explainable-market-intelligence/#post", "headline": "Making a market signal explain itself", "name": "Explainable market intelligence: building a signal that shows its working", "description": "The Pulse Engine reads prices and news and prints one number. The number was the easy part. Making it say how it got there took far longer, and that is the part that makes it worth anything.", "url": "https://codex-crusader.github.io/writing/explainable-market-intelligence/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/explainable-market-intelligence/", "image": ["https://codex-crusader.github.io/writing/og/explainable-market-intelligence.jpg", "https://codex-crusader.github.io/art/stage/burning.webp"], "datePublished": "2026-08-28", "dateModified": "2026-08-28", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 911, "keywords": "market intelligence, explainability, Python", "articleSection": "Data", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "Market Intelligence Platform", "codeRepository": "https://github.com/The-Pulse-Engine/Pulse-Engine_Market_Intelligence_Platform", "description": "Scores 24 assets from −10 to +10. It combines technical indicators with live news sentiment and explains why each signal fired. It runs fully on your machine."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Making a market signal explain itself", "item": "https://codex-crusader.github.io/writing/explainable-market-intelligence/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/burning.webp" alt="" width="2000" height="1485" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Making a market signal explain itself</h1>
+      <p class="dek">A reading is worth nothing if it cannot say how it was taken.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><a class="tag" href="../?tag=Data">Data</a><a class="tag" href="../?tag=Machine learning">Machine learning</a></p>
+    </div>
+    <p class="painting-credit">Painting: Joseph Mallord William Turner, <a href="https://clevelandart.org/art/1942.647">The Burning of the Houses of Lords and Commons, 16 October 1834</a>, 1835. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>There is a particular kind of financial tool that shows you a number and expects you to be impressed. It says BUY, or it gives a confidence of 87%, and it does not tell you why. You are supposed to trust it because the interface looks expensive.</p>
+<p>I find this genuinely irritating, and not only because it is often wrong. It is because a number you cannot argue with is useless even when it is right. If I cannot see the reasoning, I cannot tell the difference between a good call and a lucky one, and I cannot learn anything from either.</p>
+<p>The Pulse Engine is my attempt at the other thing. It still prints one score, from minus ten to plus ten. But every score can be taken apart.</p>
+<h2 id="two-streams-kept-separate-on-purpose">Two streams, kept separate on purpose</h2>
+<p>The system reads two independent things on every cycle.</p>
+<p>The first is price. Thirty days of open, high, low, close and volume from Yahoo Finance, which gives the ordinary technical picture: which way the thing is moving, how fast, and whether it looks stretched.</p>
+<p>The second is news. Up to three hundred articles from twelve chosen RSS feeds, fetched at the same time rather than one after another.</p>
+<p>The important design decision is that these are never quietly blended into one mush. They are measured separately and combined at a step you can look at, because when the two disagree that disagreement is information. Prices rising while coverage turns negative is a different situation from both moving together, and a system that averages them away has thrown out the interesting part.</p>
+<h2 id="reading-the-news-without-being-fooled-by-it">Reading the news without being fooled by it</h2>
+<p>News is messier than price, in two specific ways.</p>
+<p>The same story gets filed by six different outlets. If you count all six you have not found six pieces of evidence, you have found one story shouted six times. The engine compares articles against each other using Jaccard similarity, which is a simple measure of how much two pieces of text overlap, and counts near-identical stories once.</p>
+<p>The second problem is that general-purpose sentiment tools do not understand finance. The engine uses VADER, which scores text as positive or negative, but VADER on its own reads a phrase like "bond yields plunge" as bad news because "plunge" is a bad word in ordinary English. In markets it is not necessarily bad at all. So a financial word list is injected into it, teaching it what these words mean in this context.</p>
+<p>This is worth stating plainly: this is a word-list approach, not a language model. It is fast, cheap, and you can audit exactly why it scored something the way it did. It will also miss sarcasm and unusual phrasing. That is a real limitation and it is written on the project page rather than hidden.</p>
+<h2 id="six-components-and-why-each-one-is-kept-visible">Six components, and why each one is kept visible</h2>
+<p>The final score is built from six parts: trend direction, price momentum, RSI, news sentiment, trend strength, and the wider market or sector context.</p>
+<p>Each asset class weights those six differently, because a commodity and a technology stock do not react to the same signals in the same proportion, and pretending they do is how you get a system that works on one thing and quietly fails on another.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:600px"><svg viewBox="0 0 680 340" role="img" aria-label="Diagram: price and news streams feed six components, weighted per asset class, which produce one score from minus 10 to plus 10 and an explanation."><defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-ah"/></marker></defs><rect x="0" y="20" width="220" height="110" rx="3" class="dg-box"/><text x="110.0" y="49.0" class="dg-t" text-anchor="middle" font-size="16">Price</text><text x="110.0" y="71.0" class="dg-s" text-anchor="middle" font-size="13">30 days of open, high,</text><text x="110.0" y="88.0" class="dg-s" text-anchor="middle" font-size="13">low, close and volume</text><text x="110.0" y="105.0" class="dg-s" text-anchor="middle" font-size="13">from Yahoo Finance</text><rect x="0" y="170" width="220" height="150" rx="3" class="dg-box"/><text x="110.0" y="211.0" class="dg-t" text-anchor="middle" font-size="16">News</text><text x="110.0" y="233.0" class="dg-s" text-anchor="middle" font-size="13">up to 300 articles</text><text x="110.0" y="250.0" class="dg-s" text-anchor="middle" font-size="13">from 12 RSS feeds</text><text x="110.0" y="267.0" class="dg-s" text-anchor="middle" font-size="13">Jaccard: one story counts once</text><text x="110.0" y="284.0" class="dg-s" text-anchor="middle" font-size="13">VADER + finance word list</text><rect x="262" y="20" width="200" height="300" rx="3" class="dg-box"/><text x="362" y="48" class="dg-h" text-anchor="middle" font-size="15">Six components</text><text x="362" y="86" class="dg-t" text-anchor="middle" font-size="12.5">Trend direction</text><text x="362" y="124" class="dg-t" text-anchor="middle" font-size="12.5">Price momentum</text><text x="362" y="162" class="dg-t" text-anchor="middle" font-size="12.5">RSI</text><text x="362" y="200" class="dg-t" text-anchor="middle" font-size="12.5">News sentiment</text><text x="362" y="238" class="dg-t" text-anchor="middle" font-size="12.5">Trend strength</text><text x="362" y="276" class="dg-t" text-anchor="middle" font-size="12.5">Market or sector context</text><text x="362" y="310" class="dg-s" text-anchor="middle" font-size="12">weighted per asset class</text><path d="M221 75 H258" class="dg-line" marker-end="url(#ah3)"/><path d="M221 245 H258" class="dg-line" marker-end="url(#ah3)"/><rect x="504" y="40" width="176" height="90" rx="3" class="dg-box2"/><text x="592.0" y="75.0" class="dg-t" text-anchor="middle" font-size="16">One score</text><text x="592.0" y="97.0" class="dg-s" text-anchor="middle" font-size="13">from −10 to +10</text><rect x="504" y="170" width="176" height="150" rx="3" class="dg-box2"/><text x="592.0" y="219.0" class="dg-t" text-anchor="middle" font-size="16">An explanation</text><text x="592.0" y="241.0" class="dg-s" text-anchor="middle" font-size="13">which components</text><text x="592.0" y="258.0" class="dg-s" text-anchor="middle" font-size="13">moved this reading,</text><text x="592.0" y="275.0" class="dg-s" text-anchor="middle" font-size="13">and by how much</text><path d="M463 110 H500" class="dg-line" marker-end="url(#ah3)"/><path d="M463 240 H500" class="dg-line" marker-end="url(#ah3)"/></svg></div></div><figcaption>How a Pulse Engine reading is built. The two streams stay separate until the combining step, where you can look at them.</figcaption></figure>
+<p>Here is the part that took the longest. Every signal carries a built explanation naming which of the six components moved it and by how much. Not a general description of the method, an explanation of that specific reading on that specific day.</p>
+<p>It changes what the tool is for. Instead of "the system says buy", you get "this is positive mainly because trend strength and momentum are high, while sentiment is slightly negative". Now you can disagree with it. You can decide the sentiment reading is more important than the model thinks. The tool has stopped being an oracle and started being a colleague who shows their work.</p>
+<p>Eight categories of event are also detected separately, so that something like a central bank decision does not disappear into an average of general news.</p>
+<h2 id="letting-it-be-checked">Letting it be checked</h2>
+<p>Explaining a single reading is not enough. A system can explain itself clearly and still be wrong every time.</p>
+<p>So the engine keeps its history. Snapshots are written to compressed files on disk, kept in full detail for seven days, in reduced form for thirty, and deleted at sixty. A backtester then measures hit rate by signal strength, which answers the question that actually matters: when this thing says strongly positive, what usually happens next?</p>
+<p>That number is allowed to be disappointing. The point of building it is that the platform can be checked against its own record rather than believed because of its interface.</p>
+<h2 id="the-constraint-that-shaped-everything">The constraint that shaped everything</h2>
+<p>One rule sat underneath all of this: it had to run without paid infrastructure. No server to rent, no database to provision, no API key that costs money.</p>
+<p>That constraint explains most of the architecture. The history is files on disk rather than a hosted database, because a database is a subscription and a subscription is a thing that can lapse. Twenty-four assets are rescanned every thirty minutes by a background thread inside the application itself rather than by a scheduling service.</p>
+<p>And it is not financial advice. It produces a reading and its reasoning. The decision stays with the person reading it, which is the entire reason the reasoning has to be visible.</p>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#two-streams-kept-separate-on-purpose">Two streams, kept separate on purpose</a></li><li><a href="#reading-the-news-without-being-fooled-by-it">Reading the news without being fooled by it</a></li><li><a href="#six-components-and-why-each-one-is-kept-visible">Six components, and why each one is kept visible</a></li><li><a href="#letting-it-be-checked">Letting it be checked</a></li><li><a href="#the-constraint-that-shaped-everything">The constraint that shaped everything</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/explainable-market-intelligence/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/melencolia.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/The-Pulse-Engine/Pulse-Engine_Market_Intelligence_Platform">Market Intelligence Platform</a></b><span>Scores 24 assets from −10 to +10. It combines technical indicators with live news sentiment and explains why each signal fired. It runs fully on your machine. <a href="../../#p-market-intelligence">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Machine learning|Data">
+  <div class="thumb"><img src="../../writing/img/ncaa-predictor-dashboard.webp" alt="" width="1400" height="638" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning · Data</span></p>
+    <h3><a href="../../writing/data-leakage-basketball-model/">My basketball model scored 0.97 AUC. It was cheating.</a></h3>
+    <p>When a result looks too good, suspect a leak before you suspect genius.</p>
+  </div>
+</article><article class="card rv" data-tags="Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/chess-mirror.webp" alt="" width="762" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning</span></p>
+    <h3><a href="../../writing/alphazero-chess-engine-python/">Building an AlphaZero-style chess engine in Python</a></h3>
+    <p>No opening book and no human games. It plays itself, and it learns from the result.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

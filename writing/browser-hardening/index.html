@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Browser hardening on Windows: fail-closed startup and honest security claims</title>
+<meta name="description" content="Bruhswer is a hardened browser for Windows. The most useful thing in it is not a protection. It is the words NOT ENFORCEABLE, printed whenever it cannot actually do what it claims.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/browser-hardening/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Browser hardening on Windows: fail-closed startup and honest security claims">
+<meta property="og:description" content="Bruhswer is a hardened browser for Windows. The most useful thing in it is not a protection. It is the words NOT ENFORCEABLE, printed whenever it cannot actually do what it claims.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/browser-hardening/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/browser-hardening.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Browser hardening, and saying what you cannot enforce">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-08-28">
+<meta property="article:modified_time" content="2026-08-28">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Security">
+<meta property="article:tag" content="security"><meta property="article:tag" content="privacy"><meta property="article:tag" content="browser hardening">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Browser hardening on Windows: fail-closed startup and honest security claims">
+<meta name="twitter:description" content="Bruhswer is a hardened browser for Windows. The most useful thing in it is not a protection. It is the words NOT ENFORCEABLE, printed whenever it cannot actually do what it claims.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/browser-hardening.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/vesuvius.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/browser-hardening/#post", "headline": "Browser hardening, and saying what you cannot enforce", "name": "Browser hardening on Windows: fail-closed startup and honest security claims", "description": "Bruhswer is a hardened browser for Windows. The most useful thing in it is not a protection. It is the words NOT ENFORCEABLE, printed whenever it cannot actually do what it claims.", "url": "https://codex-crusader.github.io/writing/browser-hardening/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/browser-hardening/", "image": ["https://codex-crusader.github.io/writing/og/browser-hardening.jpg", "https://codex-crusader.github.io/art/stage/vesuvius.webp"], "datePublished": "2026-08-28", "dateModified": "2026-08-28", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 730, "keywords": "security, privacy, browser hardening", "articleSection": "Security", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "bruhswer", "codeRepository": "https://github.com/Codex-Crusader/bruhswer-the-homebrew-pseudo-browser", "description": "A hardened wrapper around Microsoft Edge on Windows. It checks its protections before launch and stops if one fails. When it cannot enforce a check, it says NOT ENFORCEABLE."}, {"@type": "SoftwareSourceCode", "name": "Image Protector", "codeRepository": "https://github.com/Codex-Crusader/Image-Protector", "description": "Adds small, controlled noise to images. People see the same picture. Scrapers and ML models see a worse one."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Browser hardening, and saying what you cannot enforce", "item": "https://codex-crusader.github.io/writing/browser-hardening/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/vesuvius.webp" alt="" width="2000" height="1408" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Browser hardening, and saying what you cannot enforce</h1>
+      <p class="dek">A green tick you have not earned is worse than no tick at all.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-08-28">28 August 2026</time><span>4 min read</span><a class="tag" href="../?tag=Security">Security</a></p>
+    </div>
+    <p class="painting-credit">Painting: Albert Bierstadt, <a href="https://clevelandart.org/art/1949.541">Mount Vesuvius at Midnight</a>, 1868. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>Most security software has the same problem, and it is not a technical one. It is that the interface always says yes.</p>
+<p>You install the thing. It shows you a list of protections with green ticks beside them. Everything looks handled. What the interface does not tell you is which of those protections is genuinely being enforced right now on your machine, and which one silently failed to apply because a setting was already controlled by something else, or because the process lacked permission, or because your operating system version does that differently.</p>
+<p>The green tick is the same either way. That is the actual vulnerability, because a person who believes they are protected behaves differently from a person who knows they are not.</p>
+<h2 id="the-rule">The rule</h2>
+<p>Bruhswer is built around one rule: verify what it can enforce, and say NOT ENFORCEABLE out loud when it cannot.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/bruhswer-main-window.webp" alt="The bruhswer window with a warning banner and a status bar that marks each protection." width="1298" height="907" loading="lazy" decoding="async"></button></div><figcaption>bruhswer tells you when it cannot enforce something. The status bar marks each protection separately.</figcaption></figure>
+<p>It sounds like a small thing, and it changes the whole character of the tool. It means the interface is allowed to disappoint you. It means a claim on screen is a statement about the machine you are sitting at, not a description of what the software intended.</p>
+<p>It is also harder to build than the alternative, because it is not enough to apply a setting. You have to go back and check that it took effect, and you have to handle the case where it did not, and you have to be willing to report that failure to the user instead of quietly moving on.</p>
+<h2 id="fail-closed-not-open">Fail closed, not open</h2>
+<p>The same idea runs through startup, where it matters most.</p>
+<p>When something goes wrong during setup, software has two options. It can fail open, starting anyway in a reduced state, which is convenient and means the user is now browsing with protections they think are on. Or it can fail closed, refusing to start until it is in the state it promised.</p>
+<p>Bruhswer fails closed. If the hardened environment cannot be established, you do not get a degraded browser, you get a refusal and a reason.</p>
+<p>This is the correct trade for a security tool and it is worth being clear about why. The cost of failing closed is inconvenience. The cost of failing open is that somebody does something risky in a browser they believed was hardened. Those costs are not comparable, so the choice is not really a balance.</p>
+<h2 id="what-it-actually-does">What it actually does</h2>
+<p>Underneath, it is Microsoft Edge, hardened, rather than a browser engine written from scratch. That is deliberate. Writing a browser engine badly is far more dangerous than configuring a well-maintained one carefully, and the rendering engine is exactly the part you do not want a hobbyist inventing.</p>
+<p>Network access is restricted by scoping rules through the Windows Firewall, so local network access can be blocked at the operating system rather than requested politely from inside the browser. Downloads go into quarantine instead of straight into your documents, because a download is the most common way something unwanted arrives. Sessions are disposable, so what accumulates during browsing does not persist by default.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/bruhswer-bruhcheck.webp" alt="The bruhcheck screen of bruhswer, listing checks and their results." width="918" height="707" loading="lazy" decoding="async"></button></div><figcaption>The self-check screen. Each protection is verified, not only switched on.</figcaption></figure>
+<p>And it does not phone home. There is no telemetry. A privacy tool that reports on you is not a privacy tool, no matter how good the reason sounds.</p>
+<h2 id="the-same-honesty-problem-in-a-smaller-tool">The same honesty problem, in a smaller tool</h2>
+<p>I ran into a version of this again in Image Protector, which adds controlled distortion to images so they read normally to a person and worse to an automated system scraping or analysing them.</p>
+<p>The temptation there is to claim it makes images unusable to machine learning. That would be a lie. It makes them harder to use, against some methods, to a degree that depends entirely on what is being run against them. So the project says that instead. It says it obfuscates against automated scraping and basic analysis, and it does not promise to defeat a determined, well-resourced attacker, because it cannot.</p>
+<p>This is the discipline the whole area needs and mostly does not have. Security claims are the easiest claims in software to make and among the hardest to verify, which is precisely why the honest version is worth building. A tool that tells you where its protection ends leaves you able to make a decision. A tool that shows you a green tick has made the decision for you, and it has made it on no evidence.</p>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#the-rule">The rule</a></li><li><a href="#fail-closed-not-open">Fail closed, not open</a></li><li><a href="#what-it-actually-does">What it actually does</a></li><li><a href="#the-same-honesty-problem-in-a-smaller-tool">The same honesty problem, in a smaller tool</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/browser-hardening/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/close-helmet.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/bruhswer-the-homebrew-pseudo-browser">bruhswer</a></b><span>A hardened wrapper around Microsoft Edge on Windows. It checks its protections before launch and stops if one fails. When it cannot enforce a check, it says NOT ENFORCEABLE. <a href="../../#p-bruhswer">See it in the hall.</a></span></div></li><li><img src="../../art/relics/savoyard-helmet.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/Image-Protector">Image Protector</a></b><span>Adds small, controlled noise to images. People see the same picture. Scrapers and ML models see a worse one. <a href="../../#p-image-protector">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Software engineering|Security">
+  <div class="thumb relic"><img src="../../art/relics/rondache.webp" alt="" width="677" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><span>Software engineering · Security</span></p>
+    <h3><a href="../../writing/local-first-software/">Local-first software</a></h3>
+    <p>A tool you cannot run offline is a tool somebody can switch off.</p>
+  </div>
+</article><article class="card rv" data-tags="Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/chess-mirror.webp" alt="" width="762" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning</span></p>
+    <h3><a href="../../writing/alphazero-chess-engine-python/">Building an AlphaZero-style chess engine in Python</a></h3>
+    <p>No opening book and no human games. It plays itself, and it learns from the result.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

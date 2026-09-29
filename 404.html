@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Page not found | Bhargavaram Krishnapur</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>
+  // Old site pages now live as sections on the home page. Send visitors there.
+  (function () {
+    var p = location.pathname.replace(/\/+$/, "").toLowerCase();
+    var map = {
+      "/experience": "/#experience",
+      "/about": "/#about",
+      "/projects": "/#work",
+      "/blog": "/writing/",
+      "/resume": "/bhargavaram-krishnapur-resume.pdf",
+      "/projects/correlation-engine": "/#p-correlation-engine",
+      "/projects/pulse-engine": "/#p-market-intelligence",
+      "/projects/digital-footprint-cleaner": "/#p-digital-footprint-cleaner",
+      "/projects/campus-visitor-access": "/#p-visitor-access",
+      "/projects/bruhswer": "/#p-bruhswer",
+      "/projects/azlite-type-chess-bot": "/#p-azlite-chess",
+      "/projects/uni-basketball-etl-pipeline": "/#p-ncaa-predictor",
+      "/projects/quantum-neural-horror": "/#p-neural-horror"
+    };
+    var dest = map[p] || (p.indexOf("/projects/") === 0 ? "/#work" : p.indexOf("/writing/") === 0 ? "/writing/" : p.indexOf("/blog/") === 0 ? "/writing/" : null);
+    if (dest) location.replace(dest);
+  })();
+</script>
+<style>
+  :root { --bg: #0C0F1D; --fg: #ECEDF5; --muted: #9CA3C0; --accent: #F3B340; color-scheme: dark; }
+  @media (prefers-color-scheme: light) { :root { --bg: #F2F3F8; --fg: #121529; --muted: #515874; --accent: #945700; color-scheme: light; } }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, sans-serif; padding: 0 16px; }
+  main { max-width: 36rem; }
+  p.code { font-family: ui-monospace, monospace; color: var(--accent); margin: 0; }
+  h1 { font-size: 2rem; margin: 8px 0 12px; }
+  a { color: var(--fg); text-decoration-color: var(--accent); text-underline-offset: 4px; font-weight: 600; }
+  p { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <p class="code">404</p>
+  <h1>This page does not exist</h1>
+  <p>The link may be old. The site now has one page with every section on it.</p>
+  <p><a href="/">Go to the home page</a></p>
+</main>
+</body>
+</html>

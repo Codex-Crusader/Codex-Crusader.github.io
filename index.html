@@ -1,0 +1,1730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bhargavaram Krishnapur | Software Engineer and Open-Source Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
+<style>
+/* Layout: a fixed "stage" of public-domain paintings cross-fades behind the page, one per chapter.
+   Content sits on dark obsidian plates with gold rules. One dark look by design. */
+:root {
+  --ink: #0A0806;
+  --plate: rgba(13, 10, 7, 0.8);
+  --plate-solid: #15100B;
+  --gold: #D6A553;
+  --gold-hi: #F3D48E;
+  --ember: #E8662C;
+  --text: #EFE4CC;
+  --muted: #BCAC8D;
+  --line: rgba(214, 165, 83, 0.32);
+  --legendary: #F0A23A;
+  --epic: #B784F2;
+  --rare: #74AEF2;
+  --common: #A9A396;
+
+  --display: "Cinzel Decorative", "Cinzel", "Trajan Pro", Georgia, serif;
+  --head: "Cinzel", "Trajan Pro", Georgia, serif;
+  --body: "Cormorant Garamond", "Garamond", "Iowan Old Style", Georgia, serif;
+
+  --wrap: 1240px;
+  --gutter: clamp(16px, 4vw, 48px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 80px; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+body {
+  margin: 0; background: var(--ink); color: var(--text);
+  font: 500 1.25rem/1.55 var(--body);
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3 { margin: 0; font-weight: 600; text-wrap: balance; }
+p, ul, dl, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 4px; }
+::selection { background: var(--gold); color: var(--ink); }
+.wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
+.skip { position: absolute; left: 12px; top: -80px; z-index: 90; background: var(--gold); color: var(--ink); padding: 8px 14px; text-decoration: none; font-family: var(--head); }
+.skip:focus { top: 12px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Stage: paintings behind everything */
+.stage { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--ink); }
+.stage .painting { position: absolute; inset: -6%; opacity: 0; will-change: opacity, transform; }
+.stage .painting.on { opacity: 1; }
+.stage .painting img { width: 100%; height: 100%; object-fit: cover; animation: drift 38s ease-in-out infinite alternate; }
+.stage .painting:nth-child(even) img { animation-duration: 46s; animation-direction: alternate-reverse; }
+@keyframes drift { from { transform: scale(1.02) translate(-1%, 0); } to { transform: scale(1.12) translate(1.5%, -1.5%); } }
+.stage .veil { position: absolute; inset: 0; background:
+  radial-gradient(120% 90% at 50% 40%, rgba(10, 8, 6, 0.15), rgba(10, 8, 6, 0.85) 75%),
+  linear-gradient(180deg, rgba(10, 8, 6, 0.35), rgba(10, 8, 6, 0.55)); }
+.fog { position: absolute; left: -50%; width: 200%; height: 60%; opacity: .5; mix-blend-mode: screen; will-change: transform;
+  background:
+    radial-gradient(30% 40% at 20% 60%, rgba(220, 200, 170, .14), transparent 70%),
+    radial-gradient(25% 35% at 55% 50%, rgba(220, 200, 170, .10), transparent 70%),
+    radial-gradient(35% 45% at 85% 65%, rgba(220, 200, 170, .12), transparent 70%);
+  filter: blur(18px); }
+.fog.f1 { bottom: -10%; animation: fogmove 60s linear infinite; }
+.fog.f2 { bottom: 15%; opacity: .32; animation: fogmove 95s linear infinite reverse; }
+@keyframes fogmove { to { transform: translateX(25%); } }
+#motes { position: fixed; inset: 0; z-index: 1; pointer-events: none; width: 100%; height: 100%; }
+main, footer, .bar { position: relative; z-index: 2; }
+main { overflow-x: clip; }
+
+/* Top bar */
+.bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; gap: 18px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) var(--gutter) 10px;
+  background: rgba(10, 8, 6, 0.82);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(214, 165, 83, 0.18);
+}
+.sigil { width: 44px; height: 44px; flex: none; display: grid; place-items: center; text-decoration: none; position: relative; }
+.sigil svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sigil b { font: 700 0.8rem/1 var(--display); color: var(--gold-hi); position: relative; }
+.bar nav { display: flex; gap: 2px; margin-inline: auto; }
+.bar nav a {
+  font: 500 0.8rem/1 var(--head); letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+  color: var(--muted); padding: 10px 12px; position: relative; transition: color .3s;
+}
+.bar nav a::after { content: ""; position: absolute; left: 50%; right: 50%; bottom: 3px; height: 1px; background: var(--gold); transition: left .35s, right .35s; }
+.bar nav a:hover, .bar nav a[aria-current="true"] { color: var(--gold-hi); }
+.bar nav a[aria-current="true"]::after, .bar nav a:hover::after { left: 12px; right: 12px; }
+.bar-tools { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.bar nav + .bar-tools { margin-left: 0; }
+.summon {
+  display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 8px 0 14px; cursor: pointer;
+  font: 500 0.78rem/1 var(--head); letter-spacing: .12em; text-transform: uppercase; color: var(--text);
+  background: rgba(20, 15, 10, .7); border: 1px solid var(--line); transition: border-color .3s, box-shadow .3s;
+}
+.summon:hover { border-color: var(--gold); box-shadow: 0 0 24px -6px var(--gold); }
+kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--line); color: var(--gold); letter-spacing: .05em; }
+.astrolabe { width: 46px; height: 46px; flex: none; position: relative; }
+.astrolabe svg { width: 100%; height: 100%; overflow: visible; }
+.astrolabe .numeral { position: absolute; inset: 0; display: grid; place-items: center; font: 700 0.72rem/1 var(--head); color: var(--gold-hi); }
+@media (max-width: 960px) { .bar nav { display: none; } .bar-tools { margin-left: auto; } }
+
+/* Shared type */
+.eyebrow { font: 500 0.82rem/1.3 var(--head); letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 14px; }
+.eyebrow::before, .eyebrow.both::after { content: ""; width: 42px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.eyebrow.both::after { background: linear-gradient(90deg, var(--gold), transparent); }
+.chapter { position: relative; padding-block: clamp(110px, 16vw, 200px) 0; }
+.chapter-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; margin-bottom: clamp(40px, 6vw, 72px); position: relative; }
+.chapter-head .roman { position: absolute; top: -0.45em; left: 50%; transform: translateX(-50%); font: 700 clamp(7rem, 22vw, 17rem)/1 var(--display); color: transparent; -webkit-text-stroke: 1px rgba(214, 165, 83, 0.22); pointer-events: none; user-select: none; z-index: -1; }
+.chapter-head h2 { font: 600 clamp(2.2rem, 1.2rem + 4.2vw, 4.4rem)/1.05 var(--head); letter-spacing: 0.02em; color: var(--gold-hi); text-shadow: 0 0 40px rgba(232, 102, 44, 0.35), 0 2px 0 rgba(0,0,0,.6); }
+.chapter-head .lede { max-width: 56ch; color: var(--text); font-size: 1.3rem; }
+.split .ch { display: inline-block; will-change: transform; }
+.split .word { display: inline-block; white-space: nowrap; }
+.rule { width: min(360px, 70%); height: 14px; background:
+  linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent) center / 100% 1px no-repeat;
+  position: relative; }
+.rule::after { content: ""; position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; background: var(--gold); transform: translate(-50%, -50%) rotate(45deg); box-shadow: 0 0 12px var(--gold); }
+
+/* Plates: obsidian panels with gold corners */
+.plate {
+  position: relative; background: var(--plate); border: 1px solid var(--line);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.plate::before, .plate::after {
+  content: ""; position: absolute; width: 22px; height: 22px; pointer-events: none;
+  border: 2px solid var(--gold);
+}
+.plate::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.plate::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+
+.btn {
+  position: relative; display: inline-flex; align-items: center; gap: 12px; height: 54px; padding: 0 26px; cursor: pointer;
+  font: 600 0.85rem/1 var(--head); letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none;
+  color: var(--text); background: rgba(20, 15, 10, .72); border: 1px solid var(--gold);
+  transition: color .3s, background .3s, box-shadow .3s; will-change: transform;
+}
+.btn:hover { background: rgba(214, 165, 83, 0.14); box-shadow: 0 0 34px -8px var(--gold); }
+.btn.gold { background: linear-gradient(180deg, #F3D48E, #C98F3A); color: #1B1207; border-color: #F3D48E; }
+.btn.gold:hover { box-shadow: 0 0 44px -6px var(--ember); }
+.btn svg { width: 16px; height: 16px; }
+
+/* Hero */
+.hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-block: 120px 170px; position: relative; overflow: hidden; }
+.ridges { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; pointer-events: none; }
+.ridges svg { position: absolute; left: -5%; bottom: 0; width: 110%; height: 100%; overflow: visible; }
+.moon { position: absolute; right: 12%; top: 18%; width: clamp(70px, 9vw, 130px); aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 35% 35%, #FFF3D6, #E9C98C 55%, #B7894A 100%);
+  box-shadow: 0 0 60px 10px rgba(243, 212, 142, .35), 0 0 160px 40px rgba(232, 102, 44, .18); }
+.hero-inner { position: relative; display: flex; flex-direction: column; gap: 22px; }
+.name { font: 900 clamp(2.3rem, 1rem + 6.6vw, 7rem)/0.95 var(--display); letter-spacing: 0.01em; color: var(--gold-hi);
+  text-shadow: 0 0 30px rgba(243, 212, 142, .35), 0 0 80px rgba(232, 102, 44, .35), 0 3px 0 #3A2A12; }
+.name .row { display: block; }
+.name .row + .row { font-size: 0.78em; color: var(--text); padding-left: 0.6em; }
+.tagline { max-width: 40ch; font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.75rem); line-height: 1.4; font-style: italic; }
+.tagline b { font-style: normal; font-weight: 600; color: var(--gold-hi); }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+.scroll-cue { position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px;
+  font: 500 0.7rem/1 var(--head); letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
+.scroll-cue i { width: 1px; height: 54px; background: linear-gradient(var(--gold), transparent); animation: cue 2.2s ease-in-out infinite; transform-origin: top; }
+@keyframes cue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+/* Marquee */
+.marquee { position: relative; z-index: 2; overflow: hidden; border-block: 1px solid var(--line); background: rgba(10, 8, 6, .72); padding-block: 16px; }
+.marquee .track { display: flex; width: max-content; will-change: transform; }
+.marquee span { font: 600 clamp(1.1rem, .8rem + 1.2vw, 1.7rem)/1 var(--head); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; padding-right: 1.4em; color: var(--text); }
+.marquee span i { font-style: normal; color: var(--gold); padding-left: 1.4em; }
+
+/* Oath */
+.oath-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 6vw, 90px); align-items: center; }
+.frame { position: relative; padding: 14px; background: linear-gradient(135deg, #7A5520, #F3D48E 25%, #9A6B2A 50%, #E9C27A 75%, #6B4818); box-shadow: 0 30px 80px -20px #000, inset 0 0 0 2px #3A2710; }
+.frame::after { content: ""; position: absolute; inset: 14px; box-shadow: inset 0 0 40px rgba(0,0,0,.7); pointer-events: none; }
+.frame img { width: 100%; height: auto; }
+.frame .shine { position: absolute; inset: 14px; background: linear-gradient(115deg, transparent 35%, rgba(255, 240, 200, .28) 50%, transparent 65%); background-size: 250% 100%; mix-blend-mode: overlay; pointer-events: none; }
+.caption { font: 400 0.95rem/1.4 var(--body); font-style: italic; color: var(--muted); margin-top: 14px; }
+.caption a { color: var(--muted); }
+.oath-words { font: 500 clamp(1.6rem, 1rem + 2vw, 2.7rem)/1.3 var(--body); }
+.oath-words .w { display: inline-block; opacity: 1; }
+.js .oath-words .w { opacity: .18; }
+.oath-words em { color: var(--gold-hi); }
+.ledger { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: clamp(48px, 7vw, 90px); }
+.ledger > div { padding: 22px 18px; text-align: center; display: flex; flex-direction: column-reverse; gap: 8px; }
+.ledger > div + div { border-left: 1px solid var(--line); }
+.ledger dd { margin: 0; font: 700 clamp(2rem, 1.3rem + 2.4vw, 3.4rem)/1 var(--head); color: var(--gold-hi); font-variant-numeric: lining-nums tabular-nums; text-shadow: 0 0 24px rgba(243, 212, 142, .35); }
+.ledger dd small { font-size: .45em; color: var(--muted); }
+.ledger dt { font: 500 0.72rem/1.4 var(--head); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 860px) {
+  .oath-grid { grid-template-columns: 1fr; }
+  .oath-grid .frame { max-width: 420px; margin-inline: auto; }
+  .ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ledger > div:nth-child(3) { border-left: 0; }
+  .ledger > div:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+
+/* Hall of relics */
+.hall { position: relative; }
+.hall-viewport { overflow-x: auto; overflow-y: visible; padding-block: 30px 40px; scrollbar-width: thin; scrollbar-color: var(--gold) transparent; }
+.pinned .hall-viewport { overflow: visible; }
+.hall-track { display: flex; gap: 34px; width: max-content; padding-inline: var(--gutter); perspective: 1400px; }
+.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; font: 500 0.75rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.gem { width: 10px; height: 10px; transform: rotate(45deg); background: var(--gem, var(--common)); box-shadow: 0 0 10px var(--gem, var(--common)); display: inline-block; flex: none; }
+.r-legendary { --gem: var(--legendary); }
+.r-epic { --gem: var(--epic); }
+.r-rare { --gem: var(--rare); }
+.r-common { --gem: var(--common); }
+.relic {
+  --rx: 0deg; --ry: 0deg; --gx: 50%; --gy: 30%;
+  position: relative; width: 340px; flex: none; display: flex; flex-direction: column;
+  background: linear-gradient(180deg, rgba(24, 18, 12, .94), rgba(12, 9, 6, .96));
+  border: 1px solid var(--line); transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .5s cubic-bezier(.2,.7,.2,1), border-color .4s, box-shadow .4s;
+}
+.relic.tilting { transition: border-color .4s, box-shadow .4s; }
+.relic:hover { border-color: var(--gem); box-shadow: 0 30px 70px -25px #000, 0 0 50px -18px var(--gem); }
+.relic.big { width: 400px; }
+.relic .glare { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; mix-blend-mode: soft-light;
+  background: radial-gradient(420px circle at var(--gx) var(--gy), rgba(255, 236, 190, .55), transparent 45%); }
+.relic:hover .glare { opacity: 1; }
+.relic .art { position: relative; height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: radial-gradient(60% 70% at 50% 45%, rgba(214, 165, 83, .16), transparent 70%); }
+.relic.big .art { height: 250px; }
+.relic .art img { height: 86%; width: auto; max-width: 86%; object-fit: contain; filter: sepia(.35) contrast(1.08) brightness(.95);
+  -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+  transform: translateZ(40px); will-change: transform; }
+.relic .body { padding: 18px 22px 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; border-top: 1px solid var(--line); }
+.relic .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: 500 0.7rem/1 var(--head); letter-spacing: .16em; text-transform: uppercase; }
+.relic .rarity { display: inline-flex; align-items: center; gap: 8px; color: var(--gem); }
+.relic .stars { color: var(--muted); display: inline-flex; gap: 6px; align-items: center; font-variant-numeric: tabular-nums; }
+.relic .stars svg { width: 12px; height: 12px; fill: var(--gold); }
+.relic h3 { font: 600 1.35rem/1.2 var(--head); color: var(--text); }
+.relic h3 a { text-decoration: none; }
+.relic h3 a::after { content: ""; position: absolute; inset: 0; z-index: 3; }
+.relic:has(h3 a:focus-visible) { outline: 2px solid var(--gold-hi); outline-offset: 4px; }
+.relic h3 a:focus-visible { outline: none; }
+.relic p { color: var(--muted); font-size: 1.08rem; line-height: 1.45; }
+.relic .proof { font: 500 0.72rem/1.5 var(--head); letter-spacing: .08em; color: var(--text); padding-top: 12px; border-top: 1px dashed var(--line); margin-top: auto; }
+.relic .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.relic .tags li { font: 500 0.66rem/1 var(--head); letter-spacing: .1em; text-transform: uppercase; padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); }
+.relic .from { font-size: .9rem; font-style: italic; color: var(--muted); opacity: .8; }
+.hall-progress { width: min(420px, 70%); height: 2px; margin: 18px auto 0; background: var(--line); position: relative; }
+.hall-progress b { position: absolute; inset: 0; background: var(--gold); transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 12px var(--gold); }
+.hall-hint { text-align: center; font: 500 0.72rem/1 var(--head); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-top: 14px; }
+.more-link { text-align: center; margin-top: 30px; }
+.link { color: var(--gold-hi); font: 600 0.85rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; text-underline-offset: 6px; text-decoration-color: var(--gold); }
+@media (max-width: 700px) { .relic, .relic.big { width: min(82vw, 340px); } }
+
+.slot { display: flex; flex: none; will-change: transform; transform-style: preserve-3d; }
+.win { animation: twinkle 2.6s ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: .25; } to { opacity: 1; } }
+.moon { animation: glow 6s ease-in-out infinite alternate; }
+@keyframes glow { to { box-shadow: 0 0 90px 18px rgba(243, 212, 142, .45), 0 0 220px 60px rgba(232, 102, 44, .22); } }
+
+/* Road */
+.road-wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 48px; align-items: start; }
+.road { position: relative; }
+.road svg.path { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.road .trail { fill: none; stroke: rgba(214, 165, 83, .25); stroke-width: 2; stroke-dasharray: 2 10; stroke-linecap: round; }
+.road .drawn { fill: none; stroke: var(--gold); stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(243, 212, 142, .7)); }
+.road .torch { fill: #FFE7A8; filter: drop-shadow(0 0 10px #F3B340) drop-shadow(0 0 24px #E8662C); }
+.road-group { font: 600 0.8rem/1 var(--head); letter-spacing: .3em; text-transform: uppercase; color: var(--gold); text-align: center; padding: 34px 0 14px; position: relative; }
+.road-group span { background: var(--ink); padding: 6px 14px; border: 1px solid var(--line); position: relative; z-index: 1; }
+.stop { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding-block: 18px; }
+.stop .banner { grid-column: 1; margin-right: 44px; padding: 22px 24px; transform-origin: top center; }
+.stop:nth-of-type(even) .banner { grid-column: 2; margin-right: 0; margin-left: 44px; }
+.stop .node { position: absolute; left: 50%; top: 40px; width: 16px; height: 16px; transform: translate(-50%, 0) rotate(45deg); background: var(--ink); border: 2px solid var(--gold); z-index: 1; transition: background .4s, box-shadow .4s; }
+.stop.lit .node { background: var(--gold-hi); box-shadow: 0 0 18px var(--gold); }
+.stop .when { font: 500 0.72rem/1.4 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.stop h3 { font: 600 1.3rem/1.25 var(--head); margin-top: 8px; }
+.stop h3 span { display: block; font: italic 500 1.15rem/1.3 var(--body); color: var(--muted); margin-top: 2px; }
+.stop p { margin-top: 10px; font-size: 1.1rem; line-height: 1.5; color: var(--text); }
+.stop .num { color: var(--gold-hi); font-weight: 600; }
+.knight { position: sticky; top: 110px; }
+.knight .frame { padding: 10px; }
+@media (max-width: 1000px) { .road-wrap { grid-template-columns: 1fr; } .knight { display: none; } }
+@media (max-width: 720px) {
+  .stop { grid-template-columns: 1fr; }
+  .stop .banner, .stop:nth-of-type(even) .banner { grid-column: 1; margin: 0 0 0 38px; }
+  .stop .node { left: 14px; }
+  .road-group { text-align: left; padding-left: 38px; }
+}
+
+/* Honours */
+.honours { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+.seal { position: relative; width: min(420px, 100%); aspect-ratio: 1; margin-inline: auto; display: grid; place-items: center; }
+.seal svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.seal .inner { position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0 18%; }
+.seal .num { font: 900 clamp(3.5rem, 2rem + 5vw, 6rem)/0.9 var(--display); color: #FFE9B0; text-shadow: 0 2px 0 #6B1D0E, 0 0 30px rgba(255, 200, 120, .5); }
+.seal .of { font: 700 1rem/1 var(--head); letter-spacing: .2em; color: #F6D9A8; }
+.seal .what { font: 500 0.95rem/1.3 var(--body); color: #F6E3C4; font-style: italic; }
+.pennants { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.pennant { position: relative; padding: 26px 20px 60px; text-align: center; transform-origin: top center; animation: sway 5s ease-in-out infinite; animation-delay: var(--d, 0s);
+  background: linear-gradient(180deg, #5A1A12, #3A0F0A); color: #F6E3C4;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 38px), 0 100%); border-top: 4px solid var(--gold); }
+.pennant::before { content: ""; position: absolute; inset: 8px 8px 44px; border: 1px solid rgba(243, 212, 142, .4); pointer-events: none; }
+.pennant:hover { animation-duration: 1.2s; }
+@keyframes sway { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
+.pennant .crest { width: 34px; height: 34px; margin: 0 auto 12px; }
+.pennant strong { display: block; font: 600 1.05rem/1.25 var(--head); color: var(--gold-hi); }
+.pennant span { display: block; margin-top: 8px; font-size: 1.02rem; line-height: 1.4; }
+.pennant.blue { background: linear-gradient(180deg, #16284A, #0D1830); }
+.pennant.green { background: linear-gradient(180deg, #173A26, #0D2617); }
+.scrolls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 32px; }
+.scrolls .plate { padding: 24px; }
+.scrolls h3 { font: 600 0.82rem/1 var(--head); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+.scrolls li { padding-block: 10px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
+.scrolls li:first-child { border-top: 0; padding-top: 0; }
+.scrolls li span { color: var(--muted); font-style: italic; flex: none; }
+.runes { display: flex; flex-wrap: wrap; gap: 8px; }
+.runes li { border: 1px solid var(--line); padding: 8px 12px; font: 500 0.72rem/1 var(--head); letter-spacing: .12em; text-transform: uppercase; display: block; transition: border-color .3s, color .3s, box-shadow .3s; }
+.runes li:hover { border-color: var(--gold); color: var(--gold-hi); box-shadow: 0 0 16px -4px var(--gold); }
+@media (max-width: 900px) { .honours { grid-template-columns: 1fr; } .pennants { grid-template-columns: 1fr 1fr 1fr; } }
+@media (max-width: 640px) { .pennants { grid-template-columns: 1fr 1fr; } .scrolls { grid-template-columns: 1fr; } }
+
+/* Memories */
+.gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 34px); align-items: start; }
+.gallery figure { will-change: transform; }
+.gallery figure:nth-child(4n+2) { margin-top: 70px; }
+.gallery figure:nth-child(4n+3) { margin-top: 26px; }
+.gallery figure:nth-child(4n+4) { margin-top: 110px; }
+.gallery .frame { padding: 9px; cursor: zoom-in; display: block; width: 100%; border: 0; transition: box-shadow .5s; }
+.gallery .frame::after { inset: 9px; }
+.gallery .frame:hover { box-shadow: 0 40px 80px -20px #000, 0 0 40px -10px var(--gold); }
+.gallery img { width: 100%; height: auto; filter: sepia(.25) saturate(.9); transition: filter .5s; }
+.gallery .frame:hover img { filter: none; }
+.gallery figcaption { font: italic 500 1rem/1.3 var(--body); color: var(--muted); text-align: center; margin-top: 10px; }
+@media (max-width: 860px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gallery figure:nth-child(n) { margin-top: 0; } .gallery figure:nth-child(even) { margin-top: 40px; } }
+.lightbox { border: 0; padding: 0; background: transparent; max-width: min(92vw, 900px); max-height: 92vh; }
+.lightbox::backdrop { background: rgba(6, 4, 2, .88); }
+.lightbox img { max-height: 82vh; width: auto; margin-inline: auto; border: 8px solid #C99746; }
+.lightbox p { text-align: center; color: var(--text); font-style: italic; padding-top: 12px; }
+
+/* Chronicler */
+.about { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(32px, 6vw, 84px); align-items: center; }
+.portrait { position: relative; width: min(380px, 100%); aspect-ratio: 1; margin-inline: auto; }
+.portrait .ring { position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform; }
+.portrait .ring text { font: 600 13.5px var(--head); letter-spacing: 3.2px; fill: var(--gold); }
+.portrait .oval { position: absolute; inset: 15%; border-radius: 50%; overflow: hidden; border: 6px solid #C99746; box-shadow: 0 0 0 2px #3A2710, 0 0 60px -10px var(--gold), inset 0 0 30px #000; }
+.portrait .oval img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: sepia(.2); }
+.about .plate { padding: clamp(24px, 4vw, 44px); }
+.about .prose { display: flex; flex-direction: column; gap: 16px; max-width: 62ch; }
+.about .prose p:first-child::first-letter { float: left; font: 700 4.2rem/0.8 var(--display); color: var(--gold-hi); padding: 6px 12px 0 0; text-shadow: 0 0 20px rgba(232,102,44,.4); }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); margin-top: 26px; border-top: 1px solid var(--line); }
+.facts dt, .facts dd { margin: 0; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.facts dt { font: 500 0.72rem/1.9 var(--head); letter-spacing: .16em; text-transform: uppercase; color: var(--gold); padding-right: 22px; }
+@media (max-width: 860px) { .about { grid-template-columns: 1fr; } }
+
+/* Chronicles on the home page */
+.chron-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+@media (max-width: 960px) { .chron-cards { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .chron-cards { grid-template-columns: 1fr; } }
+.chron-card { position: relative; display: flex; flex-direction: column; min-width: 0; background: rgba(14, 10, 7, .88); border: 1px solid var(--line); transition: border-color .4s, box-shadow .4s; }
+.chron-card:hover { border-color: var(--gold); box-shadow: 0 30px 60px -28px #000, 0 0 40px -16px var(--gold); }
+.chron-card .thumb { aspect-ratio: 16 / 9; overflow: hidden; border-bottom: 1px solid var(--line); background: radial-gradient(60% 70% at 50% 45%, rgba(214,165,83,.16), transparent 70%), #100C08; }
+.chron-card .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transition: scale .8s cubic-bezier(.2,.7,.2,1); }
+.chron-card .thumb.relic { display: flex; align-items: center; justify-content: center; }
+.chron-card .thumb.relic img { width: auto; height: 86%; object-fit: contain; filter: sepia(.3); -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
+.chron-card:hover .thumb img { scale: 1.06; }
+.chron-card .cbody { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; }
+.chron-card .cmeta { font: 500 .68rem/1.4 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.chron-card h3 { font: 600 1.25rem/1.25 var(--head); }
+.chron-card h3 a { text-decoration: none; }
+.chron-card h3 a::after { content: ""; position: absolute; inset: 0; }
+.chron-card p { color: var(--muted); font-size: 1.08rem; line-height: 1.45; }
+.chron-card:has(h3 a:focus-visible) { outline: 2px solid var(--gold-hi); outline-offset: 4px; }
+.chron-card h3 a:focus-visible { outline: none; }
+.chron-more { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 40px; align-items: end; margin-top: 30px; padding: 24px; }
+.chron-list { columns: 2 280px; column-gap: 36px; }
+.chron-list li { break-inside: avoid; padding-block: 7px; border-bottom: 1px solid rgba(214,165,83,.16); font-size: 1.1rem; }
+.chron-list a { text-decoration-color: var(--line); text-underline-offset: 4px; }
+.chron-list a:hover { color: var(--gold-hi); }
+@media (max-width: 700px) { .chron-more { grid-template-columns: 1fr; } }
+.relic .chron { position: relative; z-index: 4; align-self: flex-start; font: 600 .7rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--gold-hi); text-underline-offset: 5px; text-decoration-color: var(--gold); }
+
+/* Raven */
+.raven-sky { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.raven { position: absolute; left: 0; top: 0; width: clamp(90px, 12vw, 160px); will-change: transform; }
+.raven .wing { transform-origin: 50% 60%; animation: flap .5s ease-in-out infinite alternate; }
+@keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(-0.55); } }
+.letter { max-width: 820px; margin-inline: auto; padding: clamp(28px, 5vw, 60px); text-align: center; }
+.letter h2 { font: 600 clamp(2rem, 1.2rem + 3vw, 3.6rem)/1.1 var(--head); color: var(--gold-hi); }
+.letter .lede { margin: 16px auto 0; max-width: 46ch; }
+.email-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px 20px; margin-top: 30px; }
+.email { font: 500 clamp(1.05rem, .8rem + 1.2vw, 1.6rem)/1.3 var(--head); letter-spacing: .04em; color: var(--text); overflow-wrap: anywhere; user-select: all; min-width: 0; }
+.waxbtn { width: 64px; height: 64px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; flex: none;
+  background: radial-gradient(circle at 35% 30%, #D2452C, #8E1E12 60%, #5A0F08); box-shadow: 0 6px 18px rgba(0,0,0,.6), inset 0 -4px 8px rgba(0,0,0,.35);
+  font: 700 0.62rem/1.1 var(--head); letter-spacing: .08em; color: #FFE0C0; text-transform: uppercase; transition: box-shadow .3s; }
+.waxbtn:hover { box-shadow: 0 6px 18px rgba(0,0,0,.6), 0 0 26px rgba(232,102,44,.7); }
+.stones { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 34px; text-align: left; }
+.stones a { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; text-decoration: none; border: 1px solid var(--line); background: rgba(10,8,6,.6); transition: border-color .3s, box-shadow .3s, background .3s; }
+.stones a:hover { border-color: var(--gold); background: rgba(214,165,83,.1); box-shadow: 0 0 30px -10px var(--gold); }
+.stones b { font: 600 0.85rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--gold-hi); }
+.stones span { font-size: 1rem; color: var(--muted); overflow-wrap: anywhere; }
+
+/* Colophon */
+.colophon { padding: clamp(24px, 4vw, 40px); }
+.colophon h2 { font: 600 1rem/1 var(--head); letter-spacing: .24em; text-transform: uppercase; color: var(--gold); }
+.colophon > p { color: var(--muted); margin-top: 10px; max-width: 70ch; }
+.credits { columns: 2 320px; column-gap: 40px; margin-top: 20px; font-size: 1rem; line-height: 1.4; }
+.credits li { break-inside: avoid; padding-block: 6px; border-bottom: 1px solid rgba(214,165,83,.14); }
+.credits a { color: var(--text); text-decoration-color: var(--line); text-underline-offset: 3px; }
+.credits span { color: var(--muted); font-style: italic; }
+footer { padding-block: 60px 40px; color: var(--muted); font-size: 1rem; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 22px; }
+
+/* Palette */
+.palette { width: min(640px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--gold); background: #120D08; color: var(--text); margin-top: 12vh; box-shadow: 0 0 80px -10px rgba(214,165,83,.35), 0 40px 100px #000; }
+.palette::backdrop { background: rgba(6, 4, 2, .7); backdrop-filter: blur(3px); }
+.palette[open] { animation: pop .22s ease-out; }
+@keyframes pop { from { opacity: 0; transform: translateY(-10px) scale(.97); } }
+.palette input { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--text); font: 500 1.25rem/1 var(--body); padding: 18px 20px; outline: none; }
+.palette ul { max-height: min(56vh, 420px); overflow-y: auto; padding: 8px; }
+.palette li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; font-size: 1.12rem; }
+.palette li span { font: 500 0.66rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); flex: none; }
+.palette li[aria-selected="true"] { background: rgba(214, 165, 83, .14); box-shadow: inset 2px 0 0 var(--gold); }
+.palette li[aria-selected="true"] span { color: var(--gold-hi); }
+.palette .hint { display: flex; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--line); font: 500 0.66rem/1 var(--head); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.palette .empty { color: var(--muted); cursor: default; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 95; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: var(--gold); color: #1B1207; padding: 10px 18px; font: 600 .8rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; transition: opacity .3s, transform .3s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.flash { animation: flashy 1.8s ease; }
+@keyframes flashy { 0%, 60% { box-shadow: 0 0 0 3px var(--gold-hi), 0 0 60px var(--gold); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .oath-words .w { opacity: 1; }
+}
+</style>
+
+<meta name="description" content="Bhargavaram Krishnapur is a computer science student and founder of The Pulse Engine. He builds local-first open-source software: machine learning, data pipelines and privacy tools.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="google-site-verification" content="eo34pFyJFp-2ccSkvZZySrCk_kmRi1c-_oSQL6xxYNk">
+<link rel="canonical" href="https://codex-crusader.github.io/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<link rel="preload" as="image" href="art/stage/vesuvius.webp" fetchpriority="high">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Bhargavaram Krishnapur | Software Engineer and Open-Source Developer">
+<meta property="og:description" content="Bhargavaram Krishnapur is a computer science student and founder of The Pulse Engine. He builds local-first open-source software: machine learning, data pipelines and privacy tools.">
+<meta property="og:url" content="https://codex-crusader.github.io/">
+<meta property="og:image" content="https://codex-crusader.github.io/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bhargavaram Krishnapur, software engineer and open-source developer, over a painting of a volcano at night.">
+<meta property="og:locale" content="en_IN">
+<meta property="profile:first_name" content="Bhargavaram">
+<meta property="profile:last_name" content="Krishnapur">
+<meta property="profile:username" content="Codex-Crusader">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bhargavaram Krishnapur | Software Engineer and Open-Source Developer">
+<meta name="twitter:description" content="Bhargavaram Krishnapur is a computer science student and founder of The Pulse Engine. He builds local-first open-source software: machine learning, data pipelines and privacy tools.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/og-cover.png">
+<meta name="twitter:image:alt" content="Bhargavaram Krishnapur, software engineer and open-source developer, over a painting of a volcano at night.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "ProfilePage", "url": "https://codex-crusader.github.io/", "dateModified": "2026-09-29", "mainEntity": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "alternateName": ["Bhargav Krishnapur", "Codex-Crusader"], "url": "https://codex-crusader.github.io/", "image": "https://codex-crusader.github.io/og-cover.png", "email": "mailto:bhargavaramkrishnapur@gmail.com", "jobTitle": "Founder, The Pulse Engine", "description": "Bhargavaram Krishnapur is a computer science student and founder of The Pulse Engine. He builds local-first open-source software: machine learning, data pipelines and privacy tools.", "address": {"@type": "PostalAddress", "addressLocality": "Thane", "addressRegion": "Maharashtra", "addressCountry": "IN"}, "affiliation": {"@type": "CollegeOrUniversity", "name": "Vijaybhoomi University"}, "worksFor": {"@type": "Organization", "name": "The Pulse Engine", "url": "https://github.com/The-Pulse-Engine"}, "award": ["Rank 17 of 4,000, National Entrepreneurship Challenge 2025, E-Cell IIT Bombay"], "hasCredential": [{"@type": "EducationalOccupationalCredential", "name": "ISC2 Certified in Cybersecurity (CC)"}, {"@type": "EducationalOccupationalCredential", "name": "Google Cloud Cybersecurity"}, {"@type": "EducationalOccupationalCredential", "name": "IBM Data Engineering"}], "knowsAbout": ["Python", "Machine learning", "Data pipelines", "Local-first software", "Open-source software", "Cybersecurity", "GitHub Actions", "UX research"], "sameAs": ["https://github.com/Codex-Crusader", "https://www.linkedin.com/in/bhargavaram-krishnapur/", "https://gitlab.com/bhargavaramkrishnapur"]}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="stage" id="stage" aria-hidden="true">
+  <div class="painting on" data-for="top"><img src="art/stage/vesuvius.webp" alt="" width="2000" height="1408" fetchpriority="high"></div>
+  <div class="painting" data-for="oath"><img src="art/stage/schroon.webp" alt="" width="2000" height="1227" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="work"><img src="art/stage/ruins.webp" alt="" width="2000" height="1607" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="experience"><img src="art/stage/twilight.webp" alt="" width="2000" height="1249" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="recognition"><img src="art/stage/burning.webp" alt="" width="2000" height="1485" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="photos"><img src="art/stage/landers-peak.webp" alt="" width="2000" height="1199" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="about"><img src="art/stage/starr-king.webp" alt="" width="2000" height="1355" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="chronicles"><img src="art/stage/schroon.webp" alt="" width="2000" height="1227" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="contact"><img src="art/stage/island-of-the-dead.webp" alt="" width="2000" height="1229" loading="eager" decoding="async"></div>
+  <div class="veil"></div>
+  <div class="fog f1"></div>
+  <div class="fog f2"></div>
+</div>
+<canvas id="motes" aria-hidden="true"></canvas>
+
+<header class="bar">
+  <a class="sigil" href="#top" aria-label="Bhargavaram Krishnapur, back to the top">
+    <svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg>
+    <b>BK</b>
+  </a>
+  <nav aria-label="Chapters">
+    <a href="#oath">Oath</a>
+    <a href="#work">Work</a>
+    <a href="#experience">Road</a>
+    <a href="#recognition">Honours</a>
+    <a href="#photos">Memories</a>
+    <a href="#about">About</a>
+    <a href="writing/">Blog</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <div class="bar-tools">
+    <button class="summon" id="open-palette" type="button" aria-haspopup="dialog" aria-controls="palette">Summon <kbd id="kbd-hint">Ctrl K</kbd></button>
+    <div class="astrolabe" aria-hidden="true">
+      <svg viewBox="0 0 46 46">
+        <g id="astro-ring"><line x1="23.00" y1="2.50" x2="23.00" y2="0.00" stroke="#D6A553" stroke-width="1.4"/><line x1="28.51" y1="2.43" x2="28.95" y2="0.78" stroke="#D6A553" stroke-width="0.7"/><line x1="33.65" y1="4.55" x2="34.50" y2="3.08" stroke="#D6A553" stroke-width="0.7"/><line x1="38.06" y1="7.94" x2="39.26" y2="6.74" stroke="#D6A553" stroke-width="0.7"/><line x1="41.45" y1="12.35" x2="42.92" y2="11.50" stroke="#D6A553" stroke-width="0.7"/><line x1="43.57" y1="17.49" x2="45.22" y2="17.05" stroke="#D6A553" stroke-width="0.7"/><line x1="43.50" y1="23.00" x2="46.00" y2="23.00" stroke="#D6A553" stroke-width="1.4"/><line x1="43.57" y1="28.51" x2="45.22" y2="28.95" stroke="#D6A553" stroke-width="0.7"/><line x1="41.45" y1="33.65" x2="42.92" y2="34.50" stroke="#D6A553" stroke-width="0.7"/><line x1="38.06" y1="38.06" x2="39.26" y2="39.26" stroke="#D6A553" stroke-width="0.7"/><line x1="33.65" y1="41.45" x2="34.50" y2="42.92" stroke="#D6A553" stroke-width="0.7"/><line x1="28.51" y1="43.57" x2="28.95" y2="45.22" stroke="#D6A553" stroke-width="0.7"/><line x1="23.00" y1="43.50" x2="23.00" y2="46.00" stroke="#D6A553" stroke-width="1.4"/><line x1="17.49" y1="43.57" x2="17.05" y2="45.22" stroke="#D6A553" stroke-width="0.7"/><line x1="12.35" y1="41.45" x2="11.50" y2="42.92" stroke="#D6A553" stroke-width="0.7"/><line x1="7.94" y1="38.06" x2="6.74" y2="39.26" stroke="#D6A553" stroke-width="0.7"/><line x1="4.55" y1="33.65" x2="3.08" y2="34.50" stroke="#D6A553" stroke-width="0.7"/><line x1="2.43" y1="28.51" x2="0.78" y2="28.95" stroke="#D6A553" stroke-width="0.7"/><line x1="2.50" y1="23.00" x2="0.00" y2="23.00" stroke="#D6A553" stroke-width="1.4"/><line x1="2.43" y1="17.49" x2="0.78" y2="17.05" stroke="#D6A553" stroke-width="0.7"/><line x1="4.55" y1="12.35" x2="3.08" y2="11.50" stroke="#D6A553" stroke-width="0.7"/><line x1="7.94" y1="7.94" x2="6.74" y2="6.74" stroke="#D6A553" stroke-width="0.7"/><line x1="12.35" y1="4.55" x2="11.50" y2="3.08" stroke="#D6A553" stroke-width="0.7"/><line x1="17.49" y1="2.43" x2="17.05" y2="0.78" stroke="#D6A553" stroke-width="0.7"/><circle cx="23" cy="23" r="19" fill="none" stroke="rgba(214,165,83,.35)" stroke-width="1"/><path d="M23 1.5 25 5 23 8.5 21 5Z" fill="#F3D48E"/></g>
+        <circle id="astro-progress" cx="23" cy="23" r="15" fill="none" stroke="#D6A553" stroke-width="2" stroke-dasharray="94.25" stroke-dashoffset="94.25" transform="rotate(-90 23 23)"/>
+      </svg>
+      <span class="numeral" id="astro-numeral">P</span>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="name">
+    <div class="moon" id="moon" aria-hidden="true"></div>
+    <div class="ridges" aria-hidden="true">
+      <svg class="layer" data-depth="1" viewBox="0 0 1600 500" preserveAspectRatio="xMidYMax slice"><path d="M0 500 L0 262.8 L25.0 257.5 L50.0 254.6 L75.0 247.7 L100.0 239.8 L125.0 230.6 L150.0 221.5 L175.0 212.1 L200.0 203.9 L225.0 200.0 L250.0 196.0 L275.0 199.1 L300.0 199.1 L325.0 199.1 L350.0 200.4 L375.0 205.9 L400.0 209.0 L425.0 214.3 L450.0 224.1 L475.0 228.4 L500.0 231.8 L525.0 232.4 L550.0 230.7 L575.0 220.8 L600.0 215.3 L625.0 209.4 L650.0 202.5 L675.0 199.8 L700.0 201.9 L725.0 202.8 L750.0 201.1 L775.0 201.1 L800.0 200.4 L825.0 198.2 L850.0 199.1 L875.0 198.8 L900.0 198.8 L925.0 199.6 L950.0 200.0 L975.0 198.2 L1000.0 200.0 L1025.0 204.8 L1050.0 206.2 L1075.0 208.8 L1100.0 212.1 L1125.0 216.1 L1150.0 220.4 L1175.0 225.1 L1200.0 233.7 L1225.0 238.4 L1250.0 238.8 L1275.0 239.4 L1300.0 238.6 L1325.0 233.2 L1350.0 227.0 L1375.0 223.2 L1400.0 219.5 L1425.0 219.8 L1450.0 223.9 L1475.0 230.6 L1500.0 237.5 L1525.0 242.8 L1550.0 248.2 L1575.0 248.4 L1600.0 251.8 L1600 500Z" fill="#3B2517" opacity="0.9"/></svg>
+      <svg class="layer" data-depth="2" viewBox="0 0 1600 500" preserveAspectRatio="xMidYMax slice"><path d="M0 500 L0 338.5 L25.0 339.8 L50.0 338.3 L75.0 340.8 L100.0 344.2 L125.0 346.7 L150.0 349.4 L175.0 352.2 L200.0 348.7 L225.0 341.8 L250.0 335.4 L275.0 325.5 L300.0 320.1 L325.0 316.5 L350.0 311.8 L375.0 302.7 L400.0 301.1 L425.0 299.1 L450.0 302.2 L475.0 308.3 L500.0 314.4 L525.0 315.2 L550.0 314.0 L575.0 306.7 L600.0 302.1 L625.0 300.2 L650.0 296.9 L675.0 296.2 L700.0 295.6 L725.0 294.7 L750.0 294.5 L775.0 297.5 L800.0 296.7 L825.0 298.8 L850.0 295.0 L875.0 290.0 L900.0 287.6 L925.0 284.3 L950.0 284.3 L975.0 285.9 L1000.0 293.0 L1025.0 299.8 L1050.0 307.7 L1075.0 312.9 L1100.0 314.9 L1125.0 314.9 L1150.0 314.9 L1175.0 314.9 L1200.0 314.9 L1225.0 314.9 L1250.0 314.9 L1275.0 314.9 L1300.0 330.0 L1325.0 336.6 L1350.0 344.9 L1375.0 349.9 L1400.0 354.4 L1425.0 357.1 L1450.0 355.4 L1475.0 350.5 L1500.0 348.2 L1525.0 346.0 L1550.0 344.6 L1575.0 344.6 L1600.0 350.1 L1600 500Z" fill="#1B110B" opacity="1"/><g fill="#1B110B"><rect x="1114" y="244.90642411159104" width="146" height="80" /><rect x="1114" y="194.90642411159104" width="18" height="130" /><path d="M1110 194.90642411159104 L1123 164.90642411159104 L1136 194.90642411159104Z" /><rect x="1160" y="164.90642411159104" width="18" height="160" /><path d="M1156 164.90642411159104 L1169 134.90642411159104 L1182 164.90642411159104Z" /><rect x="1210" y="186.90642411159104" width="18" height="138" /><path d="M1206 186.90642411159104 L1219 156.90642411159104 L1232 186.90642411159104Z" /><rect x="1242" y="218.90642411159104" width="18" height="106" /><path d="M1238 218.90642411159104 L1251 188.90642411159104 L1264 218.90642411159104Z" /></g><g fill="#FFC35A"><rect class="win" style="animation-delay:0s" x="1120" y="218.90642411159104" width="4" height="7" /><rect class="win" style="animation-delay:1.3s" x="1166" y="190.90642411159104" width="4" height="7" /><rect class="win" style="animation-delay:0.6s" x="1216" y="210.90642411159104" width="4" height="7" /><rect class="win" style="animation-delay:2.1s" x="1248" y="244.90642411159104" width="4" height="7" /><rect class="win" style="animation-delay:1.7s" x="1150" y="274.90642411159104" width="4" height="7" /><rect class="win" style="animation-delay:0.3s" x="1190" y="270.90642411159104" width="4" height="7" /></g></svg>
+      <svg class="layer" data-depth="3" viewBox="0 0 1600 500" preserveAspectRatio="xMidYMax slice"><path d="M0 500 L0 417.9 L25.0 413.8 L50.0 412.7 L75.0 409.6 L100.0 411.3 L125.0 411.9 L150.0 413.7 L175.0 411.5 L200.0 406.7 L225.0 399.8 L250.0 392.5 L275.0 385.6 L300.0 382.2 L325.0 380.7 L350.0 378.0 L375.0 378.4 L400.0 380.7 L425.0 379.8 L450.0 380.4 L475.0 383.3 L500.0 384.7 L525.0 382.5 L550.0 385.0 L575.0 385.0 L600.0 382.1 L625.0 380.2 L650.0 382.2 L675.0 382.1 L700.0 384.7 L725.0 390.3 L750.0 396.0 L775.0 402.4 L800.0 407.6 L825.0 411.4 L850.0 415.7 L875.0 420.4 L900.0 424.6 L925.0 429.8 L950.0 436.0 L975.0 437.7 L1000.0 437.2 L1025.0 433.5 L1050.0 427.1 L1075.0 418.0 L1100.0 409.2 L1125.0 400.7 L1150.0 394.1 L1175.0 389.2 L1200.0 385.0 L1225.0 382.2 L1250.0 380.6 L1275.0 380.8 L1300.0 382.5 L1325.0 385.6 L1350.0 387.6 L1375.0 391.0 L1400.0 390.0 L1425.0 387.5 L1450.0 387.1 L1475.0 389.3 L1500.0 390.6 L1525.0 394.8 L1550.0 401.6 L1575.0 403.6 L1600.0 405.7 L1600 500Z" fill="#090705" opacity="1"/></svg>
+    </div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow hero-el">Prologue · The chronicle of</p>
+      <h1 class="name" id="name"><span class="row split-hero">Bhargavaram</span><span class="row split-hero">Krishnapur</span></h1>
+      <p class="tagline hero-el">Software engineer and open-source developer from Mumbai. Founder of <b>The Pulse Engine</b>. I make <b>local-first</b> tools that run on your own machine.</p>
+      <div class="cta hero-el">
+        <a class="btn gold magnetic" href="#work">Enter the hall
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+        <a class="btn magnetic" href="bhargavaram-krishnapur-resume.pdf" target="_blank" rel="noopener">Résumé (PDF)</a>
+        <button class="btn magnetic" type="button" data-copy="bhargavaramkrishnapur@gmail.com">Copy email</button>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="track" id="marquee-track"><span>Local-first<i>✦</i></span><span>Open source<i>✦</i></span><span>Python<i>✦</i></span><span>Machine learning<i>✦</i></span><span>Data pipelines<i>✦</i></span><span>Privacy tools<i>✦</i></span><span>MIT licensed<i>✦</i></span><span>GitHub Actions<i>✦</i></span><span>UX research<i>✦</i></span><span>Sponsorship<i>✦</i></span><span>Operations<i>✦</i></span><span>Local-first<i>✦</i></span><span>Open source<i>✦</i></span><span>Python<i>✦</i></span><span>Machine learning<i>✦</i></span><span>Data pipelines<i>✦</i></span><span>Privacy tools<i>✦</i></span><span>MIT licensed<i>✦</i></span><span>GitHub Actions<i>✦</i></span><span>UX research<i>✦</i></span><span>Sponsorship<i>✦</i></span><span>Operations<i>✦</i></span></div></div>
+
+  <section class="chapter wrap" id="oath" aria-labelledby="oath-title">
+    <header class="chapter-head">
+      <span class="roman" aria-hidden="true">I</span>
+      <p class="eyebrow both">Chapter I · What I build</p>
+      <h2 class="split" id="oath-title">The Oath</h2>
+      <div class="rule" aria-hidden="true"></div>
+    </header>
+    <div class="oath-grid">
+      <figure>
+        <div class="frame tilt-frame" id="goblet">
+          <img src="art/plates/titans-goblet.webp" alt="The Titan's Goblet by Thomas Cole: a giant stone goblet stands in a landscape, with a small world of lakes and towns on its rim." width="1091" height="1300" loading="lazy" decoding="async">
+          <span class="shine" aria-hidden="true"></span>
+        </div>
+        <figcaption class="caption">Thomas Cole, <a href="https://www.metmuseum.org/art/collection/search/10499" target="_blank" rel="noopener">The Titan's Goblet</a>, 1833. A whole world, built on top of one tool.</figcaption>
+      </figure>
+      <div>
+        <p class="oath-words" id="oath-words">I build software that <em>runs on your machine</em>, keeps <em>your data</em> with you, and does <em>not</em> ask for a subscription. Everything I release is <em>open source</em> and MIT licensed. Most of it runs on free infrastructure: <em>GitHub Actions</em> and a free API tier. I write the code, and I can explain it to the people who pay for it.</p>
+      </div>
+    </div>
+    <dl class="ledger plate" aria-label="Key figures">
+      <div><dt>NEC 2025 rank · IIT Bombay</dt><dd><span class="count" data-to="17">17</span><small> / 4,000</small></dd></div>
+      <div><dt>Public repositories</dt><dd><span class="count" id="stat-repos" data-to="14">14</span></dd></div>
+      <div><dt>GitHub stars</dt><dd><span class="count" id="stat-stars" data-to="64">64</span></dd></div>
+      <div><dt>Sponsorship raised · Kanyathon</dt><dd>₹<span class="count" data-to="20">20</span>L<small>+</small></dd></div>
+    </dl>
+  </section>
+
+  <section class="chapter hall" id="work" aria-labelledby="work-title">
+    <header class="chapter-head wrap">
+      <span class="roman" aria-hidden="true">II</span>
+      <p class="eyebrow both">Chapter II · Projects</p>
+      <h2 class="split" id="work-title">The Hall of Relics</h2>
+      <p class="lede">Fourteen open-source projects, mine and The Pulse Engine's. Each one is shown with a real museum object that matches what it does. Rarity comes from GitHub stars.</p>
+      <div class="legend" aria-label="Rarity key">
+        <span><i class="gem r-legendary"></i>Legendary 10+</span>
+        <span><i class="gem r-epic"></i>Epic 5–9</span>
+        <span><i class="gem r-rare"></i>Rare 2–4</span>
+        <span><i class="gem r-common"></i>Common 1</span>
+      </div>
+    </header>
+    <div class="hall-pin" id="hall-pin">
+      <div class="hall-viewport" id="hall-viewport">
+        <div class="hall-track" id="hall-track">
+          <div class="slot">
+            <article class="relic r-legendary big" id="p-market-intelligence" data-repo="Pulse-Engine_Market_Intelligence_Platform" data-name="Market Intelligence Platform">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/melencolia.webp" alt="Melencolia I, Albrecht Dürer, 1514" width="602" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Legendary</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>13</b></span></div>
+                <h3><a href="https://github.com/The-Pulse-Engine/Pulse-Engine_Market_Intelligence_Platform" target="_blank" rel="noopener">Market Intelligence Platform</a></h3>
+                <p>Scores 24 assets from −10 to +10. It combines technical indicators with live news sentiment and explains why each signal fired. It runs fully on your machine.</p>
+                <ul class="tags"><li>Data and ML</li><li>Python</li><li>Sentiment analysis</li><li>Multiprocessing</li><li>Docker</li></ul>
+                <p class="proof">24 assets · 12 news feeds · scan every 30 min · 332 commits</p>
+                <a class="chron" href="writing/explainable-market-intelligence/">Read the chronicle →</a>
+                <p class="from">Relic: Melencolia I, Albrecht Dürer, 1514</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-common big" id="p-correlation-engine" data-repo="Correlation-engine" data-name="Correlation Engine">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/urania.webp" alt="Urania, Tarocchi card, before 1467" width="556" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Common</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>1</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/Correlation-engine" target="_blank" rel="noopener">Correlation Engine</a></h3>
+                <p>A daily scan across news, market and government data. It shows every finding next to what pure noise produces, so a lucky match cannot pass as a real one.</p>
+                <ul class="tags"><li>Data and ML</li><li>Python</li><li>GitHub Actions</li><li>GDELT</li><li>FRED</li></ul>
+                <p class="proof">Spearman · Benjamini-Hochberg FDR · phase-randomized placebos · 0 servers</p>
+                <a class="chron" href="writing/correlation-engine-noise-baseline/">Read the chronicle →</a>
+                <p class="from">Relic: Urania, Tarocchi card, before 1467</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-epic big" id="p-bruhswer" data-repo="bruhswer-the-homebrew-pseudo-browser" data-name="bruhswer">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/close-helmet.webp" alt="Close helmet, Maximilian style, c. 1520" width="596" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Epic</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>6</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/bruhswer-the-homebrew-pseudo-browser" target="_blank" rel="noopener">bruhswer</a></h3>
+                <p>A hardened wrapper around Microsoft Edge on Windows. It checks its protections before launch and stops if one fails. When it cannot enforce a check, it says NOT ENFORCEABLE.</p>
+                <ul class="tags"><li>Security and privacy</li><li>Python stdlib</li><li>PowerShell</li><li>Windows</li></ul>
+                <p class="proof">fail-closed start · LAN blocked at firewall · download quarantine · disposable sessions</p>
+                <a class="chron" href="writing/browser-hardening/">Read the chronicle →</a>
+                <p class="from">Relic: Close helmet, Maximilian style, c. 1520</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-epic" id="p-azlite-chess" data-repo="azlite_type_chess_bot" data-name="AZLite Chess Engine">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/chess-mirror.webp" alt="Mirror case, couple playing chess, 1325–50" width="762" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Epic</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>7</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/azlite_type_chess_bot" target="_blank" rel="noopener">AZLite Chess Engine</a></h3>
+                <p>An AlphaZero-style engine. PUCT tree search with a policy and value network that learns only from self-play.</p>
+                <ul class="tags"><li>Data and ML</li><li>Python</li><li>MCTS</li><li>Reinforcement learning</li></ul>
+                <p class="proof">~1000–1400 Elo on CPU · 100–200 self-play games per hour</p>
+                <a class="chron" href="writing/alphazero-chess-engine-python/">Read the chronicle →</a>
+                <p class="from">Relic: Mirror case, couple playing chess, 1325–50</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-legendary" id="p-digital-footprint-cleaner" data-repo="digital-footprint-cleaner" data-name="Digital Footprint Cleaner">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/rondache.webp" alt="Rondache, round shield, c. 1570" width="677" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Legendary</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>13</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/digital-footprint-cleaner" target="_blank" rel="noopener">Digital Footprint Cleaner</a></h3>
+                <p>Finds your personal data on public websites and helps you remove it. Privacy-first and fully open source.</p>
+                <ul class="tags"><li>Security and privacy</li><li>Python</li><li>Flask</li></ul>
+                <p class="proof">OSINT · data removal requests · Flask web app</p>
+                <a class="chron" href="writing/local-first-software/">Read the chronicle →</a>
+                <p class="from">Relic: Rondache, round shield, c. 1570</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-rare" id="p-ncaa-predictor" data-repo="Uni-basketball-ETL-pipeline" data-name="NCAA Basketball Predictor">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/st-george.webp" alt="St. George Killing the Dragon, Dürer, 1500s" width="524" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Rare</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>2</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/Uni-basketball-ETL-pipeline" target="_blank" rel="noopener">NCAA Basketball Predictor</a></h3>
+                <p>A self-improving pipeline. It pulls game data from ESPN, trains 6 models, and deploys the best one. It is built to stop data leakage.</p>
+                <ul class="tags"><li>Data and ML</li><li>Python</li><li>scikit-learn</li><li>Flask</li><li>MLOps</li></ul>
+                <p class="proof">~2,900 games · ROC-AUC ~0.74 · auto retrain and rollback</p>
+                <a class="chron" href="writing/data-leakage-basketball-model/">Read the chronicle →</a>
+                <p class="from">Relic: St. George Killing the Dragon, Dürer, 1500s</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-rare" id="p-visitor-access" data-repo="visitor-access-project" data-name="Campus Visitor Access Study">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/key.webp" alt="Key, 1–100 CE" width="499" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Rare</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>2</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/visitor-access-project" target="_blank" rel="noopener">Campus Visitor Access Study</a></h3>
+                <p>A UX study of visitor entry at Vijaybhoomi University. A parent stood in the rain at the gate because the approval step had no owner and no time limit.</p>
+                <ul class="tags"><li>UX research</li><li>UX research</li><li>Information architecture</li></ul>
+                <p class="proof">interviews · card sort · tree test · MoSCoW on 27 requirements</p>
+                <a class="chron" href="writing/campus-visitor-access-ux-study/">Read the chronicle →</a>
+                <p class="from">Relic: Key, 1–100 CE</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-rare" id="p-image-protector" data-repo="Image-Protector" data-name="Image Protector">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/savoyard-helmet.webp" alt="Savoyard helmet, c. 1600–20" width="582" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Rare</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>3</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/Image-Protector" target="_blank" rel="noopener">Image Protector</a></h3>
+                <p>Adds small, controlled noise to images. People see the same picture. Scrapers and ML models see a worse one.</p>
+                <ul class="tags"><li>Security and privacy</li><li>Python</li><li>Adversarial ML</li></ul>
+                <p class="proof">0.15–1.6 s per image · 35–40 dB PSNR · GUI and CLI</p>
+                <a class="chron" href="writing/browser-hardening/">Read the chronicle →</a>
+                <p class="from">Relic: Savoyard helmet, c. 1600–20</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-rare" id="p-neural-horror" data-repo="Quantum-Neural-Horror" data-name="Quantum Neural Horror">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/beast-initial.webp" alt="Initial I: beast and serpent, c. 1225–50" width="584" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Rare</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>2</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/Quantum-Neural-Horror" target="_blank" rel="noopener">Quantum Neural Horror</a></h3>
+                <p>A neuro-evolution sandbox. The network changes its own topology, activations and weights with simulated annealing, not backprop.</p>
+                <ul class="tags"><li>Data and ML</li><li>Python</li><li>Neuroevolution</li><li>Matplotlib</li></ul>
+                <p class="proof">150 generations in 2–8 s · live fitness plot</p>
+                <a class="chron" href="writing/neuroevolution/">Read the chronicle →</a>
+                <p class="from">Relic: Initial I: beast and serpent, c. 1225–50</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-common" id="p-stack-sight" data-repo="Stack-Sight" data-name="StackSight">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/spider-helmet.webp" alt="Cavalry spider helmet, 1600s" width="886" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Common</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>1</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/Stack-Sight" target="_blank" rel="noopener">StackSight</a></h3>
+                <p>A local-only Chrome extension. It groups sites into stacks, tracks use, and shows subscriptions you pay for but do not open.</p>
+                <ul class="tags"><li>Tools and apps</li><li>JavaScript</li><li>Chrome extension</li></ul>
+                <p class="proof">Manifest V3 · local-only · 61-test suite</p>
+                <a class="chron" href="writing/local-first-software/">Read the chronicle →</a>
+                <p class="from">Relic: Cavalry spider helmet, 1600s</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-epic" id="p-repo-finder" data-repo="Random_Github_Repo_Finder" data-name="Random Repo Finder">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/apollo.webp" alt="Apollo, Tarocchi card, before 1467" width="536" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Epic</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>6</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/Random_Github_Repo_Finder" target="_blank" rel="noopener">Random Repo Finder</a></h3>
+                <p>Opens a random public repository or a good first issue in one click. For when you want to contribute but have no search query.</p>
+                <ul class="tags"><li>Tools and apps</li><li>Python</li><li>Tkinter</li></ul>
+                <p class="proof">GitHub REST API · no hardcoded list</p>
+                
+                <p class="from">Relic: Apollo, Tarocchi card, before 1467</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-rare" id="p-meme-web" data-repo="meme-web" data-name="meme-web">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/chronos.webp" alt="Chronos, Father Time, c. 1700" width="767" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Rare</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>2</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/meme-web" target="_blank" rel="noopener">meme-web</a></h3>
+                <p>A meme gallery that refills itself. A GitHub Actions job pulls five new images every morning and redeploys the page.</p>
+                <ul class="tags"><li>Tools and apps</li><li>Python</li><li>GitHub Actions</li></ul>
+                <p class="proof">no server · no database · $0 to run</p>
+                
+                <p class="from">Relic: Chronos, Father Time, c. 1700</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-rare" id="p-infinite-monkeys" data-repo="infinite-monkeys" data-name="Infinite Monkeys">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/hanuman.webp" alt="Monkey General Hanuman, c. 1000" width="545" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Rare</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>3</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/infinite-monkeys" target="_blank" rel="noopener">Infinite Monkeys</a></h3>
+                <p>The infinite monkey theorem, run on every CPU core with a live attempt rate. You can watch the odds refuse to move.</p>
+                <ul class="tags"><li>Tools and apps</li><li>Python</li></ul>
+                <p class="proof">multiprocessing · standard library only</p>
+                
+                <p class="from">Relic: Monkey General Hanuman, c. 1000</p>
+              </div>
+            </article>
+          </div>
+          <div class="slot">
+            <article class="relic r-rare" id="p-coding-war-crimes" data-repo="coding-war-crimes" data-name="Coding War Crimes">
+              <div class="glare" aria-hidden="true"></div>
+              <div class="art"><img src="art/relics/executioners-sword.webp" alt="Executioner&#x27;s sword, late 1600s" width="487" height="760" loading="lazy" decoding="async"></div>
+              <div class="body">
+                <div class="top"><span class="rarity"><i class="gem" aria-hidden="true"></i><em style="font-style:normal">Rare</em></span><span class="stars" title="GitHub stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .8l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3 3.5 14.6l.9-5L.8 6.1l5-.7z"/></svg><b>3</b></span></div>
+                <h3><a href="https://github.com/Codex-Crusader/coding-war-crimes" target="_blank" rel="noopener">Coding War Crimes</a></h3>
+                <p>Bad code, written on purpose. Each entry shows its complexity cost and the correct version next to it.</p>
+                <ul class="tags"><li>Tools and apps</li><li>Python</li></ul>
+                <p class="proof">72 commits · complexity analysis per entry</p>
+                <a class="chron" href="writing/coding-war-crimes/">Read the chronicle →</a>
+                <p class="from">Relic: Executioner&#x27;s sword, late 1600s</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+      <div class="hall-progress" aria-hidden="true"><b id="hall-progress"></b></div>
+      <p class="hall-hint" id="hall-hint">Scroll sideways to walk the hall</p>
+    </div>
+    <p class="more-link"><a class="link" href="https://github.com/Codex-Crusader?tab=repositories" target="_blank" rel="noopener">Every repository on GitHub →</a></p>
+  </section>
+
+  <section class="chapter wrap" id="experience" aria-labelledby="exp-title">
+    <header class="chapter-head">
+      <span class="roman" aria-hidden="true">III</span>
+      <p class="eyebrow both">Chapter III · Experience</p>
+      <h2 class="split" id="exp-title">The Road Travelled</h2>
+      <p class="lede">Engineering, operations and sponsorship, most recent first. The road draws itself as you walk it.</p>
+    </header>
+    <div class="road-wrap">
+      <div class="road" id="road">
+        <svg class="path" aria-hidden="true"><path class="trail" id="road-trail"/><path class="drawn" id="road-drawn"/><circle class="torch" id="road-torch" r="7" cx="-50" cy="-50"/></svg>
+        <p class="road-group"><span>Now</span></p>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Apr 2026 – now · Mumbai · hybrid</p>
+            <h3>Founder<span>The Pulse Engine</span></h3>
+            <p>Started an open-source community for local-first software. Everything is MIT licensed and free. <span class="num">10+</span> active members across the GitHub org and Discord.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Mar 2026 – now · Karjat · on-site</p>
+            <h3>Podcast Host<span>VUTV</span></h3>
+            <p>Co-host an official university podcast in a three-host rotation. I pick topics, research and invite guests, and moderate each episode.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Jan 2026 – now · Mumbai · remote</p>
+            <h3>Strategic Research Advisor<span>Self-employed, Udyam registered</span></h3>
+            <p>Help founders test a business idea before they spend months on it. Market and competitor research, SWOT and forecasts, then a clear call: pursue, pivot or pause.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Sep 2024 – now · Karjat · on-site</p>
+            <h3>Sponsorship Manager<span>Vijaybhoomi E-Cell</span></h3>
+            <p>Raised <span class="num">₹2L+</span> for Elevate 2.0, the flagship event. Helped plan the roadmap that took the team to the IIT Bombay E-Summit finals.</p>
+          </div>
+        </article>
+        <p class="road-group"><span>Before</span></p>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">May 2026 – Jun 2026 · Navi Mumbai · on-site</p>
+            <h3>Technology and Operations Intern<span>Sanjay Electrical Enterprises</span></h3>
+            <p>Led ERP digitisation on the company side and picked the ERP after vendor evaluation. Logged <span class="num">50+</span> bugs and security issues, including a stored XSS. Designed a tap-first square-foot billing model and moved tenders to a digital workflow across 3 sites.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Jan 2026 – Apr 2026 · Remote</p>
+            <h3>Brand Partnership Intern<span>MedInventory</span></h3>
+            <p>Ran sponsorship for a company event from research to onboarding. Researched <span class="num">30+</span> brands, pitched <span class="num">60+</span> and closed <span class="num">12</span> sponsors.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Jun 2025 – Dec 2025 · Mumbai</p>
+            <h3>Outreach Manager<span>FundNexus</span></h3>
+            <p>Built a central deal tracker that stopped duplicate follow-ups. Sourced <span class="num">30+</span> startups, added <span class="num">250+</span> investor connections, and ran term sheet and NDA workflows.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Oct 2024 – Dec 2025 · Mumbai · on-site</p>
+            <h3>Operations Co-Head<span>Kanyathon, Mumbai Division</span></h3>
+            <p>Led <span class="num">80</span> volunteers on a one-month timeline. Ran <span class="num">100+</span> CSR outreaches that raised <span class="num">₹20L+</span> in sponsorship, and ran the event day end to end.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">May 2025 – Jun 2025 · Mumbai · on-site</p>
+            <h3>Student Volunteer<span>DBM India (NIT)</span></h3>
+            <p>Co-designed a Grades 1–5 education pipeline for children in Mumbai slum communities. Field research in 3 communities and guidelines for future volunteers. Volunteer of the Month, June 2025.</p>
+          </div>
+        </article>
+        <article class="stop">
+          <span class="node" aria-hidden="true"></span>
+          <div class="banner plate">
+            <p class="when">Jan 2023 – Jul 2025 · Mumbai · remote</p>
+            <h3>Freelance Resume Writer<span>Self-employed</span></h3>
+            <p>Wrote resumes, cover letters and LinkedIn profiles with ATS optimisation. Helped <span class="num">50+</span> clients get interviews.</p>
+          </div>
+        </article>
+      </div>
+      <aside class="knight">
+        <div class="frame" id="knight-frame"><img src="art/plates/knight-death-devil.webp" alt="Knight, Death and the Devil, an engraving by Albrecht Dürer: an armoured knight rides on through a dark valley." width="1088" height="1400" loading="lazy" decoding="async"></div>
+        <p class="caption">Albrecht Dürer, <a href="https://clevelandart.org/art/1965.231" target="_blank" rel="noopener">Knight, Death, and the Devil</a>, 1513. The knight keeps riding.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="recognition" aria-labelledby="rec-title">
+    <header class="chapter-head">
+      <span class="roman" aria-hidden="true">IV</span>
+      <p class="eyebrow both">Chapter IV · Recognition</p>
+      <h2 class="split" id="rec-title">Deeds and Honours</h2>
+    </header>
+    <div class="honours">
+      <div class="seal" id="seal">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <defs><radialGradient id="wax" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#D4492E"/><stop offset=".55" stop-color="#8E1E12"/><stop offset="1" stop-color="#4E0C06"/></radialGradient></defs>
+          <path id="seal-edge" d="M194.50 100.00 L194.21 101.64 L193.08 103.25 L191.35 104.79 L189.40 106.25 L187.63 107.67 L186.42 109.08 L185.99 110.56 L186.42 112.15 L187.60 113.87 L189.25 115.74 L191.00 117.69 L192.44 119.65 L193.22 121.52 L193.12 123.22 L192.10 124.68 L190.27 125.88 L187.92 126.88 L185.43 127.76 L183.18 128.64 L181.50 129.67 L180.61 130.94 L180.52 132.53 L181.10 134.42 L182.07 136.54 L183.08 138.74 L183.75 140.85 L183.79 142.70 L183.03 144.15 L181.47 145.16 L179.24 145.75 L176.64 146.05 L174.01 146.25 L171.70 146.56 L169.97 147.20 L168.98 148.30 L168.71 149.92 L169.01 152.01 L169.62 154.39 L170.20 156.85 L170.45 159.12 L170.14 160.97 L169.14 162.25 L167.47 162.92 L165.31 163.07 L162.89 162.89 L160.51 162.66 L158.43 162.66 L156.87 163.16 L155.89 164.30 L155.47 166.10 L155.44 168.46 L155.57 171.13 L155.61 173.79 L155.31 176.13 L154.53 177.87 L153.19 178.86 L151.35 179.08 L149.16 178.67 L146.81 177.90 L144.52 177.12 L142.49 176.66 L140.84 176.80 L139.59 177.70 L138.69 179.33 L138.02 181.53 L137.39 183.99 L136.65 186.35 L135.65 188.23 L134.31 189.37 L132.62 189.63 L130.65 189.02 L128.51 187.76 L126.34 186.16 L124.27 184.63 L122.39 183.54 L120.74 183.17 L119.31 183.65 L118.05 184.93 L116.87 186.80 L115.67 188.90 L114.39 190.83 L112.96 192.23 L111.40 192.82 L109.72 192.49 L107.99 191.32 L106.26 189.55 L104.59 187.54 L102.99 185.72 L101.47 184.45 L100.00 184.00 L98.53 184.45 L97.01 185.72 L95.41 187.54 L93.74 189.55 L92.01 191.32 L90.28 192.49 L88.60 192.82 L87.04 192.23 L85.61 190.83 L84.33 188.90 L83.13 186.80 L81.95 184.93 L80.69 183.65 L79.26 183.17 L77.61 183.54 L75.73 184.63 L73.66 186.16 L71.49 187.76 L69.35 189.02 L67.38 189.63 L65.69 189.37 L64.35 188.23 L63.35 186.35 L62.61 183.99 L61.98 181.53 L61.31 179.33 L60.41 177.70 L59.16 176.80 L57.51 176.66 L55.48 177.12 L53.19 177.90 L50.84 178.67 L48.65 179.08 L46.81 178.86 L45.47 177.87 L44.69 176.13 L44.39 173.79 L44.43 171.13 L44.56 168.46 L44.53 166.10 L44.11 164.30 L43.13 163.16 L41.57 162.66 L39.49 162.66 L37.11 162.89 L34.69 163.07 L32.53 162.92 L30.86 162.25 L29.86 160.97 L29.55 159.12 L29.80 156.85 L30.38 154.39 L30.99 152.01 L31.29 149.92 L31.02 148.30 L30.03 147.20 L28.30 146.56 L25.99 146.25 L23.36 146.05 L20.76 145.75 L18.53 145.16 L16.97 144.15 L16.21 142.70 L16.25 140.85 L16.92 138.74 L17.93 136.54 L18.90 134.42 L19.48 132.53 L19.39 130.94 L18.50 129.67 L16.82 128.64 L14.57 127.76 L12.08 126.88 L9.73 125.88 L7.90 124.68 L6.88 123.22 L6.78 121.52 L7.56 119.65 L9.00 117.69 L10.75 115.74 L12.40 113.87 L13.58 112.15 L14.01 110.56 L13.58 109.08 L12.37 107.67 L10.60 106.25 L8.65 104.79 L6.92 103.25 L5.79 101.64 L5.50 100.00 L6.15 98.36 L7.65 96.78 L9.73 95.27 L12.01 93.85 L14.08 92.48 L15.58 91.13 L16.26 89.72 L16.04 88.20 L15.04 86.54 L13.52 84.75 L11.87 82.87 L10.48 80.97 L9.70 79.15 L9.76 77.50 L10.70 76.07 L12.40 74.88 L14.59 73.89 L16.88 72.99 L18.90 72.07 L20.31 70.99 L20.92 69.64 L20.70 67.96 L19.80 65.96 L18.50 63.71 L17.16 61.37 L16.15 59.10 L15.79 57.09 L16.24 55.46 L17.51 54.27 L19.46 53.50 L21.81 53.02 L24.22 52.65 L26.35 52.17 L27.92 51.38 L28.79 50.14 L28.98 48.40 L28.63 46.22 L28.02 43.77 L27.47 41.27 L27.28 38.98 L27.70 37.15 L28.83 35.92 L30.64 35.32 L32.99 35.29 L35.61 35.61 L38.21 36.01 L40.51 36.21 L42.32 35.93 L43.53 35.04 L44.20 33.50 L44.46 31.42 L44.56 29.04 L44.74 26.66 L45.23 24.62 L46.20 23.17 L47.70 22.46 L49.68 22.51 L51.99 23.16 L54.43 24.15 L56.77 25.13 L58.85 25.75 L60.52 25.74 L61.76 24.94 L62.62 23.37 L63.25 21.18 L63.80 18.69 L64.46 16.27 L65.36 14.27 L66.59 12.97 L68.16 12.53 L70.01 12.91 L72.03 13.92 L74.08 15.23 L76.04 16.45 L77.82 17.21 L79.36 17.23 L80.70 16.40 L81.88 14.76 L83.00 12.54 L84.15 10.09 L85.40 7.82 L86.80 6.11 L88.36 5.23 L90.05 5.30 L91.80 6.24 L93.55 7.81 L95.27 9.66 L96.90 11.37 L98.47 12.57 L100.00 13.00 L101.53 12.57 L103.10 11.37 L104.73 9.66 L106.45 7.81 L108.20 6.24 L109.95 5.30 L111.64 5.23 L113.20 6.11 L114.60 7.82 L115.85 10.09 L117.00 12.54 L118.12 14.76 L119.30 16.40 L120.64 17.23 L122.18 17.21 L123.96 16.45 L125.92 15.23 L127.97 13.92 L129.99 12.91 L131.84 12.53 L133.41 12.97 L134.64 14.27 L135.54 16.27 L136.20 18.69 L136.75 21.18 L137.38 23.37 L138.24 24.94 L139.48 25.74 L141.15 25.75 L143.23 25.13 L145.57 24.15 L148.01 23.16 L150.32 22.51 L152.30 22.46 L153.80 23.17 L154.77 24.62 L155.26 26.66 L155.44 29.04 L155.54 31.42 L155.80 33.50 L156.47 35.04 L157.68 35.93 L159.49 36.21 L161.79 36.01 L164.39 35.61 L167.01 35.29 L169.36 35.32 L171.17 35.92 L172.30 37.15 L172.72 38.98 L172.53 41.27 L171.98 43.77 L171.37 46.22 L171.02 48.40 L171.21 50.14 L172.08 51.38 L173.65 52.17 L175.78 52.65 L178.19 53.02 L180.54 53.50 L182.49 54.27 L183.76 55.46 L184.21 57.09 L183.85 59.10 L182.84 61.37 L181.50 63.71 L180.20 65.96 L179.30 67.96 L179.08 69.64 L179.69 70.99 L181.10 72.07 L183.12 72.99 L185.41 73.89 L187.60 74.88 L189.30 76.07 L190.24 77.50 L190.30 79.15 L189.52 80.97 L188.13 82.87 L186.48 84.75 L184.96 86.54 L183.96 88.20 L183.74 89.72 L184.42 91.13 L185.92 92.48 L187.99 93.85 L190.27 95.27 L192.35 96.78 L193.85 98.36Z" fill="url(#wax)"/>
+          <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,220,180,.35)" stroke-width="1.5"/>
+          <circle cx="100" cy="100" r="64" fill="none" stroke="rgba(255,220,180,.2)" stroke-width="1" stroke-dasharray="2 4"/>
+        </svg>
+        <div class="inner">
+          <span class="num"><span class="count" data-to="17">17</span></span>
+          <span class="of">OF 4,000</span>
+          <span class="what">National Entrepreneurship Challenge 2025, E-Cell IIT Bombay</span>
+        </div>
+      </div>
+      <div>
+        <ul class="pennants">
+          <li><div class="pennant" style="--d:-1s"><svg class="crest" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.6 10.6 11.4 1-8.7 7.5 2.7 11.2L20 27.4 9.9 33.3l2.7-11.2L4 14.6l11.4-1z" fill="#F3D48E" stroke="#8A5A1C" stroke-width="1"/></svg><strong>Top 17 of 4,000</strong><span>NEC 2025, a six-month national competition.</span></div></li>
+          <li><div class="pennant blue" style="--d:-2.4s"><svg class="crest" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.6 10.6 11.4 1-8.7 7.5 2.7 11.2L20 27.4 9.9 33.3l2.7-11.2L4 14.6l11.4-1z" fill="#F3D48E" stroke="#8A5A1C" stroke-width="1"/></svg><strong>ISRO IRoC-U 2025</strong><span>Shortlisted from 2,000+ teams with team VSST.</span></div></li>
+          <li><div class="pennant green" style="--d:-3.3s"><svg class="crest" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.6 10.6 11.4 1-8.7 7.5 2.7 11.2L20 27.4 9.9 33.3l2.7-11.2L4 14.6l11.4-1z" fill="#F3D48E" stroke="#8A5A1C" stroke-width="1"/></svg><strong>Youth panelist</strong><span>MANTHAN: Youth Voices, on AI and digital literacy.</span></div></li>
+        </ul>
+        <div class="scrolls">
+          <div class="plate">
+            <h3>Certifications</h3>
+            <ul>
+              <li>ISC² Certified in Cybersecurity <span>2024</span></li>
+              <li>Google Cloud Cybersecurity <span>2025</span></li>
+              <li>IBM Data Engineering <span>2025</span></li>
+              <li>Volunteer of the Month, DBM India <span>2025</span></li>
+            </ul>
+          </div>
+          <div class="plate">
+            <h3>Tools of the trade</h3>
+            <ul class="runes">
+              <li>Python</li><li>SQL</li><li>JavaScript</li><li>Kotlin</li><li>pandas</li><li>scikit-learn</li><li>XGBoost</li><li>Streamlit</li><li>Flask</li><li>Docker</li><li>Git</li><li>GitHub Actions</li><li>Linux</li><li>Next.js</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="photos" aria-labelledby="photos-title">
+    <header class="chapter-head">
+      <span class="roman" aria-hidden="true">V</span>
+      <p class="eyebrow both">Chapter V · Photos</p>
+      <h2 class="split" id="photos-title">Memories</h2>
+      <p class="lede">Moments from panels, labs, fields and events. Select a frame to see it large.</p>
+    </header>
+    <div class="gallery" id="gallery">
+      <figure><button class="frame" type="button" aria-label="Open photo: Speaking on a panel"><img src="photos/speaking-on-a-panel.webp" alt="Speaking on a panel" width="480" height="356" loading="lazy" decoding="async"></button><figcaption>Speaking on a panel</figcaption></figure>
+      <figure><button class="frame" type="button" aria-label="Open photo: Building in the electronics lab"><img src="photos/building-in-the-electronics-lab.webp" alt="Building in the electronics lab" width="480" height="320" loading="lazy" decoding="async"></button><figcaption>Building in the electronics lab</figcaption></figure>
+      <figure><button class="frame" type="button" aria-label="Open photo: At Vijaybhoomi University"><img src="photos/at-vijaybhoomi-university.webp" alt="At Vijaybhoomi University" width="480" height="640" loading="lazy" decoding="async"></button><figcaption>At Vijaybhoomi University</figcaption></figure>
+      <figure><button class="frame" type="button" aria-label="Open photo: Coding with a mountain view"><img src="photos/coding-with-a-mountain-view.webp" alt="Coding with a mountain view" width="480" height="269" loading="lazy" decoding="async"></button><figcaption>Coding with a mountain view</figcaption></figure>
+      <figure><button class="frame" type="button" aria-label="Open photo: Kanyathon 2026"><img src="photos/kanyathon-2026.webp" alt="Kanyathon 2026" width="480" height="1056" loading="lazy" decoding="async"></button><figcaption>Kanyathon 2026</figcaption></figure>
+      <figure><button class="frame" type="button" aria-label="Open photo: CyberSec India Expo"><img src="photos/cybersec-india-expo.webp" alt="CyberSec India Expo" width="480" height="640" loading="lazy" decoding="async"></button><figcaption>CyberSec India Expo</figcaption></figure>
+      <figure><button class="frame" type="button" aria-label="Open photo: Certificates at DBM India"><img src="photos/certificates-at-dbm-india.webp" alt="Certificates at DBM India" width="480" height="361" loading="lazy" decoding="async"></button><figcaption>Certificates at DBM India</figcaption></figure>
+      <figure><button class="frame" type="button" aria-label="Open photo: Internship letter at Sanjay Electrical"><img src="photos/internship-letter-at-sanjay-electrical.webp" alt="Internship letter at Sanjay Electrical" width="480" height="219" loading="lazy" decoding="async"></button><figcaption>Internship letter at Sanjay Electrical</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="about" aria-labelledby="about-title">
+    <header class="chapter-head">
+      <span class="roman" aria-hidden="true">VI</span>
+      <p class="eyebrow both">Chapter VI · About</p>
+      <h2 class="split" id="about-title">The Chronicler</h2>
+    </header>
+    <div class="about">
+      <div class="portrait">
+        <svg class="ring" id="ring" viewBox="0 0 300 300" aria-hidden="true">
+          <defs><path id="ring-path" d="M150 150 m-128 0 a128 128 0 1 1 256 0 a128 128 0 1 1 -256 0"/></defs>
+          <circle cx="150" cy="150" r="140" fill="none" stroke="rgba(214,165,83,.4)"/>
+          <circle cx="150" cy="150" r="116" fill="none" stroke="rgba(214,165,83,.4)"/>
+          <text><textPath href="#ring-path">BHARGAVARAM KRISHNAPUR ✦ FOUNDER OF THE PULSE ENGINE ✦ CLASS OF 2028 ✦</textPath></text>
+        </svg>
+        <div class="oval"><img src="photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur at Vijaybhoomi University" width="480" height="640" loading="lazy"></div>
+      </div>
+      <div class="plate">
+        <div class="prose">
+          <p>I build things because I want them to exist. Most of them are local-first: tools that run on your own machine, keep your data there, and do not ask for a subscription.</p>
+          <p>The Pulse Engine is the open-source community I started around that idea. I also wrote a transformer from scratch, from a character tokenizer to BPE, RoPE and a KV cache, to find out if I understood the internals or only the diagrams.</p>
+          <p>I work on the business side too: sponsorships, operations and ERP rollouts. Away from the terminal: Soulsborne games, Sanskrit and Buddhist terms, and a Samoyed.</p>
+        </div>
+        <dl class="facts">
+          <dt>Based in</dt><dd>Thane, Mumbai, India</dd>
+          <dt>Time zone</dt><dd>IST (UTC+5:30)</dd>
+          <dt>Studying</dt><dd>B.Tech CSE, Vijaybhoomi University, 2024–2028</dd>
+          <dt>Building</dt><dd>The Pulse Engine</dd>
+          <dt>Open to</dt><dd>Collaboration and good problems</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="chronicles" aria-labelledby="chron-title">
+    <header class="chapter-head">
+      <span class="roman" aria-hidden="true">VII</span>
+      <p class="eyebrow both">Chapter VII · Blog</p>
+      <h2 class="split" id="chron-title">The Chronicles</h2>
+      <p class="lede">Long-form posts about the work: what I built, why it works that way, and what went wrong on the way.</p>
+    </header>
+    <div class="chron-cards">
+      <article class="chron-card">
+        <div class="thumb"><img src="writing/img/correlation-engine-live-site.webp" alt="" width="1400" height="875" loading="lazy" decoding="async"></div>
+        <div class="cbody"><p class="cmeta">29 September 2026 · 4 min read · Data</p>
+        <h3><a href="writing/correlation-engine-noise-baseline/">Testing every finding against pure noise</a></h3><p>Run enough tests and you will always find something. The honest move is to show what noise finds too.</p></div>
+      </article>
+      <article class="chron-card">
+        <div class="thumb"><img src="writing/img/ncaa-predictor-dashboard.webp" alt="" width="1400" height="638" loading="lazy" decoding="async"></div>
+        <div class="cbody"><p class="cmeta">29 September 2026 · 4 min read · Machine learning</p>
+        <h3><a href="writing/data-leakage-basketball-model/">My basketball model scored 0.97 AUC. It was cheating.</a></h3><p>When a result looks too good, suspect a leak before you suspect genius.</p></div>
+      </article>
+      <article class="chron-card">
+        <div class="thumb relic"><img src="art/relics/chess-mirror.webp" alt="" width="762" height="760" loading="lazy" decoding="async"></div>
+        <div class="cbody"><p class="cmeta">29 September 2026 · 4 min read · Machine learning</p>
+        <h3><a href="writing/alphazero-chess-engine-python/">Building an AlphaZero-style chess engine in Python</a></h3><p>No opening book and no human games. It plays itself, and it learns from the result.</p></div>
+      </article>
+    </div>
+    <div class="chron-more plate">
+      <ul class="chron-list"><li><a href="writing/campus-visitor-access-ux-study/">The hour of silence: a UX study of campus visitor entry</a></li><li><a href="writing/local-first-software/">Local-first software</a></li><li><a href="writing/explainable-market-intelligence/">Making a market signal explain itself</a></li><li><a href="writing/transformer-from-scratch/">Writing a transformer from scratch</a></li><li><a href="writing/neuroevolution/">Neuroevolution: networks that grow instead of learn</a></li><li><a href="writing/browser-hardening/">Browser hardening, and saying what you cannot enforce</a></li><li><a href="writing/coding-war-crimes/">Coding war crimes: learning from deliberately terrible code</a></li></ul>
+      <a class="btn magnetic" href="writing/">All chronicles</a>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="contact" aria-labelledby="contact-title">
+    <div class="raven-sky" aria-hidden="true">
+      <svg class="raven" id="raven" viewBox="0 0 200 120">
+        <g fill="#050403">
+          <path d="M18 70c20-4 40-6 58-4 10-10 24-14 38-12 12 2 22 8 30 16l22-2-16 8c-4 8-12 14-24 16l6 18-14-16c-14 2-30 0-44-6-16 4-34 2-56-6 14-2 24-6 30-10-12-2-22-2-30-2z"/>
+          <path d="M150 68l30-4-26 10z"/>
+          <circle cx="146" cy="66" r="2" fill="#E8C27A"/>
+          <path class="wing" d="M70 66c6-22 22-44 50-58-6 16-6 30 0 42-14 2-30 8-50 16z"/>
+        </g>
+      </svg>
+    </div>
+    <header class="chapter-head">
+      <span class="roman" aria-hidden="true">VIII</span>
+      <p class="eyebrow both">Chapter VIII · Contact</p>
+    </header>
+    <div class="letter plate">
+      <h2 class="split" id="contact-title">Send a Raven</h2>
+      <p class="lede">Email is the fastest road to me. I read every message and answer most within a few days.</p>
+      <div class="email-row">
+        <span class="email" id="email">bhargavaramkrishnapur@gmail.com</span>
+        <button class="waxbtn" type="button" data-copy="bhargavaramkrishnapur@gmail.com" aria-label="Copy email address">Copy</button>
+      </div>
+      <div class="stones">
+        <a href="https://github.com/Codex-Crusader" target="_blank" rel="noopener"><b>GitHub</b><span>Codex-Crusader</span></a>
+        <a href="https://www.linkedin.com/in/bhargavaram-krishnapur/" target="_blank" rel="noopener"><b>LinkedIn</b><span>bhargavaram-krishnapur</span></a>
+        <a href="https://github.com/The-Pulse-Engine" target="_blank" rel="noopener"><b>Pulse Engine</b><span>GitHub org</span></a>
+        <a href="https://gitlab.com/bhargavaramkrishnapur" target="_blank" rel="noopener"><b>GitLab</b><span>bhargavaramkrishnapur</span></a>
+        <a href="bhargavaram-krishnapur-resume.pdf" target="_blank" rel="noopener"><b>Résumé</b><span>PDF, 221 KB</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="colophon" aria-labelledby="colophon-title">
+    <div class="colophon plate">
+      <h2 id="colophon-title">Colophon · The art</h2>
+      <p>All paintings, prints and objects on this site are public domain, released as CC0 open access by the Cleveland Museum of Art and The Metropolitan Museum of Art. Select a title to see the work at its museum.</p>
+      <ul class="credits">
+        <li><a href="https://clevelandart.org/art/1924.432.20" target="_blank" rel="noopener">Apollo (from the Tarocchi, series D:  Apollo and the Muses, #20)</a>, Master of the E-Series Tarocchi, before 1467 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1921.1258" target="_blank" rel="noopener">Cavalry Spider Helmet</a>, 1600s <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1916.1855" target="_blank" rel="noopener">Close Helmet in Maximilian Style</a>, c. 1520 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1968.31" target="_blank" rel="noopener">Console Table Depicting Chronos, or Father Time</a>, c. 1700 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1916.1620" target="_blank" rel="noopener">Executioner&#x27;s Sword</a>, late 1600s <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/2011.52" target="_blank" rel="noopener">Initial I: Entwined Beast and Serpent: Leaf from a Bible (2 of 2 Excised Leaves)</a>, c. 1225–50 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://www.metmuseum.org/art/collection/search/435683" target="_blank" rel="noopener">Island of the Dead</a>, Arnold Böcklin, 1880 <span>· The Metropolitan Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1952.586" target="_blank" rel="noopener">Key</a>, 1–100 CE <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1965.231" target="_blank" rel="noopener">Knight, Death, and the Devil</a>, Albrecht Dürer, 1513 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1926.211" target="_blank" rel="noopener">Melencolia I</a>, Albrecht Dürer, 1514 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1940.1200" target="_blank" rel="noopener">Mirror Case with a Couple Playing Chess</a>, 1325–50 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1980.26" target="_blank" rel="noopener">Monkey General Hanuman</a>, c. 1000 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1922.684" target="_blank" rel="noopener">Mount Starr King, Yosemite</a>, Albert Bierstadt, 1866 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1949.541" target="_blank" rel="noopener">Mount Vesuvius at Midnight</a>, Albert Bierstadt, 1868 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1916.1504" target="_blank" rel="noopener">Rondache (Round Shield)</a>, c. 1570 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1981.13" target="_blank" rel="noopener">Ruins of an Ancient City</a>, John Martin, c. 1810–20 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/2013.50" target="_blank" rel="noopener">Savoyard Helmet (Todenkopf)</a>, c. 1600–20 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1922.248" target="_blank" rel="noopener">St. George Killing the Dragon</a>, Albrecht Dürer, 1500s <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1942.647" target="_blank" rel="noopener">The Burning of the Houses of Lords and Commons, 16 October 1834</a>, Joseph Mallord William Turner, 1835 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://www.metmuseum.org/art/collection/search/10154" target="_blank" rel="noopener">The Rocky Mountains, Lander&#x27;s Peak</a>, Albert Bierstadt, 1863 <span>· The Metropolitan Museum of Art</span></li>
+        <li><a href="https://www.metmuseum.org/art/collection/search/10499" target="_blank" rel="noopener">The Titan&#x27;s Goblet</a>, Thomas Cole, 1833 <span>· The Metropolitan Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1965.233" target="_blank" rel="noopener">Twilight in the Wilderness</a>, Frederic Edwin Church, 1860 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1924.432.12" target="_blank" rel="noopener">Urania (astronomy) (from the Tarocchi series D:  Apollo and the Muses, #12)</a>, Master of the E-Series Tarocchi, before 1467 <span>· Cleveland Museum of Art</span></li>
+        <li><a href="https://clevelandart.org/art/1917.1335" target="_blank" rel="noopener">View of Schroon Mountain, Essex County, New York, After a Storm</a>, Thomas Cole, 1838 <span>· Cleveland Museum of Art</span></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Bhargavaram Krishnapur</span>
+    <span><a href="writing/">The Chronicles (blog)</a> · <a href="writing/feed.xml">RSS</a> · no trackers · press <kbd>/</kbd> to summon the map</span>
+  </div>
+</footer>
+
+<dialog class="palette" id="palette" aria-label="Jump to a chapter, project or link">
+  <input id="palette-input" type="text" placeholder="Search chapters, relics and links" autocomplete="off" spellcheck="false" aria-controls="palette-list">
+  <ul id="palette-list" role="listbox" data-lenis-prevent></ul>
+  <div class="hint"><span>↑ ↓ move</span><span>Enter go</span><span>Esc close</span></div>
+</dialog>
+<dialog class="lightbox" id="lightbox" aria-label="Photo">
+  <img id="lightbox-img" src="" alt="">
+  <p id="lightbox-cap"></p>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var finePointer = window.matchMedia("(pointer: fine)").matches;
+  var hasGsap = !!(window.gsap && window.ScrollTrigger);
+  var EMAIL = "bhargavaramkrishnapur@gmail.com";
+  var EXCLUDE = ["pay-off"]; // org repos that are not mine
+
+  function $(s, c) { return (c || document).querySelector(s); }
+  function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  // ---------- Small helpers ----------
+  var toastEl = $("#toast"), toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1900);
+  }
+  function copyEmail() {
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents($("#email"));
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      toast("Press Ctrl+C to copy");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(EMAIL).then(function () { toast("The raven has the address"); }, fallback);
+    } else { fallback(); }
+  }
+  $all("[data-copy]").forEach(function (b) { b.addEventListener("click", copyEmail); });
+
+  var lenis = null;
+  function goTo(target) {
+    var el = typeof target === "string" ? $(target) : target;
+    if (!el) return;
+    if (lenis) lenis.scrollTo(el, { offset: -70, duration: 1.8 });
+    else el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute("href");
+    if (id.length < 2 || !$(id)) return;
+    e.preventDefault();
+    goTo(id);
+  });
+
+  // ---------- Rarity from stars ----------
+  function rarity(stars) {
+    if (stars >= 10) return ["legendary", "Legendary"];
+    if (stars >= 5) return ["epic", "Epic"];
+    if (stars >= 2) return ["rare", "Rare"];
+    return ["common", "Common"];
+  }
+  function setStars(relic, n) {
+    relic.querySelector(".stars b").textContent = n;
+    var r = rarity(n);
+    relic.className = relic.className.replace(/r-\w+/, "r-" + r[0]);
+    relic.querySelector(".rarity em").textContent = r[1];
+  }
+  (function loadStars() {
+    if (!window.fetch) return;
+    var urls = ["https://api.github.com/users/Codex-Crusader/repos?per_page=100",
+                "https://api.github.com/orgs/The-Pulse-Engine/repos?per_page=100"];
+    Promise.all(urls.map(function (u) { return fetch(u).then(function (r) { if (!r.ok) throw r; return r.json(); }); }))
+      .then(function (groups) {
+        var by = {}, stars = 0, repos = 0;
+        groups.forEach(function (g) { g.forEach(function (r) { if (!r.fork && !r.private) by[r.name] = r.stargazers_count; }); });
+        $all(".relic[data-repo]").forEach(function (el) {
+          var n = by[el.dataset.repo];
+          if (typeof n === "number") setStars(el, n);
+        });
+        Object.keys(by).forEach(function (k) {
+          if (/^codex-crusader(\.github\.io)?$/i.test(k) || EXCLUDE.indexOf(k) !== -1) return;
+          stars += by[k]; repos += 1;
+        });
+        if (repos) {
+          $("#stat-repos").dataset.to = repos; $("#stat-repos").textContent = repos;
+          $("#stat-stars").dataset.to = stars; $("#stat-stars").textContent = stars;
+        }
+      })
+      .catch(function () {});
+  })();
+
+  // ---------- Relic tilt ----------
+  if (finePointer) {
+    $all(".relic").forEach(function (card) {
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        card.classList.add("tilting");
+        card.style.setProperty("--ry", ((px - 0.5) * 16).toFixed(2) + "deg");
+        card.style.setProperty("--rx", ((0.5 - py) * 14).toFixed(2) + "deg");
+        card.style.setProperty("--gx", (px * 100).toFixed(1) + "%");
+        card.style.setProperty("--gy", (py * 100).toFixed(1) + "%");
+      });
+      card.addEventListener("pointerleave", function () {
+        card.classList.remove("tilting");
+        card.style.setProperty("--rx", "0deg"); card.style.setProperty("--ry", "0deg");
+      });
+    });
+  }
+
+  // ---------- Lightbox ----------
+  var lightbox = $("#lightbox");
+  $all(".gallery .frame").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var img = btn.querySelector("img");
+      $("#lightbox-img").src = img.src; $("#lightbox-img").alt = img.alt;
+      $("#lightbox-cap").textContent = img.alt;
+      if (lightbox.showModal) lightbox.showModal();
+    });
+  });
+  lightbox.addEventListener("click", function () { lightbox.close(); });
+
+  // ---------- Summon palette ----------
+  var palette = $("#palette"), input = $("#palette-input"), list = $("#palette-list");
+  $("#kbd-hint").textContent = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? "⌘ K" : "Ctrl K";
+  var items = [];
+  $all(".bar nav a").forEach(function (a) {
+    var target = a.getAttribute("href");
+    if (target.charAt(0) !== "#") return;
+    items.push({ label: $(target + " h2") ? $(target + " h2").textContent.trim() : a.textContent, kind: "Chapter", run: function () { goTo(target); } });
+  });
+  $all(".relic").forEach(function (card) {
+    items.push({ label: card.dataset.name, kind: "Relic", run: function () { showRelic(card); } });
+  });
+  function openUrl(url) { return function () { var a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove(); }; }
+  $all(".chron-card h3 a, .chron-list a").forEach(function (a) {
+    var href = a.getAttribute("href");
+    items.push({ label: a.textContent.trim(), kind: "Blog", run: function () { window.location.href = href; } });
+  });
+  var blogLink = $('.bar nav a[href^="writing"]');
+  if (blogLink) items.push({ label: "The Chronicles (all blog posts)", kind: "Blog", run: function () { window.location.href = blogLink.getAttribute("href"); } });
+  items.push({ label: "Open résumé (PDF)", kind: "Link", run: openUrl("bhargavaram-krishnapur-resume.pdf") });
+  items.push({ label: "GitHub profile", kind: "Link", run: openUrl("https://github.com/Codex-Crusader") });
+  items.push({ label: "LinkedIn profile", kind: "Link", run: openUrl("https://www.linkedin.com/in/bhargavaram-krishnapur/") });
+  items.push({ label: "The Pulse Engine on GitHub", kind: "Link", run: openUrl("https://github.com/The-Pulse-Engine") });
+  items.push({ label: "Copy email address", kind: "Action", run: copyEmail });
+  items.push({ label: "Art credits", kind: "Chapter", run: function () { goTo("#colophon"); } });
+
+  var hallTween = null;
+  function showRelic(card) {
+    var slot = card.parentElement;
+    if (hallTween && hallTween.scrollTrigger) {
+      var st = hallTween.scrollTrigger;
+      var track = $("#hall-track"), view = $("#hall-viewport");
+      var dist = track.scrollWidth - view.clientWidth;
+      var want = clamp(slot.offsetLeft - (view.clientWidth - slot.offsetWidth) / 2, 0, dist);
+      var y = st.start + (st.end - st.start) * (dist ? want / dist : 0);
+      if (lenis) lenis.scrollTo(y, { duration: 1.8 }); else window.scrollTo(0, y);
+    } else {
+      goTo("#work");
+      setTimeout(function () { slot.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }, 900);
+    }
+    setTimeout(function () { card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash"); }, 1500);
+  }
+
+  var shown = [], active = 0;
+  function render() {
+    var q = input.value.trim().toLowerCase();
+    shown = items.filter(function (it) { return !q || (it.label + " " + it.kind).toLowerCase().indexOf(q) !== -1; });
+    active = Math.min(active, Math.max(shown.length - 1, 0));
+    list.innerHTML = "";
+    if (!shown.length) {
+      var li = document.createElement("li"); li.className = "empty"; li.textContent = "Nothing answers that name. Try a project or a chapter.";
+      list.appendChild(li); return;
+    }
+    shown.forEach(function (it, i) {
+      var li = document.createElement("li");
+      li.id = "pal-" + i; li.setAttribute("role", "option");
+      li.setAttribute("aria-selected", i === active ? "true" : "false");
+      li.textContent = it.label;
+      var k = document.createElement("span"); k.textContent = it.kind; li.appendChild(k);
+      li.addEventListener("mousemove", function () { if (active !== i) { active = i; mark(); } });
+      li.addEventListener("click", function () { choose(i); });
+      list.appendChild(li);
+    });
+  }
+  function mark() {
+    $all("li[role=option]", list).forEach(function (li, i) { li.setAttribute("aria-selected", i === active ? "true" : "false"); });
+    var el = $("#pal-" + active); if (el) el.scrollIntoView({ block: "nearest" });
+  }
+  function choose(i) { var it = shown[i]; if (!it) return; palette.close(); it.run(); }
+  function openPalette() { if (palette.open) return; input.value = ""; active = 0; render(); palette.showModal(); input.focus(); if (lenis) lenis.stop(); }
+  palette.addEventListener("close", function () { if (lenis) lenis.start(); });
+  $("#open-palette").addEventListener("click", openPalette);
+  input.addEventListener("input", function () { active = 0; render(); });
+  input.addEventListener("keydown", function (e) {
+    var n = Math.max(shown.length, 1);
+    if (e.key === "ArrowDown") { e.preventDefault(); active = (active + 1) % n; mark(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); active = (active - 1 + n) % n; mark(); }
+    else if (e.key === "Enter") { e.preventDefault(); choose(active); }
+  });
+  palette.addEventListener("click", function (e) { if (e.target === palette) palette.close(); });
+  document.addEventListener("keydown", function (e) {
+    var typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+    if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openPalette(); }
+    else if (e.key === "/" && !typing) { e.preventDefault(); openPalette(); }
+  });
+
+  // ---------- Open at the top, or at the #chapter in the link ----------
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  function toStart() {
+    var id = location.hash.slice(1);
+    var target = id && document.getElementById(decodeURIComponent(id));
+    if (lenis) {
+      if (target) lenis.scrollTo(target, { offset: -70, immediate: true, force: true });
+      else lenis.scrollTo(0, { immediate: true, force: true });
+    } else if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
+    else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }
+  window.addEventListener("load", function () { toStart(); setTimeout(toStart, 60); setTimeout(toStart, 300); });
+  window.addEventListener("pageshow", function (e) { if (e.persisted) toStart(); });
+
+  // ---------- Static fallback ----------
+  var paintings = $all(".stage .painting");
+  if (!hasGsap || reduce) {
+    paintings[0].classList.add("on");
+    $all(".count").forEach(function (c) { c.textContent = c.dataset.to; });
+    return;
+  }
+
+  // ================= Motion =================
+  root.classList.add("js");
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.defaults({ ease: "power3.out" });
+
+  // Smooth scroll + velocity
+  var velocity = 0;
+  if (window.Lenis) {
+    lenis = new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95 });
+    root.classList.add("lenis");
+    lenis.on("scroll", function (e) { velocity = e.velocity || 0; ScrollTrigger.update(); });
+    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+    gsap.ticker.lagSmoothing(0);
+    toStart();
+  } else {
+    var lastY = window.scrollY;
+    gsap.ticker.add(function () { velocity = (window.scrollY - lastY) * 0.6; lastY = window.scrollY; });
+  }
+
+  // Split text into characters
+  function splitChars(el) {
+    var text = el.textContent.trim(), words = text.split(/\s+/);
+    el.innerHTML = '<span class="sr">' + text + "</span>" + words.map(function (w) {
+      return '<span class="word" aria-hidden="true">' + w.split("").map(function (c) { return '<span class="ch">' + c + "</span>"; }).join("") + "</span>";
+    }).join(" ");
+    return $all(".ch", el);
+  }
+
+  // ---------- Stage: one painting per chapter ----------
+  var stageEl = $("#stage");
+  var themes = { top: "ember", oath: "gold", work: "gold", experience: "ember", recognition: "ember", photos: "gold", about: "gold", chronicles: "gold", contact: "frost", colophon: "frost" };
+  var numerals = { top: "P", oath: "I", work: "II", experience: "III", recognition: "IV", photos: "V", about: "VI", chronicles: "VII", contact: "VIII", colophon: "✦" };
+  var current = null, moteTheme = "ember";
+  var navLinks = $all(".bar nav a");
+  function setChapter(id) {
+    if (current === id) return;
+    current = id;
+    var target = $('.stage .painting[data-for="' + id + '"]');
+    if (target) {
+      paintings.forEach(function (p) {
+        gsap.to(p, { opacity: p === target ? 1 : 0, duration: 1.6, ease: "power2.inOut", overwrite: "auto" });
+      });
+    }
+    moteTheme = themes[id] || "gold";
+    $("#astro-numeral").textContent = numerals[id] || "";
+    navLinks.forEach(function (a) { a.setAttribute("aria-current", a.getAttribute("href") === "#" + id ? "true" : "false"); });
+  }
+  gsap.set(paintings, { opacity: 0 });
+  gsap.set(paintings[0], { opacity: 1 });
+  current = "top";
+  // Every painting slowly zooms and rises with the whole page
+  gsap.fromTo(paintings, { scale: 1, yPercent: 2 }, {
+    scale: 1.12, yPercent: -3, ease: "none",
+    scrollTrigger: { trigger: document.body, start: "top top", end: "bottom bottom", scrub: 1.2 }
+  });
+  gsap.to(".fog.f1", { yPercent: -40, ease: "none", scrollTrigger: { trigger: document.body, start: "top top", end: "bottom bottom", scrub: true } });
+  gsap.to(".fog.f2", { yPercent: 30, ease: "none", scrollTrigger: { trigger: document.body, start: "top top", end: "bottom bottom", scrub: true } });
+
+  // Astrolabe turns with the scroll
+  var astroRing = $("#astro-ring"), astroProg = $("#astro-progress");
+  ScrollTrigger.create({
+    trigger: document.body, start: "top top", end: "bottom bottom",
+    onUpdate: function (self) {
+      gsap.set(astroRing, { rotation: self.progress * 720, transformOrigin: "23px 23px" });
+      astroProg.style.strokeDashoffset = (94.25 * (1 - self.progress)).toFixed(2);
+    }
+  });
+
+  // Pointer parallax on the stage and hero
+  var mx = 0, my = 0;
+  if (finePointer) {
+    var stageX = gsap.quickTo(stageEl, "x", { duration: 1.2, ease: "power3" });
+    var stageY = gsap.quickTo(stageEl, "y", { duration: 1.2, ease: "power3" });
+    var moonX = gsap.quickTo("#moon", "x", { duration: 1.4, ease: "power3" });
+    var layers = $all(".ridges .layer").map(function (l, i) { return { x: gsap.quickTo(l, "x", { duration: 1.1, ease: "power3" }), depth: (i + 1) * 12 }; });
+    window.addEventListener("pointermove", function (e) {
+      mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5;
+      stageX(-mx * 26); stageY(-my * 18); moonX(mx * 40);
+      layers.forEach(function (l) { l.x(-mx * l.depth * 2); });
+    });
+  }
+
+  // Magnetic buttons
+  if (finePointer) {
+    $all(".magnetic").forEach(function (b) {
+      b.addEventListener("pointermove", function (e) {
+        var r = b.getBoundingClientRect();
+        gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * 0.28, y: (e.clientY - r.top - r.height / 2) * 0.4, duration: 0.4 });
+      });
+      b.addEventListener("pointerleave", function () { gsap.to(b, { x: 0, y: 0, duration: 0.9, ease: "elastic.out(1, 0.35)" }); });
+    });
+  }
+
+  // ---------- Hero ----------
+  var heroChars = [];
+  $all(".split-hero").forEach(function (row) { heroChars = heroChars.concat(splitChars(row)); });
+  var intro = gsap.timeline({ delay: 0.15 });
+  intro.from(".ridges .layer", { yPercent: 40, duration: 1.8, stagger: 0.12, ease: "expo.out" }, 0)
+       .from("#moon", { y: 140, opacity: 0, scale: 0.6, duration: 2.2, ease: "expo.out" }, 0.1)
+       .from(heroChars, { yPercent: 110, rotateX: -95, opacity: 0, filter: "blur(8px)", duration: 1.3, stagger: 0.045, ease: "expo.out" }, 0.35)
+       .from(".hero-el", { y: 36, opacity: 0, duration: 1.1, stagger: 0.14 }, 0.9);
+
+  intro.eventCallback("onComplete", buildHeroScroll);
+  function buildHeroScroll() {
+  var heroScroll = gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1 } });
+  heroChars.forEach(function (c) {
+    heroScroll.to(c, { y: -60 - Math.random() * 220, x: (Math.random() - 0.5) * 80, rotation: (Math.random() - 0.5) * 50, opacity: 0.15, ease: "none" }, 0);
+  });
+  heroScroll.to(".ridges .layer[data-depth='1']", { yPercent: 8, ease: "none" }, 0)
+            .to(".ridges .layer[data-depth='2']", { yPercent: -6, ease: "none" }, 0)
+            .to(".ridges .layer[data-depth='3']", { yPercent: -22, ease: "none" }, 0)
+            .to("#moon", { yPercent: 160, scale: 1.3, ease: "none" }, 0)
+            .to(".hero-el", { y: -80, opacity: 0, stagger: 0.05, ease: "none" }, 0)
+            .to(".scroll-cue", { opacity: 0, ease: "none" }, 0);
+  }
+
+  // ---------- Marquee reacts to scroll speed ----------
+  var track = $("#marquee-track");
+  var skewTo = gsap.quickTo(track, "skewX", { duration: 0.5, ease: "power3" });
+  var wrapX = gsap.utils.wrap(-50, 0), marqueeX = 0, dir = 1;
+  gsap.ticker.add(function () {
+    if (Math.abs(velocity) > 0.2) dir = velocity > 0 ? 1 : -1;
+    marqueeX -= 0.025 * dir * (1 + Math.min(Math.abs(velocity) * 0.35, 12));
+    gsap.set(track, { xPercent: wrapX(marqueeX) });
+    skewTo(clamp(-velocity * 0.6, -14, 14));
+  });
+
+  // ---------- Chapter headings ----------
+  $all(".chapter-head").forEach(function (head) {
+    var h2 = head.querySelector("h2.split");
+    var tl = gsap.timeline({ scrollTrigger: { trigger: head, start: "top 82%", toggleActions: "play none none reverse" } });
+    tl.from(head.querySelector(".eyebrow"), { letterSpacing: "0.9em", opacity: 0, duration: 1.2 }, 0);
+    if (h2) tl.from(splitChars(h2), { yPercent: 120, rotateX: -90, opacity: 0, duration: 1.1, stagger: 0.035, ease: "back.out(1.7)" }, 0.1);
+    var rule = head.querySelector(".rule"); if (rule) tl.from(rule, { scaleX: 0, duration: 1.2, ease: "expo.out" }, 0.4);
+    $all(".lede, .legend", head).forEach(function (el) { tl.from(el, { y: 30, opacity: 0, duration: 1 }, 0.5); });
+    var roman = head.querySelector(".roman");
+    if (roman) gsap.fromTo(roman, { yPercent: 40, rotation: -6, opacity: 0 }, { yPercent: -40, rotation: 4, opacity: 1, ease: "none", scrollTrigger: { trigger: head, start: "top bottom", end: "bottom top", scrub: true } });
+  });
+  // The contact heading sits inside the letter
+  var ravenTitle = $("#contact-title");
+
+  // ---------- Oath ----------
+  var oath = $("#oath-words");
+  (function splitWords() {
+    var html = "";
+    oath.childNodes.forEach(function (n) {
+      var text = n.textContent, isEm = n.nodeName === "EM";
+      text.split(/(\s+)/).forEach(function (part) {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { html += " "; return; }
+        html += isEm ? '<em class="w">' + part + "</em>" : '<span class="w">' + part + "</span>";
+      });
+    });
+    oath.innerHTML = html;
+  })();
+  gsap.to($all(".w", oath), {
+    opacity: 1, stagger: 0.1, ease: "none",
+    scrollTrigger: { trigger: oath, start: "top 78%", end: "bottom 42%", scrub: 0.6 }
+  });
+  gsap.fromTo("#goblet", { rotation: -5, y: 80, scale: 0.9 }, { rotation: 4, y: -60, scale: 1.04, ease: "none", scrollTrigger: { trigger: "#goblet", start: "top bottom", end: "bottom top", scrub: 1 } });
+  gsap.fromTo("#goblet .shine", { backgroundPosition: "140% 0" }, { backgroundPosition: "-60% 0", ease: "none", scrollTrigger: { trigger: "#goblet", start: "top bottom", end: "bottom top", scrub: true } });
+
+  // Counters
+  function countUp(el) {
+    var to = Number(el.dataset.to) || 0, obj = { v: 0 };
+    gsap.to(obj, { v: to, duration: 2.2, ease: "power2.out", onUpdate: function () { el.textContent = Math.round(obj.v).toLocaleString("en-IN"); } });
+  }
+  $all(".count").forEach(function (el) {
+    ScrollTrigger.create({ trigger: el, start: "top 88%", once: true, onEnter: function () { countUp(el); } });
+  });
+  gsap.from(".ledger > div", { y: 50, opacity: 0, duration: 1, stagger: 0.12, scrollTrigger: { trigger: ".ledger", start: "top 88%" } });
+
+  // ---------- Hall of relics ----------
+  var mm = gsap.matchMedia();
+  $all(".relic .art img").forEach(function (img, i) {
+    gsap.set(img, { z: 40 });
+    gsap.to(img, { y: -12, rotation: i % 2 ? 2 : -2, duration: 2.6 + (i % 5) * 0.4, ease: "sine.inOut", yoyo: true, repeat: -1, delay: i * 0.17 });
+  });
+  mm.add("(min-width: 900px)", function () {
+    var trackEl = $("#hall-track"), view = $("#hall-viewport"), section = $("#work");
+    section.classList.add("pinned");
+    function dist() { return Math.max(0, trackEl.scrollWidth - view.clientWidth); }
+    hallTween = gsap.to(trackEl, {
+      x: function () { return -dist(); }, ease: "none",
+      scrollTrigger: {
+        trigger: "#hall-pin", start: "center 54%", end: function () { return "+=" + dist(); },
+        pin: true, scrub: 1, invalidateOnRefresh: true,
+        onUpdate: function (self) { gsap.set("#hall-progress", { scaleX: self.progress }); }
+      }
+    });
+    $all(".slot").forEach(function (slot) {
+      gsap.fromTo(slot, { y: 70, scale: 0.94, opacity: 0 }, {
+        y: 0, scale: 1, opacity: 1, ease: "power2.out",
+        scrollTrigger: { trigger: slot, containerAnimation: hallTween, start: "left 100%", end: "left 72%", scrub: true }
+      });
+    });
+    return function () { section.classList.remove("pinned"); hallTween = null; };
+  });
+  mm.add("(max-width: 899px)", function () {
+    $("#hall-hint").textContent = "Swipe sideways to walk the hall";
+    var view = $("#hall-viewport");
+    view.addEventListener("scroll", function () {
+      var p = view.scrollLeft / Math.max(1, view.scrollWidth - view.clientWidth);
+      gsap.set("#hall-progress", { scaleX: p });
+    }, { passive: true });
+    gsap.from(".slot", { y: 60, opacity: 0, stagger: 0.08, duration: 1, scrollTrigger: { trigger: "#hall-pin", start: "top 85%" } });
+  });
+
+  // ---------- The road ----------
+  var road = $("#road"), trail = $("#road-trail"), drawn = $("#road-drawn"), torch = $("#road-torch");
+  var roadLen = 0, stops = $all(".stop");
+  function buildRoad() {
+    var w = road.clientWidth, h = road.scrollHeight;
+    var narrow = window.innerWidth <= 720;
+    var cx = narrow ? 14 : w / 2, amp = narrow ? 10 : Math.min(110, w * 0.09);
+    var svg = road.querySelector("svg.path");
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    var ys = stops.map(function (s) { var n = s.querySelector(".node"); return s.offsetTop + n.offsetTop + 8; });
+    var pts = [0].concat(ys, [h]);
+    var d = "M" + cx + " 0";
+    for (var i = 1; i < pts.length; i++) {
+      var y0 = pts[i - 1], y1 = pts[i], dy = y1 - y0, side = i % 2 ? 1 : -1;
+      d += " C" + (cx + side * amp) + " " + (y0 + dy / 3) + " " + (cx + side * amp) + " " + (y0 + dy * 2 / 3) + " " + cx + " " + y1;
+    }
+    trail.setAttribute("d", d); drawn.setAttribute("d", d);
+    roadLen = drawn.getTotalLength();
+    drawn.style.strokeDasharray = roadLen;
+    drawn.style.strokeDashoffset = roadLen;
+  }
+  buildRoad();
+  ScrollTrigger.create({
+    trigger: road, start: "top 65%", end: "bottom 65%", scrub: true,
+    onUpdate: function (self) {
+      var at = roadLen * self.progress;
+      drawn.style.strokeDashoffset = (roadLen - at).toFixed(1);
+      var p = drawn.getPointAtLength(at);
+      torch.setAttribute("cx", p.x.toFixed(1)); torch.setAttribute("cy", p.y.toFixed(1));
+      stops.forEach(function (s) { s.classList.toggle("lit", s.offsetTop + 40 < p.y); });
+    }
+  });
+  gsap.to(torch, { attr: { r: 9 }, duration: 0.35, repeat: -1, yoyo: true, ease: "sine.inOut" });
+  stops.forEach(function (s, i) {
+    var banner = s.querySelector(".banner");
+    gsap.fromTo(banner, { clipPath: "inset(0 0 100% 0)", rotation: i % 2 ? 4 : -4, y: -20 }, {
+      clipPath: "inset(0 0 0% 0)", rotation: 0, y: 0, duration: 1.4, ease: "elastic.out(1, 0.55)",
+      scrollTrigger: { trigger: s, start: "top 80%", toggleActions: "play none none reverse" }
+    });
+  });
+  gsap.fromTo("#knight-frame", { rotation: -3, scale: 0.92 }, { rotation: 3, scale: 1.02, ease: "none", scrollTrigger: { trigger: "#experience", start: "top bottom", end: "bottom top", scrub: 1 } });
+
+  // ---------- Honours ----------
+  gsap.from("#seal", { rotation: -200, scale: 0.2, opacity: 0, duration: 1.8, ease: "back.out(1.4)", scrollTrigger: { trigger: "#seal", start: "top 80%" } });
+  gsap.to("#seal-edge", { rotation: 360, transformOrigin: "100px 100px", duration: 90, ease: "none", repeat: -1 });
+  gsap.fromTo("#seal", { y: 60 }, { y: -60, ease: "none", scrollTrigger: { trigger: "#recognition", start: "top bottom", end: "bottom top", scrub: true } });
+  gsap.from(".pennants > li", { yPercent: -60, opacity: 0, duration: 1.5, stagger: 0.18, ease: "bounce.out", scrollTrigger: { trigger: ".pennants", start: "top 82%" } });
+  gsap.from(".scrolls .plate", { x: function (i) { return i ? 90 : -90; }, opacity: 0, duration: 1.2, stagger: 0.15, scrollTrigger: { trigger: ".scrolls", start: "top 85%" } });
+  gsap.from(".runes li", { scale: 0, opacity: 0, duration: 0.6, stagger: 0.04, ease: "back.out(2.5)", scrollTrigger: { trigger: ".runes", start: "top 88%" } });
+
+  // ---------- Memories ----------
+  $all(".gallery figure").forEach(function (fig, i) {
+    var speed = [1.2, 0.5, 1.6, 0.8][i % 4];
+    gsap.set(fig.querySelector(".frame"), { rotation: [-2.5, 1.8, -1.2, 2.6][i % 4] });
+    gsap.fromTo(fig, { y: 80 * speed }, { y: -80 * speed, ease: "none", scrollTrigger: { trigger: "#gallery", start: "top bottom", end: "bottom top", scrub: 1 } });
+  });
+  $all(".gallery .frame").forEach(function (f) {
+    var base = gsap.getProperty(f, "rotation");
+    f.addEventListener("pointerenter", function () { gsap.to(f, { rotation: 0, y: -10, scale: 1.04, duration: 0.5, overwrite: "auto" }); });
+    f.addEventListener("pointerleave", function () { gsap.to(f, { rotation: base, y: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.5)", overwrite: "auto" }); });
+  });
+  gsap.from(".gallery .frame", { scale: 0.75, opacity: 0, rotationY: 40, duration: 1.3, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: "#gallery", start: "top 82%" } });
+
+  // ---------- Chronicler ----------
+  gsap.fromTo("#ring", { rotation: -120 }, { rotation: 240, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: 1 } });
+  gsap.from(".portrait .oval", { scale: 0.5, opacity: 0, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: ".portrait", start: "top 80%" } });
+  gsap.from("#about .plate", { x: 120, opacity: 0, duration: 1.4, scrollTrigger: { trigger: "#about .plate", start: "top 85%" } });
+  gsap.from("#about .facts > *", { opacity: 0, x: 30, duration: 0.8, stagger: 0.05, scrollTrigger: { trigger: "#about .facts", start: "top 90%" } });
+
+  // ---------- Chronicles ----------
+  gsap.from(".chron-card", { y: 70, opacity: 0, duration: 1.2, stagger: 0.14, ease: "expo.out", scrollTrigger: { trigger: ".chron-cards", start: "top 85%" } });
+  gsap.from(".chron-list li", { x: -30, opacity: 0, duration: 0.8, stagger: 0.06, scrollTrigger: { trigger: ".chron-list", start: "top 90%" } });
+
+  // ---------- Send a raven ----------
+  var ravenTl = gsap.timeline({ scrollTrigger: { trigger: "#contact", start: "top bottom", end: "bottom 40%", scrub: 1.2 } });
+  ravenTl.fromTo("#raven", { x: "-20vw", y: "40vh", rotation: -8, scale: 0.6 },
+    { keyframes: [
+        { x: "20vw", y: "8vh", rotation: -14, scale: 0.9 },
+        { x: "55vw", y: "18vh", rotation: 6, scale: 1.1 },
+        { x: "105vw", y: "-4vh", rotation: -10, scale: 0.8 }
+      ], ease: "none" });
+  if (ravenTitle) gsap.from(splitChars(ravenTitle), { yPercent: 120, opacity: 0, rotateX: -90, stagger: 0.04, duration: 1, ease: "back.out(1.7)", scrollTrigger: { trigger: ".letter", start: "top 80%" } });
+  gsap.from(".letter", { y: 100, rotationX: 18, opacity: 0, duration: 1.5, transformPerspective: 900, scrollTrigger: { trigger: ".letter", start: "top 88%" } });
+  gsap.from(".stones a", { y: 40, opacity: 0, duration: 0.9, stagger: 0.07, scrollTrigger: { trigger: ".stones", start: "top 92%" } });
+  gsap.to(".waxbtn", { scale: 1.08, duration: 1.1, repeat: -1, yoyo: true, ease: "sine.inOut" });
+  gsap.from(".colophon", { y: 60, opacity: 0, duration: 1.2, scrollTrigger: { trigger: ".colophon", start: "top 90%" } });
+
+  // ---------- Motes, embers and the cursor trail ----------
+  var canvas = $("#motes"), ctx = canvas.getContext("2d");
+  var palettes = {
+    ember: ["255,180,90", "232,102,44", "255,217,138"],
+    gold: ["243,212,142", "214,165,83", "255,241,201"],
+    frost: ["207,227,255", "159,195,240", "255,255,255"]
+  };
+  var W = 0, H = 0, dpr = 1, motes = [], sparks = [];
+  var COUNT = window.innerWidth < 700 ? 45 : 110;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function newMote(anywhere) {
+    return { x: Math.random() * W, y: anywhere ? Math.random() * H : H + 10, r: 0.6 + Math.random() * 2.2,
+      vy: -(0.15 + Math.random() * 0.6), ph: Math.random() * 6.28, sw: 0.3 + Math.random() * 0.8, c: Math.floor(Math.random() * 3), a: 0.35 + Math.random() * 0.6 };
+  }
+  resize();
+  for (var i = 0; i < COUNT; i++) motes.push(newMote(true));
+  window.addEventListener("resize", function () { resize(); });
+  function spark(x, y, n, power) {
+    for (var k = 0; k < n; k++) {
+      var ang = Math.random() * Math.PI * 2, sp = Math.random() * power;
+      sparks.push({ x: x, y: y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 0.6, life: 1, r: 0.8 + Math.random() * 1.8, c: Math.floor(Math.random() * 3) });
+    }
+    if (sparks.length > 400) sparks.splice(0, sparks.length - 400);
+  }
+  var lastSpark = 0;
+  window.addEventListener("pointermove", function (e) {
+    var now = performance.now();
+    if (now - lastSpark > 16) { spark(e.clientX, e.clientY, 2, 1.4); lastSpark = now; }
+  }, { passive: true });
+  window.addEventListener("pointerdown", function (e) { spark(e.clientX, e.clientY, 26, 4.5); }, { passive: true });
+
+  var running = true;
+  document.addEventListener("visibilitychange", function () { running = !document.hidden; });
+  gsap.ticker.add(function () {
+    if (!running) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "lighter";
+    var pal = palettes[moteTheme], boost = clamp(velocity, -40, 40) * 0.12, t = performance.now() / 1000;
+    for (var i = 0; i < motes.length; i++) {
+      var m = motes[i];
+      m.y += m.vy - boost;
+      m.x += Math.sin(t * m.sw + m.ph) * 0.35 + mx * 0.4;
+      if (m.y < -20 || m.y > H + 30 || m.x < -20 || m.x > W + 20) { motes[i] = newMote(false); if (boost < 0) motes[i].y = -10; continue; }
+      var flick = m.a * (0.6 + 0.4 * Math.sin(t * 3 + m.ph * 5));
+      ctx.fillStyle = "rgba(" + pal[m.c] + "," + (flick * 0.18).toFixed(3) + ")";
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r * 4, 0, 6.283); ctx.fill();
+      ctx.fillStyle = "rgba(" + pal[m.c] + "," + flick.toFixed(3) + ")";
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, 6.283); ctx.fill();
+    }
+    for (var j = sparks.length - 1; j >= 0; j--) {
+      var s = sparks[j];
+      s.x += s.vx; s.y += s.vy; s.vy += 0.03; s.vx *= 0.97; s.life -= 0.022;
+      if (s.life <= 0) { sparks.splice(j, 1); continue; }
+      ctx.fillStyle = "rgba(" + pal[s.c] + "," + (s.life * 0.25).toFixed(3) + ")";
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 3.5 * s.life + 0.5, 0, 6.283); ctx.fill();
+      ctx.fillStyle = "rgba(" + pal[s.c] + "," + s.life.toFixed(3) + ")";
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r * s.life + 0.3, 0, 6.283); ctx.fill();
+    }
+    ctx.globalCompositeOperation = "source-over";
+  });
+
+  // Current chapter = the section under the 55% line of the viewport
+  var chapterIds = ["top", "oath", "work", "experience", "recognition", "photos", "about", "chronicles", "contact", "colophon"];
+  function detectChapter() {
+    var line = window.innerHeight * 0.55;
+    for (var i = 0; i < chapterIds.length; i++) {
+      var el = document.getElementById(chapterIds[i]);
+      var r = el.getBoundingClientRect();
+      if (r.top <= line && r.bottom > line) { setChapter(chapterIds[i] === "colophon" ? "contact" : chapterIds[i]); return; }
+    }
+  }
+  ScrollTrigger.create({ trigger: document.body, start: "top top", end: "bottom bottom", onUpdate: detectChapter });
+  detectChapter();
+  ScrollTrigger.sort();
+
+  // Rebuild measurements once fonts and images are in
+  function refreshAll() { buildRoad(); ScrollTrigger.sort(); ScrollTrigger.refresh(); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refreshAll);
+  window.addEventListener("load", refreshAll);
+  var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(refreshAll, 250); });
+})();
+
+</script>
+
+</body>
+</html>

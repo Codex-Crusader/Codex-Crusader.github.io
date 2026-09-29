@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AZ-Lite: building an AlphaZero-style chess engine in Python</title>
+<meta name="description" content="AZ-Lite is a small chess engine that learns only from self-play. How its tree search, policy and value network, and training loop fit together, and what it does not do yet.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/alphazero-chess-engine-python/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="AZ-Lite: building an AlphaZero-style chess engine in Python">
+<meta property="og:description" content="AZ-Lite is a small chess engine that learns only from self-play. How its tree search, policy and value network, and training loop fit together, and what it does not do yet.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/alphazero-chess-engine-python/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/alphazero-chess-engine-python.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Building an AlphaZero-style chess engine in Python">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-09-29">
+<meta property="article:modified_time" content="2026-09-29">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Machine learning">
+<meta property="article:tag" content="AlphaZero"><meta property="article:tag" content="Monte Carlo tree search"><meta property="article:tag" content="reinforcement learning"><meta property="article:tag" content="chess engine"><meta property="article:tag" content="Python"><meta property="article:tag" content="PyTorch">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AZ-Lite: building an AlphaZero-style chess engine in Python">
+<meta name="twitter:description" content="AZ-Lite is a small chess engine that learns only from self-play. How its tree search, policy and value network, and training loop fit together, and what it does not do yet.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/alphazero-chess-engine-python.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/starr-king.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/alphazero-chess-engine-python/#post", "headline": "Building an AlphaZero-style chess engine in Python", "name": "AZ-Lite: building an AlphaZero-style chess engine in Python", "description": "AZ-Lite is a small chess engine that learns only from self-play. How its tree search, policy and value network, and training loop fit together, and what it does not do yet.", "url": "https://codex-crusader.github.io/writing/alphazero-chess-engine-python/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/alphazero-chess-engine-python/", "image": ["https://codex-crusader.github.io/writing/og/alphazero-chess-engine-python.jpg", "https://codex-crusader.github.io/art/stage/starr-king.webp"], "datePublished": "2026-09-29", "dateModified": "2026-09-29", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 602, "keywords": "AlphaZero, Monte Carlo tree search, reinforcement learning, chess engine, Python, PyTorch", "articleSection": "Machine learning", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "AZLite Chess Engine", "codeRepository": "https://github.com/Codex-Crusader/azlite_type_chess_bot", "description": "An AlphaZero-style engine. PUCT tree search with a policy and value network that learns only from self-play."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Building an AlphaZero-style chess engine in Python", "item": "https://codex-crusader.github.io/writing/alphazero-chess-engine-python/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/starr-king.webp" alt="" width="2000" height="1355" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Building an AlphaZero-style chess engine in Python</h1>
+      <p class="dek">No opening book and no human games. It plays itself, and it learns from the result.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><a class="tag" href="../?tag=Machine learning">Machine learning</a></p>
+    </div>
+    <p class="painting-credit">Painting: Albert Bierstadt, <a href="https://clevelandart.org/art/1922.684">Mount Starr King, Yosemite</a>, 1866. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+
+<p>AlphaZero is famous because it learned chess with no human knowledge beyond the rules. It played itself on very large hardware, and it became stronger than every engine before it. I wanted to know how much of that idea still works on one ordinary computer, in code that a person can read in an afternoon.</p>
+<p>AZ-Lite is the result. It is a compact engine in Python. It combines Monte Carlo tree search with a small neural network, and it learns from self-play. It is built to be readable, reproducible and runnable locally. It is not built to beat Stockfish.</p>
+<h2 id="the-pieces">The pieces</h2>
+<p>The engine has four parts, and each one is small.</p>
+<ul>
+<li><strong>The board encoder.</strong> A position becomes a 12 × 8 × 8 tensor: one 8 × 8 plane for each of the six piece types in each of the two colours. A small three-layer convolutional network turns that tensor into a compact embedding of the position.</li>
+<li><strong>The policy head.</strong> Chess has a very large set of possible moves, and most of them are illegal in any given position. So the engine does not predict over a fixed list. It learns embeddings for the from square, the to square and the promotion piece, combines them with the position embedding, and scores only the legal moves, on the fly.</li>
+<li><strong>The value head.</strong> One number between −1 and 1 that predicts the result of the game from this position.</li>
+<li><strong>The search.</strong> Monte Carlo tree search with the PUCT rule. The policy tells the search which moves to look at first. The value tells it how good a position is without playing the game to the end.</li>
+</ul>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:560px"><svg viewBox="0 0 640 310" role="img" aria-label="Training loop: self-play produces replay data, training updates the network, a new checkpoint guides the next self-play."><defs><marker id="ah5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-ah"/></marker></defs><rect x="10" y="20" width="270" height="84" rx="3" class="dg-box"/><text x="145.0" y="44.0" class="dg-t" text-anchor="middle" font-size="16">Self-play</text><text x="145.0" y="66.0" class="dg-s" text-anchor="middle" font-size="13">PUCT tree search</text><text x="145.0" y="83.0" class="dg-s" text-anchor="middle" font-size="13">Dirichlet noise at the root</text><rect x="360" y="20" width="270" height="84" rx="3" class="dg-box"/><text x="495.0" y="44.0" class="dg-t" text-anchor="middle" font-size="16">Replay data</text><text x="495.0" y="66.0" class="dg-s" text-anchor="middle" font-size="13">(state, π, z) examples</text><text x="495.0" y="83.0" class="dg-s" text-anchor="middle" font-size="13">one line of JSON each</text><rect x="360" y="216" width="270" height="84" rx="3" class="dg-box"/><text x="495.0" y="240.0" class="dg-t" text-anchor="middle" font-size="16">Training</text><text x="495.0" y="262.0" class="dg-s" text-anchor="middle" font-size="13">value: mean squared error</text><text x="495.0" y="279.0" class="dg-s" text-anchor="middle" font-size="13">policy: cross-entropy</text><rect x="10" y="216" width="270" height="84" rx="3" class="dg-box2"/><text x="145.0" y="240.0" class="dg-t" text-anchor="middle" font-size="16">New checkpoint</text><text x="145.0" y="262.0" class="dg-s" text-anchor="middle" font-size="13">a better network</text><text x="145.0" y="279.0" class="dg-s" text-anchor="middle" font-size="13">guides the next search</text><path d="M281 62 H356" class="dg-line" marker-end="url(#ah5)"/><path d="M495 105 V212" class="dg-line" marker-end="url(#ah5)"/><path d="M359 258 H284" class="dg-line" marker-end="url(#ah5)"/><path d="M145 215 V108" class="dg-line" marker-end="url(#ah5)"/><text x="320" y="166" class="dg-h" text-anchor="middle" font-size="15">one loop</text></svg></div></div><figcaption>The AZ-Lite training loop. Each turn of the loop gives the search a better guide.</figcaption></figure>
+<h2 id="the-loop">The loop</h2>
+<p>Training is a closed loop with three steps.</p>
+<p><strong>Self-play.</strong> The engine plays games against itself. At each move it runs a tree search and records the position, the visit counts of the search (called π), and later the final result of the game (called z). Dirichlet noise is added at the root of the search, so that the engine also tries moves it would otherwise ignore. Each example is saved as one line of JSON.</p>
+<p><strong>Training.</strong> The network samples from the saved examples. It learns to make its value match the real result and its policy match the search. The loss is the mean squared error on the value plus the cross-entropy on the policy.</p>
+<p><strong>A new checkpoint.</strong> The next round of self-play uses the improved network. The search gets better guidance, so the games get better, so the training data gets better.</p>
+<p>That is the whole idea of AlphaZero, and it fits in one file. The command line has three modes: <code>selfplay</code>, <code>train</code> and <code>play</code>. In play mode you type moves such as <code>e4</code> or <code>Nf3</code>, and the engine answers.</p>
+<figure class="fig relic rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../art/relics/chess-mirror.webp" alt="A carved ivory mirror case showing two people playing chess." width="762" height="760" loading="lazy" decoding="async"></button></div><figcaption>Mirror Case with a Couple Playing Chess, 1325–50. <a href="https://clevelandart.org/art/1940.1200">Cleveland Museum of Art</a>, CC0.</figcaption></figure>
+<h2 id="what-small-hardware-changes">What small hardware changes</h2>
+<p>The real AlphaZero used thousands of processors. On one CPU, the number of self-play games is the limit. With a small dataset, the loss falls slowly and the network learns slowly. That is the honest cost of running everything locally.</p>
+<p>It also changes what the project is for. AZ-Lite is not a strong engine. It is a working, readable version of the method, where each part can be changed and tested on its own.</p>
+<h2 id="what-comes-next">What comes next</h2>
+<p>The roadmap is public in the repository. The next steps are a configuration file for the hyperparameters, more tests, and profiling of the self-play and training loops. After that come support for the UCI protocol, so that the engine works in standard chess programs, a larger network, and a pipeline that measures the engine's strength as an Elo rating over time.</p>
+
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#the-pieces">The pieces</a></li><li><a href="#the-loop">The loop</a></li><li><a href="#what-small-hardware-changes">What small hardware changes</a></li><li><a href="#what-comes-next">What comes next</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/alphazero-chess-engine-python/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/chess-mirror.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/azlite_type_chess_bot">AZLite Chess Engine</a></b><span>An AlphaZero-style engine. PUCT tree search with a policy and value network that learns only from self-play. <a href="../../#p-azlite-chess">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Machine learning|Data">
+  <div class="thumb"><img src="../../writing/img/ncaa-predictor-dashboard.webp" alt="" width="1400" height="638" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning · Data</span></p>
+    <h3><a href="../../writing/data-leakage-basketball-model/">My basketball model scored 0.97 AUC. It was cheating.</a></h3>
+    <p>When a result looks too good, suspect a leak before you suspect genius.</p>
+  </div>
+</article><article class="card rv" data-tags="Data|Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/melencolia.webp" alt="" width="602" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><span>Data · Machine learning</span></p>
+    <h3><a href="../../writing/explainable-market-intelligence/">Making a market signal explain itself</a></h3>
+    <p>A reading is worth nothing if it cannot say how it was taken.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

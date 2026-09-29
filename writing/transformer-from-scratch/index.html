@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Writing a transformer from scratch: tokenizer, BPE and RoPE, and what I learned</title>
+<meta name="description" content="I built a transformer from nothing, starting at the character tokenizer and working up through BPE and RoPE. Not to produce anything useful, but to find out whether I understood the internals or only the diagrams.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/transformer-from-scratch/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Writing a transformer from scratch: tokenizer, BPE and RoPE, and what I learned">
+<meta property="og:description" content="I built a transformer from nothing, starting at the character tokenizer and working up through BPE and RoPE. Not to produce anything useful, but to find out whether I understood the internals or only the diagrams.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/transformer-from-scratch/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/transformer-from-scratch.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Writing a transformer from scratch">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-08-28">
+<meta property="article:modified_time" content="2026-08-28">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Machine learning">
+<meta property="article:tag" content="machine learning"><meta property="article:tag" content="transformers"><meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Writing a transformer from scratch: tokenizer, BPE and RoPE, and what I learned">
+<meta name="twitter:description" content="I built a transformer from nothing, starting at the character tokenizer and working up through BPE and RoPE. Not to produce anything useful, but to find out whether I understood the internals or only the diagrams.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/transformer-from-scratch.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/twilight.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/transformer-from-scratch/#post", "headline": "Writing a transformer from scratch", "name": "Writing a transformer from scratch: tokenizer, BPE and RoPE, and what I learned", "description": "I built a transformer from nothing, starting at the character tokenizer and working up through BPE and RoPE. Not to produce anything useful, but to find out whether I understood the internals or only the diagrams.", "url": "https://codex-crusader.github.io/writing/transformer-from-scratch/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/transformer-from-scratch/", "image": ["https://codex-crusader.github.io/writing/og/transformer-from-scratch.jpg", "https://codex-crusader.github.io/art/stage/twilight.webp"], "datePublished": "2026-08-28", "dateModified": "2026-08-28", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 864, "keywords": "machine learning, transformers, Python", "articleSection": "Machine learning", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Writing a transformer from scratch", "item": "https://codex-crusader.github.io/writing/transformer-from-scratch/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/twilight.webp" alt="" width="2000" height="1249" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Writing a transformer from scratch</h1>
+      <p class="dek">You do not understand a diagram until you have had to make one work.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><a class="tag" href="../?tag=Machine learning">Machine learning</a></p>
+    </div>
+    <p class="painting-credit">Painting: Frederic Edwin Church, <a href="https://clevelandart.org/art/1965.233">Twilight in the Wilderness</a>, 1860. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>You can read about transformers for a long time and come away feeling like you understand them. There is a diagram everyone uses. There are boxes labelled attention and feed-forward, arrows going up the page, and a caption explaining that the model attends to relevant parts of the input.</p>
+<p>I could reproduce that diagram from memory. Then I tried to write one, and found out that I could not.</p>
+<p>This is a specific and slightly humiliating experience I would recommend to anyone. There is a gap between being able to describe how something works and being able to make it work, and the only reliable way to find out which side of that gap you are on is to try to build the thing.</p>
+<h2 id="starting-lower-than-you-want-to">Starting lower than you want to</h2>
+<p>The temptation is to start in the middle, at the attention mechanism, because that is the interesting part. I started at the bottom instead, with tokenization, which is the unglamorous business of turning text into numbers.</p>
+<p>The simplest version is character-level. Every character gets a number. It is easy to write and easy to reason about, and it teaches you the problem with itself very quickly: your sequences become enormous. A short paragraph becomes hundreds of steps, and since attention cost grows with the square of the sequence length, you feel that immediately.</p>
+<p>That is what makes byte pair encoding, or BPE, make sense. BPE looks at your text and finds the pairs of symbols that occur most often, then merges them into single units, over and over. Common words end up as one token. Rare words break into pieces. Nobody chooses the vocabulary by hand; it falls out of the statistics of the text.</p>
+<p>Writing that yourself is genuinely clarifying. You stop thinking of tokens as a technicality and start seeing them as a decision that shapes everything above it.</p>
+<figure class="fig relic rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../art/relics/beast-initial.webp" alt="A medieval manuscript leaf with a decorated letter I made of a beast and a serpent." width="584" height="760" loading="lazy" decoding="async"></button></div><figcaption>Initial I: Entwined Beast and Serpent: Leaf from a Bible (2 of 2 Excised Leaves), c. 1225–50. <a href="https://clevelandart.org/art/2011.52">Cleveland Museum of Art</a>, CC0.</figcaption></figure>
+<h2 id="the-part-where-position-becomes-a-problem">The part where position becomes a problem</h2>
+<p>Here is the thing the diagram does not make obvious. Attention has no idea what order anything is in.</p>
+<p>It compares every position to every other position, all at once. That is what makes it fast, because there is no left-to-right loop. It is also why, without help, "the dog bit the man" and "the man bit the dog" look identical to it. The mechanism sees a bag of words.</p>
+<p>So position has to be added deliberately. The original approach adds a positional signal to each token before attention runs. It works, but it treats position as something bolted on at the start.</p>
+<p>RoPE, rotary position embedding, does something cleverer. Instead of adding position, it rotates the vectors by an angle that depends on where the token sits. When two tokens are then compared, the maths works out so that what matters is the difference between their angles, which is to say the distance between them. Position stops being an absolute stamp and becomes a relative relationship, which is usually what you actually care about. Word five relating to word three matters; whether they are at five and three or at 105 and 103 usually does not.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:560px"><svg viewBox="0 0 640 222" role="img" aria-label="Pipeline: text, characters, BPE tokens, embeddings, RoPE rotation by position, masked attention, next-token prediction."><defs><marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-ah"/></marker></defs><rect x="0" y="20" width="180" height="56" rx="3" class="dg-box"/><text x="90.0" y="53.0" class="dg-t" text-anchor="middle" font-size="15">Text</text><path d="M181 48 H226" class="dg-line" marker-end="url(#ah4)"/><rect x="230" y="20" width="180" height="56" rx="3" class="dg-box"/><text x="320.0" y="53.0" class="dg-t" text-anchor="middle" font-size="15">Characters</text><path d="M411 48 H456" class="dg-line" marker-end="url(#ah4)"/><rect x="460" y="20" width="180" height="56" rx="3" class="dg-box"/><text x="550.0" y="53.0" class="dg-t" text-anchor="middle" font-size="15">BPE tokens</text><path d="M550 78 V104 H90 V128" class="dg-line" marker-end="url(#ah4)"/><rect x="0" y="130" width="180" height="56" rx="3" class="dg-box"/><text x="90.0" y="163.0" class="dg-t" text-anchor="middle" font-size="15">Embeddings</text><path d="M181 158 H226" class="dg-line" marker-end="url(#ah4)"/><rect x="230" y="130" width="180" height="56" rx="3" class="dg-box2"/><text x="320.0" y="163.0" class="dg-t" text-anchor="middle" font-size="15">RoPE: rotate by position</text><path d="M411 158 H456" class="dg-line" marker-end="url(#ah4)"/><rect x="460" y="130" width="180" height="56" rx="3" class="dg-box"/><text x="550.0" y="163.0" class="dg-t" text-anchor="middle" font-size="15">Masked attention</text><text x="550" y="212" class="dg-s" text-anchor="middle" font-size="13">predict the next token</text></svg></div></div><figcaption>The path from text to a prediction. RoPE turns position into a rotation, so what matters is the distance between tokens.</figcaption></figure>
+<p>I could not have explained that before writing it. I had read it. Reading it is not the same.</p>
+<h2 id="what-actually-goes-wrong">What actually goes wrong</h2>
+<p>The failures are rarely conceptual. They are shapes.</p>
+<p>An enormous amount of the work is keeping track of which dimension is which: batch, sequence position, attention head, feature. Matrices happily multiply in the wrong order and give you a number rather than an error, and the model trains, and the loss goes down a bit, and everything looks fine while being subtly wrong.</p>
+<p>The mask is the other classic. When a model is learning to predict the next word, it must not be allowed to see the words after it. Get the mask wrong and the model performs beautifully, because it is reading the answer. It is the same failure I later hit in a completely different project on basketball data, where the model was reading the box score of a game it was meant to be predicting. Different field, identical mistake: the model was given information it would not have at the moment it has to guess.</p>
+<p>That pattern is worth internalising. When results look too good, the first suspicion should be that something has leaked, not that you are a genius.</p>
+<h2 id="was-it-worth-it">Was it worth it</h2>
+<p>The thing I built is not useful. It is small, it is slow, and anything I might actually want to use is better served by a library written by people with far more time and hardware.</p>
+<p>That was never the point. The point was to find out whether I understood this, and the answer turned out to be no, followed by yes.</p>
+<p>What changed is not that I memorised more. It is that the words became load-bearing. "Attention" stopped being a box on a diagram and became a specific operation with specific costs and specific ways of going wrong. When I read a paper now, I read it as something someone had to implement.</p>
+<p>I would recommend the method for anything you believe you already understand. It is uncomfortable and it is fast, and it tells you the truth.</p>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#starting-lower-than-you-want-to">Starting lower than you want to</a></li><li><a href="#the-part-where-position-becomes-a-problem">The part where position becomes a problem</a></li><li><a href="#what-actually-goes-wrong">What actually goes wrong</a></li><li><a href="#was-it-worth-it">Was it worth it</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/transformer-from-scratch/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/chess-mirror.webp" alt="" width="762" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning</span></p>
+    <h3><a href="../../writing/alphazero-chess-engine-python/">Building an AlphaZero-style chess engine in Python</a></h3>
+    <p>No opening book and no human games. It plays itself, and it learns from the result.</p>
+  </div>
+</article><article class="card rv" data-tags="Machine learning|Data">
+  <div class="thumb"><img src="../../writing/img/ncaa-predictor-dashboard.webp" alt="" width="1400" height="638" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning · Data</span></p>
+    <h3><a href="../../writing/data-leakage-basketball-model/">My basketball model scored 0.97 AUC. It was cheating.</a></h3>
+    <p>When a result looks too good, suspect a leak before you suspect genius.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

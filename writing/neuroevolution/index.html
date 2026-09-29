@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neuroevolution in Python: evolving a neural network instead of training it</title>
+<meta name="description" content="Almost every neural network is trained by backpropagation. There is another way: let the network mutate its own structure and keep whatever works. Quantum Neural Horror does that, and lets you watch it happen.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/neuroevolution/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Neuroevolution in Python: evolving a neural network instead of training it">
+<meta property="og:description" content="Almost every neural network is trained by backpropagation. There is another way: let the network mutate its own structure and keep whatever works. Quantum Neural Horror does that, and lets you watch it happen.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/neuroevolution/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/neuroevolution.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Neuroevolution: networks that grow instead of learn">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-08-28">
+<meta property="article:modified_time" content="2026-08-28">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Machine learning">
+<meta property="article:tag" content="neuroevolution"><meta property="article:tag" content="machine learning"><meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Neuroevolution in Python: evolving a neural network instead of training it">
+<meta name="twitter:description" content="Almost every neural network is trained by backpropagation. There is another way: let the network mutate its own structure and keep whatever works. Quantum Neural Horror does that, and lets you watch it happen.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/neuroevolution.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/ruins.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/neuroevolution/#post", "headline": "Neuroevolution: networks that grow instead of learn", "name": "Neuroevolution in Python: evolving a neural network instead of training it", "description": "Almost every neural network is trained by backpropagation. There is another way: let the network mutate its own structure and keep whatever works. Quantum Neural Horror does that, and lets you watch it happen.", "url": "https://codex-crusader.github.io/writing/neuroevolution/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/neuroevolution/", "image": ["https://codex-crusader.github.io/writing/og/neuroevolution.jpg", "https://codex-crusader.github.io/art/stage/ruins.webp"], "datePublished": "2026-08-28", "dateModified": "2026-08-28", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 733, "keywords": "neuroevolution, machine learning, Python", "articleSection": "Machine learning", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "Quantum Neural Horror", "codeRepository": "https://github.com/Codex-Crusader/Quantum-Neural-Horror", "description": "A neuro-evolution sandbox. The network changes its own topology, activations and weights with simulated annealing, not backprop."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Neuroevolution: networks that grow instead of learn", "item": "https://codex-crusader.github.io/writing/neuroevolution/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/ruins.webp" alt="" width="2000" height="1607" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Neuroevolution: networks that grow instead of learn</h1>
+      <p class="dek">No gradient. No teacher. Just mutation and whatever survives.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-08-28">28 August 2026</time><span>4 min read</span><a class="tag" href="../?tag=Machine learning">Machine learning</a></p>
+    </div>
+    <p class="painting-credit">Painting: John Martin, <a href="https://clevelandart.org/art/1981.13">Ruins of an Ancient City</a>, c. 1810–20. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>When people talk about training a neural network, they nearly always mean one thing. The network makes a guess, you measure how wrong it was, and then you work backwards through the network to find out how each individual number contributed to that error. Then you nudge every number slightly in the direction that would have been less wrong. Repeat a few million times.</p>
+<p>That is backpropagation, and it works extraordinarily well. It is why modern machine learning exists.</p>
+<p>It also has a requirement that is easy to miss: everything has to be differentiable. You need to be able to calculate, for every part of the network, which direction reduces the error. That constraint quietly decides a lot. It is why network shapes are usually fixed before training starts, and why the menu of activation functions is short.</p>
+<p>Neuroevolution throws that requirement away.</p>
+<h2 id="the-other-approach">The other approach</h2>
+<p>The idea is closer to breeding than to teaching. You make a network. You measure how good it is at the task, which is called its fitness. Then you make changed copies of it, keep the ones that score better, and do it again.</p>
+<p>There is no gradient, and nothing works backwards. The network is never told which of its parts was responsible for a mistake. It is only ever told whether the whole thing did better or worse.</p>
+<p>That sounds hopelessly inefficient, and for many problems it is. But it buys something significant: because nothing has to be differentiable, anything at all can be changed. Not just the weights, but the shape of the network, how many layers it has, how they connect, and which activation function each part uses. In backpropagation those are decisions a human makes in advance. Here they can evolve.</p>
+<p>That is what Quantum Neural Horror does. It mutates its own topology, its activation functions and its weights, all at once, using evolutionary operators and simulated annealing rather than gradients.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/quantum-neural-horror-evolving.webp" alt="Quantum Neural Horror: the network topology at generation 144, a mutation log, and a fitness chart." width="1400" height="705" loading="lazy" decoding="async"></button></div><figcaption>Quantum Neural Horror during a run: the current topology, the mutation log and the fitness curve, live.</figcaption></figure>
+<h2 id="what-simulated-annealing-is-doing-here">What simulated annealing is doing here</h2>
+<p>The name comes from metalwork. You heat metal so its atoms move freely, then cool it slowly so they settle into a strong arrangement. Cool it too fast and it locks into a bad one.</p>
+<p>The search does the same thing. Early on it is willing to accept changes that make things worse, which sounds counterproductive and is the entire point. A search that only ever accepts improvements walks uphill until it reaches the top of the nearest small hill and then stops, with no way of knowing there is a mountain behind it. Accepting the occasional bad move is how it gets back down and goes looking.</p>
+<p>As the run goes on, that willingness shrinks. The search becomes fussier and settles. Broad exploration early, careful refinement late.</p>
+<h2 id="why-watching-it-matters">Why watching it matters</h2>
+<p>The project shows fitness and complexity changing live, and this is more than decoration.</p>
+<p>Numbers in a log tell you a run went well or badly. Watching it tells you what kind of badly. You see fitness climb quickly and then flatten, and you can see whether the network is still changing shape underneath while the score stands still. You see complexity grow, and you get to ask the useful question: is it getting better because it is getting smarter, or just because it is getting bigger?</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/quantum-neural-horror-fitness.webp" alt="A chart of fitness and complexity over generations in Quantum Neural Horror." width="828" height="568" loading="lazy" decoding="async"></button></div><figcaption>Fitness and complexity over time. Watching both together shows whether improvement is real or just extra size.</figcaption></figure>
+<p>That question, whether improvement is real or just extra capacity, is one of the recurring problems in machine learning, and here it is visible rather than inferred.</p>
+<h2 id="when-this-is-actually-the-right-tool">When this is actually the right tool</h2>
+<p>It would be dishonest to present this as a competitor to gradient descent for ordinary work. If your problem is differentiable and you have data, backpropagation will beat this comfortably, and it will not be close.</p>
+<p>Evolution earns its place where gradients are unavailable. When you cannot compute a derivative at all. When the thing you want to optimise is the architecture rather than the weights. When your measure of success is a single score from a simulation with no smooth path back through it.</p>
+<p>And it is an unusually good way to learn. Backpropagation hides the search behind calculus, which is efficient and rather opaque. Evolution puts the search in front of you: try things, keep what works, occasionally accept something worse so you do not get stuck. Watching a network rewrite itself makes the whole business of optimisation feel less like magic and more like something you could have thought of.</p>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#the-other-approach">The other approach</a></li><li><a href="#what-simulated-annealing-is-doing-here">What simulated annealing is doing here</a></li><li><a href="#why-watching-it-matters">Why watching it matters</a></li><li><a href="#when-this-is-actually-the-right-tool">When this is actually the right tool</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/neuroevolution/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/beast-initial.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/Quantum-Neural-Horror">Quantum Neural Horror</a></b><span>A neuro-evolution sandbox. The network changes its own topology, activations and weights with simulated annealing, not backprop. <a href="../../#p-neural-horror">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/chess-mirror.webp" alt="" width="762" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning</span></p>
+    <h3><a href="../../writing/alphazero-chess-engine-python/">Building an AlphaZero-style chess engine in Python</a></h3>
+    <p>No opening book and no human games. It plays itself, and it learns from the result.</p>
+  </div>
+</article><article class="card rv" data-tags="Machine learning|Data">
+  <div class="thumb"><img src="../../writing/img/ncaa-predictor-dashboard.webp" alt="" width="1400" height="638" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning · Data</span></p>
+    <h3><a href="../../writing/data-leakage-basketball-model/">My basketball model scored 0.97 AUC. It was cheating.</a></h3>
+    <p>When a result looks too good, suspect a leak before you suspect genius.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>

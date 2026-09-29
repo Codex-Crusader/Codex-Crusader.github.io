@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coding war crimes: teaching software engineering with deliberately bad code</title>
+<meta name="description" content="Most advice about writing good code arrives as a rule you are told to follow. This is the opposite: write the terrible version on purpose, measure exactly what it costs, and let the rule be the conclusion instead of the premise.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/coding-war-crimes/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Coding war crimes: teaching software engineering with deliberately bad code">
+<meta property="og:description" content="Most advice about writing good code arrives as a rule you are told to follow. This is the opposite: write the terrible version on purpose, measure exactly what it costs, and let the rule be the conclusion instead of the premise.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/coding-war-crimes/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/coding-war-crimes.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Coding war crimes: learning from deliberately terrible code">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-08-28">
+<meta property="article:modified_time" content="2026-08-28">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Software engineering">
+<meta property="article:tag" content="software engineering"><meta property="article:tag" content="computer science"><meta property="article:tag" content="teaching">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Coding war crimes: teaching software engineering with deliberately bad code">
+<meta name="twitter:description" content="Most advice about writing good code arrives as a rule you are told to follow. This is the opposite: write the terrible version on purpose, measure exactly what it costs, and let the rule be the conclusion instead of the premise.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/coding-war-crimes.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/schroon.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/coding-war-crimes/#post", "headline": "Coding war crimes: learning from deliberately terrible code", "name": "Coding war crimes: teaching software engineering with deliberately bad code", "description": "Most advice about writing good code arrives as a rule you are told to follow. This is the opposite: write the terrible version on purpose, measure exactly what it costs, and let the rule be the conclusion instead of the premise.", "url": "https://codex-crusader.github.io/writing/coding-war-crimes/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/coding-war-crimes/", "image": ["https://codex-crusader.github.io/writing/og/coding-war-crimes.jpg", "https://codex-crusader.github.io/art/stage/schroon.webp"], "datePublished": "2026-08-28", "dateModified": "2026-08-28", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 776, "keywords": "software engineering, computer science, teaching", "articleSection": "Software engineering", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "Coding War Crimes", "codeRepository": "https://github.com/Codex-Crusader/coding-war-crimes", "description": "Bad code, written on purpose. Each entry shows its complexity cost and the correct version next to it."}, {"@type": "SoftwareSourceCode", "name": "NCAA Basketball Predictor", "codeRepository": "https://github.com/Codex-Crusader/Uni-basketball-ETL-pipeline", "description": "A self-improving pipeline. It pulls game data from ESPN, trains 6 models, and deploys the best one. It is built to stop data leakage."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Coding war crimes: learning from deliberately terrible code", "item": "https://codex-crusader.github.io/writing/coding-war-crimes/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/schroon.webp" alt="" width="2000" height="1227" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Coding war crimes: learning from deliberately terrible code</h1>
+      <p class="dek">A rule you have only been told is a rule you will break under pressure.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-08-28">28 August 2026</time><span>4 min read</span><a class="tag" href="../?tag=Software engineering">Software engineering</a></p>
+    </div>
+    <p class="painting-credit">Painting: Thomas Cole, <a href="https://clevelandart.org/art/1917.1335">View of Schroon Mountain, Essex County, New York, After a Storm</a>, 1838. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>Every programmer has been handed the same list. Do not repeat yourself. Keep functions small. Do not use global variables. Do not nest loops if you can avoid it. Name things properly.</p>
+<p>The list is correct. It is also close to useless in the form it is usually given, because it arrives as a set of commandments with no accompanying reason. You memorise it, you follow it while someone is watching, and the first time you are tired and behind schedule you break every rule on it, because a rule you have only been told is not something you believe.</p>
+<p>Coding War Crimes is a collection of deliberately terrible code, written on purpose, with the cost of each crime written next to it.</p>
+<h2 id="why-bad-examples-teach-better">Why bad examples teach better</h2>
+<p>Show someone clean, well-structured code and they will nod. It looks like every other piece of good code they have seen, and it teaches almost nothing, because nothing about it is surprising.</p>
+<p>Show someone a function that does the right thing in the worst possible way, and the reaction is different. There is a moment of recognition, usually uncomfortable, because most of us have written something close to it.</p>
+<p>That recognition is what makes the lesson stick. You are not learning a rule, you are diagnosing a specific patient. And crucially, you can see what it cost, because each entry carries the complexity analysis alongside it: what happens to this code when the input gets ten times bigger.</p>
+<p>That is the difference between "avoid nested loops" as advice and watching a comparison go from a thousand operations to a million because someone added an inner loop that looked harmless. One is a preference. The other is arithmetic.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:560px"><svg viewBox="0 0 640 292" role="img" aria-label="Log-scale bar chart of operations: for n of 10, 100 and 1,000, a nested loop needs 100, 10,000 and 1,000,000 operations; one pass needs 10, 100 and 1,000."><defs><marker id="ah7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-ah"/></marker></defs><line x1="190.0" y1="14" x2="190.0" y2="236" class="dg-grid"/><text x="190.0" y="256" class="dg-s" text-anchor="middle" font-size="12">1</text><line x1="260.0" y1="14" x2="260.0" y2="236" class="dg-grid"/><text x="260.0" y="256" class="dg-s" text-anchor="middle" font-size="12">10</text><line x1="330.0" y1="14" x2="330.0" y2="236" class="dg-grid"/><text x="330.0" y="256" class="dg-s" text-anchor="middle" font-size="12">100</text><line x1="400.0" y1="14" x2="400.0" y2="236" class="dg-grid"/><text x="400.0" y="256" class="dg-s" text-anchor="middle" font-size="12">1k</text><line x1="470.0" y1="14" x2="470.0" y2="236" class="dg-grid"/><text x="470.0" y="256" class="dg-s" text-anchor="middle" font-size="12">10k</text><line x1="540.0" y1="14" x2="540.0" y2="236" class="dg-grid"/><text x="540.0" y="256" class="dg-s" text-anchor="middle" font-size="12">100k</text><line x1="610.0" y1="14" x2="610.0" y2="236" class="dg-grid"/><text x="610.0" y="256" class="dg-s" text-anchor="middle" font-size="12">1M</text><text x="176" y="52" class="dg-t" text-anchor="end" font-size="15">n = 10</text><rect x="190" y="22" width="140.0" height="22" class="dg-bar2"/><text x="338.0" y="38" class="dg-t" font-size="13">100</text><rect x="190" y="48" width="70.0" height="22" class="dg-bar"/><text x="268.0" y="64" class="dg-t" font-size="13">10</text><text x="176" y="128" class="dg-t" text-anchor="end" font-size="15">n = 100</text><rect x="190" y="98" width="280.0" height="22" class="dg-bar2"/><text x="478.0" y="114" class="dg-t" font-size="13">10,000</text><rect x="190" y="124" width="140.0" height="22" class="dg-bar"/><text x="338.0" y="140" class="dg-t" font-size="13">100</text><text x="176" y="204" class="dg-t" text-anchor="end" font-size="15">n = 1,000</text><rect x="190" y="174" width="420.0" height="22" class="dg-bar2"/><text x="618.0" y="190" class="dg-t" font-size="13">1,000,000</text><rect x="190" y="200" width="210.0" height="22" class="dg-bar"/><text x="408.0" y="216" class="dg-t" font-size="13">1,000</text><rect x="190" y="270" width="14" height="14" class="dg-bar2"/><text x="210" y="282" class="dg-s" font-size="13">nested loop, n²</text><rect x="360" y="270" width="14" height="14" class="dg-bar"/><text x="380" y="282" class="dg-s" font-size="13">one pass with a set, n</text></svg></div></div><figcaption>Operations needed to compare every item with every other (n²) against one pass with a set (n). Logarithmic scale: each grid line is ten times the last.</figcaption></figure>
+<h2 id="the-correct-version-has-to-be-next-to-it">The correct version has to be next to it</h2>
+<p>This is the part that decides whether a collection like this is educational or just entertainment, and there is plenty of the second kind on the internet.</p>
+<p>Each entry carries the correct version beside the terrible one. That turns the anti-pattern into an argument for the rule rather than a list to memorise. You see the bad code, you see what it costs, and you see the alternative and what it costs instead. The rule stops being an instruction from an authority and becomes the obvious conclusion from evidence you just looked at.</p>
+<figure class="fig relic rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../art/relics/executioners-sword.webp" alt="A long, plain executioner&#x27;s sword." width="487" height="760" loading="lazy" decoding="async"></button></div><figcaption>Executioner&#x27;s Sword, late 1600s. <a href="https://clevelandart.org/art/1916.1620">Cleveland Museum of Art</a>, CC0.</figcaption></figure>
+<p>It is also a much better format for remembering. "Do not do X" is a floating prohibition. "Do not do X because it turns a linear operation into a quadratic one, here is the version that does not" is a small argument, and arguments survive contact with a deadline better than commandments do.</p>
+<h2 id="the-mistakes-that-survive-experience">The mistakes that survive experience</h2>
+<p>The interesting crimes are not the beginner ones. Nobody needs a repository to be told that single-letter variable names are bad.</p>
+<p>The interesting ones are the mistakes that look reasonable while you are making them. Code that is correct on your test data and quietly wrong on real data. Optimisations that make the common case faster and the rare case catastrophic. Abstractions added to prevent duplication that never arrived, which now cost more to understand than the duplication would have.</p>
+<p>The best example I have of this is not in that repository at all. In a basketball prediction pipeline I built, an early model scored an AUC of 0.9666, which is close to excellent. It was cheating. One of its features held what a team shot during the game, so it was reading the result of the match it claimed to be predicting.</p>
+<p>Nothing about that code looked wrong. It was well organised, it ran, it produced a number that suggested it was working better than expected. The mistake was conceptual, and the only reason it was caught is that the number was too good, which is a terrible detection method to have to rely on. Fixing it dropped the score to about 0.74. The pipeline now runs an automatic leakage check before any model sees the data, because the lesson only becomes durable when it turns into something the code enforces.</p>
+<h2 id="the-actual-point">The actual point</h2>
+<p>What I want from this, and from writing generally, is for the reasoning to be portable.</p>
+<p>You cannot memorise enough rules to cover every situation you will meet. But if you understand what a particular mistake costs and why, you can recognise the shape of it somewhere new, in a language you have not used, in a problem nobody wrote a rule for.</p>
+<p>That is why the complexity analysis is in there rather than a verdict. A verdict tells you what to do this time. An argument tells you how to think about the next one.</p>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#why-bad-examples-teach-better">Why bad examples teach better</a></li><li><a href="#the-correct-version-has-to-be-next-to-it">The correct version has to be next to it</a></li><li><a href="#the-mistakes-that-survive-experience">The mistakes that survive experience</a></li><li><a href="#the-actual-point">The actual point</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/coding-war-crimes/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../art/relics/executioners-sword.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/coding-war-crimes">Coding War Crimes</a></b><span>Bad code, written on purpose. Each entry shows its complexity cost and the correct version next to it. <a href="../../#p-coding-war-crimes">See it in the hall.</a></span></div></li><li><img src="../../art/relics/st-george.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/Uni-basketball-ETL-pipeline">NCAA Basketball Predictor</a></b><span>A self-improving pipeline. It pulls game data from ESPN, trains 6 models, and deploys the best one. It is built to stop data leakage. <a href="../../#p-ncaa-predictor">See it in the hall.</a></span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Software engineering|Security">
+  <div class="thumb relic"><img src="../../art/relics/rondache.webp" alt="" width="677" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><span>Software engineering · Security</span></p>
+    <h3><a href="../../writing/local-first-software/">Local-first software</a></h3>
+    <p>A tool you cannot run offline is a tool somebody can switch off.</p>
+  </div>
+</article><article class="card rv" data-tags="Machine learning">
+  <div class="thumb relic"><img src="../../art/relics/chess-mirror.webp" alt="" width="762" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-09-29">29 September 2026</time><span>4 min read</span><span>Machine learning</span></p>
+    <h3><a href="../../writing/alphazero-chess-engine-python/">Building an AlphaZero-style chess engine in Python</a></h3>
+    <p>No opening book and no human games. It plays itself, and it learns from the result.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>
