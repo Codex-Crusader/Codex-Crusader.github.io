@@ -162,6 +162,7 @@ p, figure, ul, ol { margin: 0; }
 .card:has(h3 a:focus-visible) { outline: 2px solid var(--gold-hi); outline-offset: 4px; }
 .card.feature { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
 .card.feature .thumb { aspect-ratio: auto; min-height: 320px; border-bottom: 0; border-right: 1px solid var(--line); }
+.card.feature .thumb.relic img { height: auto; max-height: min(380px, 60vh); }
 .card.feature h3 { font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.1rem); }
 .card.feature .body { justify-content: center; padding: 32px; gap: 14px; }
 @media (max-width: 760px) { .card.feature { grid-template-columns: 1fr; } .card.feature .thumb { min-height: 220px; border-right: 0; border-bottom: 1px solid var(--line); } }

@@ -30,7 +30,7 @@ If a visitor turns on "reduce motion" in their system settings, all motion stops
 | `art/relics/` | The 15 museum objects shown on the project cards. |
 | `art/plates/` | The framed paintings (Titan's Goblet, Knight, Death, and the Devil). |
 | `photos/` | Your photos. |
-| `writing/` | The blog ("The Chronicles"): an index, 10 posts, `feed.xml` (RSS), shared `blog.css` and `blog.js`. |
+| `writing/` | The blog ("The Chronicles"): an index, 11 posts, `feed.xml` (RSS), shared `blog.css` and `blog.js`. |
 | `writing/img/` | Screenshots from your repos, used in the posts. |
 | `writing/og/` | One link-preview image per post. |
 | `blog/` | Redirects `/blog/` to `/writing/`. |
