@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Page not found | Bhargavaram Krishnapur</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <script>
   // Old site pages now live as sections on the home page. Send visitors there.
   (function () {
@@ -16,13 +20,13 @@
       "/projects": "/#work",
       "/blog": "/writing/",
       "/resume": "/bhargavaram-krishnapur-resume.pdf",
-      "/projects/correlation-engine": "/#p-correlation-engine",
-      "/projects/pulse-engine": "/#p-market-intelligence",
+      "/projects/correlation-engine": "/writing/correlation-engine-noise-baseline/",
+      "/projects/pulse-engine": "/writing/explainable-market-intelligence/",
       "/projects/digital-footprint-cleaner": "/#p-digital-footprint-cleaner",
-      "/projects/campus-visitor-access": "/#p-visitor-access",
-      "/projects/bruhswer": "/#p-bruhswer",
-      "/projects/azlite-type-chess-bot": "/#p-azlite-chess",
-      "/projects/uni-basketball-etl-pipeline": "/#p-ncaa-predictor",
+      "/projects/campus-visitor-access": "/writing/campus-visitor-access-ux-study/",
+      "/projects/bruhswer": "/writing/browser-hardening/",
+      "/projects/azlite-type-chess-bot": "/writing/alphazero-chess-engine-python/",
+      "/projects/uni-basketball-etl-pipeline": "/writing/data-leakage-basketball-model/",
       "/projects/quantum-neural-horror": "/writing/neuroevolution/"
     };
     var dest = map[p] || (p.indexOf("/projects/") === 0 ? "/#work" : p.indexOf("/writing/") === 0 ? "/writing/" : p.indexOf("/blog/") === 0 ? "/writing/" : null);

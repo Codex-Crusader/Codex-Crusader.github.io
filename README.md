@@ -34,10 +34,12 @@ If a visitor turns on "reduce motion" in their system settings, all motion stops
 | `writing/img/` | Screenshots from your repos, used in the posts. |
 | `writing/og/` | One link-preview image per post. |
 | `blog/` | Redirects `/blog/` to `/writing/`. |
-| `404.html` | Sends old links (`/experience/`, `/projects/...`, `/resume/`) to the correct section. |
+| `404.html` | Sends any other old link to the correct section. It runs in the browser only, so Google still sees a 404. |
+| `about/`, `experience/`, `projects/`, `resume/` | Redirect pages for the old site's URLs that Google indexed. Each one points to the matching post or section, so the old search ranking moves to the new page. Do not list them in `sitemap.xml`. |
 | `bhargavaram-krishnapur-resume.pdf` | The résumé. Replace this file to update it. |
 | `og-cover.png` | Link preview image for LinkedIn, WhatsApp and X. 1200 × 630 px. |
-| `favicon.svg`, `apple-touch-icon.png` | Icons. |
+| `favicon.ico`, `favicon.svg`, `favicon-96x96.png` | Browser and Google Search icons. The SVG letters are outlines, so the icon looks the same without Arial Black installed. |
+| `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `site.webmanifest` | Phone home screen icons. |
 | `robots.txt`, `sitemap.xml` | For search engines. |
 | `.nojekyll` | Stops GitHub Pages from running Jekyll. |
 
