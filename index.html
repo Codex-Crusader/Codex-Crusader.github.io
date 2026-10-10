@@ -158,6 +158,7 @@ kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--
 .moon { position: absolute; right: 12%; top: 18%; width: clamp(70px, 9vw, 130px); aspect-ratio: 1; border-radius: 50%; pointer-events: none;
   background: radial-gradient(circle at 35% 35%, #FFF3D6, #E9C98C 55%, #B7894A 100%);
   box-shadow: 0 0 60px 10px rgba(243, 212, 142, .35), 0 0 160px 40px rgba(232, 102, 44, .18); }
+@media (max-width: 700px) { .moon { top: 10%; right: 8%; } }
 .hero-inner { position: relative; display: flex; flex-direction: column; gap: 22px; }
 .name { font: 900 clamp(2.3rem, 1rem + 6.6vw, 7rem)/0.95 var(--display); letter-spacing: 0.01em; color: var(--gold-hi);
   text-shadow: 0 0 30px rgba(243, 212, 142, .35), 0 0 80px rgba(232, 102, 44, .35), 0 3px 0 #3A2A12; }
@@ -572,8 +573,8 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     </div>
     <dl class="ledger plate" aria-label="Key figures">
       <div><dt>NEC 2025 rank · IIT Bombay</dt><dd><span class="count" data-to="17">17</span><small> / 4,000</small></dd></div>
-      <div><dt>Public repositories</dt><dd><span class="count" id="stat-repos" data-to="14">14</span></dd></div>
-      <div><dt>GitHub stars</dt><dd><span class="count" id="stat-stars" data-to="64">64</span></dd></div>
+      <div><dt>Public repositories</dt><dd><span class="count" id="stat-repos" data-to="16">16</span></dd></div>
+      <div><dt>GitHub stars</dt><dd><span class="count" id="stat-stars" data-to="70">70</span></dd></div>
       <div><dt>Sponsorship raised · Kanyathon</dt><dd>₹<span class="count" data-to="20">20</span>L<small>+</small></dd></div>
     </dl>
   </section>
