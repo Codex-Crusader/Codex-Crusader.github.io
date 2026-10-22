@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>I learned something new about myself: I hate Rust, more than C++</title>
+<meta name="description" content="I wrote 20,000 lines of Rust for a PDF editor and found out that I hate it more than C++. The C++ compiler it still needs, the unsafe code, the frozen enums and a week of security advisories.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/i-hate-rust/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="I learned something new about myself: I hate Rust, more than C++">
+<meta property="og:description" content="I wrote 20,000 lines of Rust for a PDF editor and found out that I hate it more than C++. The C++ compiler it still needs, the unsafe code, the frozen enums and a week of security advisories.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/i-hate-rust/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/i-hate-rust.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="I learned something new about myself. I hate Rust.">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-10-22T14:00:00+05:30">
+<meta property="article:modified_time" content="2026-10-22T14:00:00+05:30">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Software engineering">
+<meta property="article:tag" content="Rust"><meta property="article:tag" content="C++"><meta property="article:tag" content="software engineering"><meta property="article:tag" content="WebAssembly">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="I learned something new about myself: I hate Rust, more than C++">
+<meta name="twitter:description" content="I wrote 20,000 lines of Rust for a PDF editor and found out that I hate it more than C++. The C++ compiler it still needs, the unsafe code, the frozen enums and a week of security advisories.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/i-hate-rust.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/vesuvius.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/i-hate-rust/#post", "headline": "I learned something new about myself. I hate Rust.", "name": "I learned something new about myself: I hate Rust, more than C++", "description": "I wrote 20,000 lines of Rust for a PDF editor and found out that I hate it more than C++. The C++ compiler it still needs, the unsafe code, the frozen enums and a week of security advisories.", "url": "https://codex-crusader.github.io/writing/i-hate-rust/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/i-hate-rust/", "image": ["https://codex-crusader.github.io/writing/og/i-hate-rust.jpg", "https://codex-crusader.github.io/writing/img/t-rustable-editor.webp", "https://codex-crusader.github.io/writing/img/t-rustable-mod-install.webp"], "datePublished": "2026-10-22T14:00:00+05:30", "dateModified": "2026-10-22T14:00:00+05:30", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 1029, "keywords": "Rust, C++, Rust vs C++, software engineering, WebAssembly, wasmtime, PDFium", "articleSection": "Software engineering", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "T-Rustable", "codeRepository": "https://github.com/Codex-Crusader/t-rustable", "programmingLanguage": "Rust", "description": "A local, offline PDF editor for Linux and Windows where every tool is a mod. Source-available, in early development."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "I learned something new about myself. I hate Rust.", "item": "https://codex-crusader.github.io/writing/i-hate-rust/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/vesuvius.webp" alt="" width="2000" height="1408" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>I learned something new about myself. I hate Rust.</h1>
+      <p class="dek">I hate it more than C++. I did not think that was possible.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-10-22T14:00:00+05:30">22 October 2026</time><span>5 min read</span><a class="tag" href="../?tag=Software engineering">Software engineering</a></p>
+    </div>
+    <p class="painting-credit">Painting: Albert Bierstadt, <a href="https://clevelandart.org/art/1949.541">Mount Vesuvius at Midnight</a>, 1868. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>I learned something new about myself this month. I hate Rust.</p>
+<p>I do not mean that it is hard, or that it has a learning curve. Everything has a learning curve. I mean that I have now written about 20,000 lines of it, and I hate it more than C++. I have used C++. I have seen a template error scroll off the screen. I still pick C++.</p>
+<p>The 20,000 lines are a PDF editor that I am building, called T-Rustable. It runs offline, like <a href="../local-first-software/">most things I build</a>. Yes, the name has the language inside it. I named it while I still liked Rust. That was not very long ago.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/t-rustable-editor.webp" alt="The T-Rustable window: a menu bar, a row of tool buttons, page thumbnails on the left and a PDF page with a blue rectangle and turned lines of text in the middle." width="809" height="551" loading="lazy" decoding="async"></button></div><figcaption>The editor, with a test file that its own self-test makes. The text is turned on purpose, to test pages that are rotated.</figcaption></figure>
+<h2 id="to-write-rust-first-install-c">To write Rust, first install C++</h2>
+<p>On Windows, Rust has two toolchains. The GNU one is the easy one. It could not build Tauri, the app shell I chose, so I installed Visual Studio Build Tools 2022 and moved to the MSVC toolchain. The Build Tools are, for the most part, a C++ compiler.</p>
+<p>That is only the start. The PDF work itself is done by PDFium, the PDF engine from Chromium, and by qpdf, which checks and writes the final file. Both are C++. The qpdf crate compiles qpdf from source, so a clean build of my Rust app first compiles about 200 C and C++ files. In my tests, that step alone took 36 to 61 seconds.</p>
+<p>So the language that was going to save me from C++ needs a C++ compiler on every build machine, and it sits on top of a C++ engine. I am not saying it is a scam. I am saying that I noticed.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:520px"><svg viewBox="0 0 640 318" role="img" aria-label="The layers of T-Rustable, top to bottom: the interface in Svelte and TypeScript, the Tauri app shell in Rust, the core and mod host in Rust with wasmtime, the engine binding in Rust with most of the unsafe blocks, and PDFium and qpdf in C++, which do the PDF work."><rect x="20" y="10" width="600" height="50" rx="3" class="dg-box"/><text x="40" y="41" class="dg-t" font-size="16">Interface</text><text x="600" y="41" class="dg-s" text-anchor="end" font-size="14">Svelte 5 and TypeScript</text><rect x="20" y="70" width="600" height="50" rx="3" class="dg-box"/><text x="40" y="101" class="dg-t" font-size="16">App shell</text><text x="600" y="101" class="dg-s" text-anchor="end" font-size="14">Tauri 2, Rust</text><rect x="20" y="130" width="600" height="50" rx="3" class="dg-box"/><text x="40" y="161" class="dg-t" font-size="16">Core and mod host</text><text x="600" y="161" class="dg-s" text-anchor="end" font-size="14">Rust, wasmtime runs the mods</text><rect x="20" y="190" width="600" height="50" rx="3" class="dg-box"/><text x="40" y="221" class="dg-t" font-size="16">Engine binding</text><text x="600" y="221" class="dg-s" text-anchor="end" font-size="14">Rust, and most of the 54 unsafe blocks</text><rect x="20" y="250" width="600" height="58" rx="3" class="dg-box2"/><text x="40" y="285" class="dg-h" font-size="17">PDFium and qpdf</text><text x="600" y="285" class="dg-h" text-anchor="end" font-size="15">C++, where the PDF work happens</text></svg></div></div><figcaption>The layers of the editor. The bottom one, the one that touches the PDF, is C++.</figcaption></figure>
+<h2 id="the-safe-language-with-unsafe-in-it">The safe language, with unsafe in it</h2>
+<p>There is a Rust crate for PDFium, <code>pdfium-render</code>. It is a good crate. It also keeps the raw PDFium document and page handles private. I needed those handles for a render that can pause and be cancelled while the document is being edited. I also needed to restart PDFium in the same process after a crash, and the crate can load PDFium only once per process.</p>
+<p>So I wrote my own binding. Every PDFium function I use needs a declaration by hand and a safe wrapper around it. The app crates now have 54 <code>unsafe</code> blocks, and almost all of them live in that one module. They have tests. I keep them together, like a responsible adult.</p>
+<p>But I came to Rust to stop writing unsafe code, and the first big thing I did was write a whole module of it.</p>
+<h2 id="the-compiler-is-right-and-it-tells-you">The compiler is right, and it tells you</h2>
+<p>With C++, the deal is simple. The compiler lets you write the bug. You find it later, at night, in the program that is already running. It is a bad deal, but it is a quiet one.</p>
+<p>Rust does not let you write the bug. It stops you, explains the problem in a paragraph, points at the line and suggests a fix. Most of the time the fix is correct. That is the problem. I cannot even be angry at it properly.</p>
+<p>I want to run my program and see what happens. Rust wants me to understand it first. I did not ask for a teacher. I asked for a compiler.</p>
+<p class="lead-quote">C++ is dangerous, and honest about it. Rust is safe, and very pleased about it.</p>
+<h2 id="one-new-case-broke-every-mod">One new case broke every mod</h2>
+<p>Every tool in T-Rustable is a mod, including the built-in ones. A mod is a WebAssembly component, and wasmtime, which is written in Rust, runs it. My first plan for edits was one enum, with one case for each edit command. Then I tested what happens when the app grows.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>The mod was built for</th><th>The app gives it</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>API 1.0.0</td><td>1.1.0, with one new function</td><td>The mod loads</td></tr>
+<tr><td>API 1.0.0</td><td>1.1.0, with one new enum case</td><td>Refused: "a matching implementation was not found"</td></tr>
+</tbody>
+</table></div>
+<p>One new case, and every mod built for the old version stops loading. To be fair, this is a rule of the WebAssembly component model and of how wasmtime links, not of the Rust language. I am including it anyway, because it is my blog.</p>
+<p>The fix was to throw the enum away. Edits are now a transaction: an object with one method for each command. A new command is a new method, and old mods never see it. The price is that every type in the API is frozen. I can never add a field to a record again. I think about that sometimes.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/t-rustable-mod-install.webp" alt="The Mods window with an install dialog for Page numbers. It lists what the mod can do: read open documents, and change them with undo. It shows the package fingerprint and Cancel and Install buttons." width="809" height="551" loading="lazy" decoding="async"></button></div><figcaption>Installing a mod. The app reads what the mod imports and shows it as permissions before anything is installed.</figcaption></figure>
+<h2 id="six-days-of-dependency-weather">Six days of dependency weather</h2>
+<p>The build runs <code>cargo-deny</code>, which fails when a dependency has a security advisory. The first 84 commits took six days. In those six days, it stopped me three times:</p>
+<ul>
+<li><code>ttf-parser</code>, which I used to check fonts for missing glyphs, was marked unmaintained in RUSTSEC-2026-0192. I moved to <code>skrifa</code>.</li>
+<li><code>zip</code> had to go to version 9 for three advisories.</li>
+<li><code>wasmtime</code> had to go to 49.0.4 for two security advisories.</li>
+</ul>
+<p>I like that the tool exists. I do not like that I needed it three times in one week.</p>
+<p>Then the fuzzer. <code>cargo-fuzz</code> builds for its own musl target by default, and the address sanitizer does not work with a static libc. One more flag. One more evening.</p>
+<h2 id="so-why-is-it-still-in-rust">So why is it still in Rust?</h2>
+<p>Because it works, and I hate that most of all.</p>
+<p>The editor opens a PDF, draws it in tiles and lets mods add text, shapes and images, with undo. A mod that crashes takes down the mod, not the app. If the engine panics, it restarts PDFium and reloads the open documents from their journals. A 24-step self-test runs twice on Windows and twice on Linux in CI.</p>
+<p>Every one of those guarantees came from the compiler refusing something I wanted to do. It was right every time. You cannot hate something properly when it keeps being right. I am trying anyway.</p>
+<p>So T-Rustable stays in Rust. I will keep writing it, and I will keep hating it, more than C++. It is early, and not ready for daily use yet. If you want to watch me suffer in public, <a href="https://github.com/Codex-Crusader/t-rustable">the code is on GitHub</a>.</p>
+<figure class="fig relic rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/t-rustable-logo.webp" alt="The T-Rustable logo: a T-Rex in black glasses on an orange background." width="480" height="480" loading="lazy" decoding="async"></button></div><figcaption>The T-Rustable logo. The project is not affiliated with the Rust Project, which is the nicest thing I can say about it today.</figcaption></figure>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#to-write-rust-first-install-c">To write Rust, first install C++</a></li><li><a href="#the-safe-language-with-unsafe-in-it">The safe language, with unsafe in it</a></li><li><a href="#the-compiler-is-right-and-it-tells-you">The compiler is right, and it tells you</a></li><li><a href="#one-new-case-broke-every-mod">One new case broke every mod</a></li><li><a href="#six-days-of-dependency-weather">Six days of dependency weather</a></li><li><a href="#so-why-is-it-still-in-rust">So why is it still in Rust?</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/i-hate-rust/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../writing/img/t-rustable-logo.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/t-rustable">T-Rustable</a></b><span>A local, offline PDF editor for Linux and Windows. Every tool is a mod, and you can write your own. Source-available, in early development.</span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Software engineering|Security">
+  <div class="thumb relic"><img src="../../art/relics/rondache.webp" alt="" width="677" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>5 min read</span><span>Software engineering · Security</span></p>
+    <h3><a href="../../writing/local-first-software/">Local-first software</a></h3>
+    <p>A tool you cannot run offline is a tool somebody can switch off.</p>
+  </div>
+</article><article class="card rv" data-tags="Software engineering">
+  <div class="thumb relic"><img src="../../art/relics/executioners-sword.webp" alt="" width="487" height="760" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-08-28">28 August 2026</time><span>4 min read</span><span>Software engineering</span></p>
+    <h3><a href="../../writing/coding-war-crimes/">Coding war crimes: learning from deliberately terrible code</a></h3>
+    <p>A rule you have only been told is a rule you will break under pressure.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>
