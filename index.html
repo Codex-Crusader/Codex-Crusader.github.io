@@ -315,8 +315,8 @@ kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--
 .scrolls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 32px; }
 .scrolls .plate { padding: 24px; }
 .scrolls h3 { font: 600 0.82rem/1 var(--head); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
-.scrolls li { padding-block: 10px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
-.scrolls li:first-child { border-top: 0; padding-top: 0; }
+.scrolls ul:not(.runes) > li { padding-block: 10px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
+.scrolls ul:not(.runes) > li:first-child { border-top: 0; padding-top: 0; }
 .scrolls li span { color: var(--muted); font-style: italic; flex: none; }
 .runes { display: flex; flex-wrap: wrap; gap: 8px; }
 .runes li { border: 1px solid var(--line); padding: 8px 12px; font: 500 0.72rem/1 var(--head); letter-spacing: .12em; text-transform: uppercase; display: block; transition: border-color .3s, color .3s, box-shadow .3s; }
