@@ -218,20 +218,18 @@ kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--
 .r-common { --gem: var(--common); }
 .relic {
   --rx: 0deg; --ry: 0deg; --gx: 50%; --gy: 30%;
-  position: relative; width: 340px; flex: none; display: flex; flex-direction: column;
+  position: relative; width: 380px; flex: none; display: flex; flex-direction: column;
   background: linear-gradient(180deg, rgba(24, 18, 12, .94), rgba(12, 9, 6, .96));
   border: 1px solid var(--line); transform-style: preserve-3d;
   transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .5s cubic-bezier(.2,.7,.2,1), border-color .4s, box-shadow .4s;
 }
 .relic.tilting { transition: border-color .4s, box-shadow .4s; }
 .relic:hover { border-color: var(--gem); box-shadow: 0 30px 70px -25px #000, 0 0 50px -18px var(--gem); }
-.relic.big { width: 400px; }
 .relic .glare { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; mix-blend-mode: soft-light;
   background: radial-gradient(420px circle at var(--gx) var(--gy), rgba(255, 236, 190, .55), transparent 45%); }
 .relic:hover .glare { opacity: 1; }
-.relic .art { position: relative; height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+.relic .art { position: relative; height: 240px; display: flex; align-items: center; justify-content: center; overflow: hidden;
   background: radial-gradient(60% 70% at 50% 45%, rgba(214, 165, 83, .16), transparent 70%); }
-.relic.big .art { height: 250px; }
 .relic .art img { height: 86%; width: auto; max-width: 86%; object-fit: contain; filter: sepia(.35) contrast(1.08) brightness(.95);
   -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
   transform: translateZ(40px); will-change: transform; }
@@ -255,7 +253,7 @@ kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--
 .hall-hint { text-align: center; font: 500 0.72rem/1 var(--head); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-top: 14px; }
 .more-link { text-align: center; margin-top: 30px; }
 .link { color: var(--gold-hi); font: 600 0.85rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; text-underline-offset: 6px; text-decoration-color: var(--gold); }
-@media (max-width: 700px) { .relic, .relic.big { width: min(82vw, 340px); } }
+@media (max-width: 700px) { .relic { width: min(82vw, 340px); } }
 
 .slot { display: flex; flex: none; will-change: transform; transform-style: preserve-3d; }
 .win { animation: twinkle 2.6s ease-in-out infinite alternate; }
@@ -596,7 +594,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
       <div class="hall-viewport" id="hall-viewport">
         <div class="hall-track" id="hall-track">
           <div class="slot">
-            <article class="relic r-legendary big" id="p-market-intelligence" data-repo="Pulse-Engine_Market_Intelligence_Platform" data-name="Market Intelligence Platform">
+            <article class="relic r-legendary" id="p-market-intelligence" data-repo="Pulse-Engine_Market_Intelligence_Platform" data-name="Market Intelligence Platform">
               <div class="glare" aria-hidden="true"></div>
               <div class="art"><img src="art/relics/melencolia.webp" alt="Melencolia I, Albrecht Dürer, 1514" width="602" height="760" loading="lazy" decoding="async"></div>
               <div class="body">
@@ -611,7 +609,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
             </article>
           </div>
           <div class="slot">
-            <article class="relic r-rare big" id="p-rice-sauce-hair" data-repo="Rice-sauce-hair" data-name="Rice-sauce-hair">
+            <article class="relic r-rare" id="p-rice-sauce-hair" data-repo="Rice-sauce-hair" data-name="Rice-sauce-hair">
               <div class="glare" aria-hidden="true"></div>
               <div class="art"><img src="art/relics/hanuman.webp" alt="Monkey General Hanuman, c. 1000" width="545" height="760" loading="lazy" decoding="async"></div>
               <div class="body">
@@ -626,7 +624,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
             </article>
           </div>
           <div class="slot">
-            <article class="relic r-legendary big" id="p-digital-footprint-cleaner" data-repo="digital-footprint-cleaner" data-name="Digital Footprint Cleaner">
+            <article class="relic r-legendary" id="p-digital-footprint-cleaner" data-repo="digital-footprint-cleaner" data-name="Digital Footprint Cleaner">
               <div class="glare" aria-hidden="true"></div>
               <div class="art"><img src="art/relics/rondache.webp" alt="Rondache, round shield, c. 1570" width="677" height="760" loading="lazy" decoding="async"></div>
               <div class="body">
@@ -762,7 +760,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
           <span class="node" aria-hidden="true"></span>
           <div class="banner plate">
             <p class="when">Sep 2024 – now · Karjat · on-site</p>
-            <h3>Sponsorship Manager<span>Vijaybhoomi E-Cell</span></h3>
+            <h3>Secretary and Sponsorship Manager<span>Vijaybhoomi E-Cell</span></h3>
             <p>Raised <span class="num">₹2L+</span> for Elevate 2.0, the flagship event. Helped plan the roadmap that took the team to the IIT Bombay E-Summit finals.</p>
           </div>
         </article>
@@ -979,7 +977,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
         <a href="https://www.linkedin.com/in/bhargavaram-krishnapur/" target="_blank" rel="noopener"><b>LinkedIn</b><span>bhargavaram-krishnapur</span></a>
         <a href="https://github.com/The-Pulse-Engine" target="_blank" rel="noopener"><b>Pulse Engine</b><span>GitHub org</span></a>
         <a href="https://gitlab.com/bhargavaramkrishnapur" target="_blank" rel="noopener"><b>GitLab</b><span>bhargavaramkrishnapur</span></a>
-        <a href="bhargavaram-krishnapur-resume.pdf" target="_blank" rel="noopener"><b>Résumé</b><span>PDF, 221 KB</span></a>
+        <a href="bhargavaram-krishnapur-resume.pdf" target="_blank" rel="noopener"><b>Résumé</b><span>PDF, 48 KB</span></a>
       </div>
     </div>
   </section>
@@ -1476,9 +1474,10 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
       }
     });
     $all(".slot").forEach(function (slot) {
-      gsap.fromTo(slot, { y: 70, scale: 0.94, opacity: 0 }, {
-        y: 0, scale: 1, opacity: 1, ease: "power2.out",
-        scrollTrigger: { trigger: slot, containerAnimation: hallTween, start: "left 100%", end: "left 72%", scrub: true }
+      // Fade only: a scale or offset here leaves the cards near the right edge smaller than the rest
+      gsap.fromTo(slot, { opacity: 0 }, {
+        opacity: 1, ease: "power2.out",
+        scrollTrigger: { trigger: slot, containerAnimation: hallTween, start: "left 100%", end: "left 85%", scrub: true }
       });
     });
     return function () { section.classList.remove("pinned"); hallTween = null; };
