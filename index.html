@@ -486,14 +486,14 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 
 <div class="stage" id="stage" aria-hidden="true">
   <div class="painting on" data-for="top"><img src="art/stage/vesuvius.webp" alt="" width="2000" height="1408" fetchpriority="high"></div>
-  <div class="painting" data-for="oath"><img src="art/stage/schroon.webp" alt="" width="2000" height="1227" loading="eager" decoding="async"></div>
-  <div class="painting" data-for="work"><img src="art/stage/ruins.webp" alt="" width="2000" height="1607" loading="eager" decoding="async"></div>
-  <div class="painting" data-for="experience"><img src="art/stage/twilight.webp" alt="" width="2000" height="1249" loading="eager" decoding="async"></div>
-  <div class="painting" data-for="recognition"><img src="art/stage/burning.webp" alt="" width="2000" height="1485" loading="eager" decoding="async"></div>
-  <div class="painting" data-for="photos"><img src="art/stage/landers-peak.webp" alt="" width="2000" height="1199" loading="eager" decoding="async"></div>
-  <div class="painting" data-for="about"><img src="art/stage/starr-king.webp" alt="" width="2000" height="1355" loading="eager" decoding="async"></div>
-  <div class="painting" data-for="chronicles"><img src="art/stage/schroon.webp" alt="" width="2000" height="1227" loading="eager" decoding="async"></div>
-  <div class="painting" data-for="contact"><img src="art/stage/island-of-the-dead.webp" alt="" width="2000" height="1229" loading="eager" decoding="async"></div>
+  <div class="painting" data-for="oath"><img data-src="art/stage/schroon.webp" alt="" width="2000" height="1227" decoding="async"></div>
+  <div class="painting" data-for="work"><img data-src="art/stage/ruins.webp" alt="" width="2000" height="1607" decoding="async"></div>
+  <div class="painting" data-for="experience"><img data-src="art/stage/twilight.webp" alt="" width="2000" height="1249" decoding="async"></div>
+  <div class="painting" data-for="recognition"><img data-src="art/stage/burning.webp" alt="" width="2000" height="1485" decoding="async"></div>
+  <div class="painting" data-for="photos"><img data-src="art/stage/landers-peak.webp" alt="" width="2000" height="1199" decoding="async"></div>
+  <div class="painting" data-for="about"><img data-src="art/stage/starr-king.webp" alt="" width="2000" height="1355" decoding="async"></div>
+  <div class="painting" data-for="chronicles"><img data-src="art/stage/schroon.webp" alt="" width="2000" height="1227" decoding="async"></div>
+  <div class="painting" data-for="contact"><img data-src="art/stage/island-of-the-dead.webp" alt="" width="2000" height="1229" decoding="async"></div>
   <div class="veil"></div>
   <div class="fog f1"></div>
   <div class="fog f2"></div>
@@ -1315,6 +1315,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     current = id;
     var target = $('.stage .painting[data-for="' + id + '"]');
     if (target) {
+      loadPainting(target);
       paintings.forEach(function (p) {
         gsap.to(p, { autoAlpha: p === target ? 1 : 0, duration: 1.6, ease: "power2.inOut", overwrite: "auto" });
       });
@@ -1326,6 +1327,18 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   gsap.set(paintings, { autoAlpha: 0 });
   gsap.set(paintings[0], { autoAlpha: 1 });
   current = "top";
+  // Only the first painting loads with the page. The rest wait for the load event or the first scroll,
+  // so on a slow phone they do not compete with the fonts and scripts the intro needs.
+  function loadPainting(p) {
+    var img = p.querySelector("img[data-src]");
+    if (img) { img.src = img.dataset.src; img.removeAttribute("data-src"); }
+  }
+  function loadPaintings() { paintings.forEach(loadPainting); }
+  if (document.readyState === "complete") loadPaintings();
+  else {
+    window.addEventListener("load", loadPaintings, { once: true });
+    window.addEventListener("scroll", loadPaintings, { once: true, passive: true });
+  }
   // Every painting slowly zooms and rises with the whole page
   if (!lite) gsap.fromTo(paintings, { scale: 1, yPercent: 2 }, {
     scale: 1.12, yPercent: -3, ease: "none",
