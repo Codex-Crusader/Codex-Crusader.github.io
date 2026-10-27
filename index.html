@@ -1327,18 +1327,14 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   gsap.set(paintings, { autoAlpha: 0 });
   gsap.set(paintings[0], { autoAlpha: 1 });
   current = "top";
-  // Only the first painting loads with the page. The rest wait for the load event or the first scroll,
-  // so on a slow phone they do not compete with the fonts and scripts the intro needs.
+  // Only the first painting loads with the page. The rest wait until the hero intro has finished
+  // or the reader scrolls, so on a slow phone they do not compete with the fonts and scripts the intro needs.
   function loadPainting(p) {
     var img = p.querySelector("img[data-src]");
     if (img) { img.src = img.dataset.src; img.removeAttribute("data-src"); }
   }
   function loadPaintings() { paintings.forEach(loadPainting); }
-  if (document.readyState === "complete") loadPaintings();
-  else {
-    window.addEventListener("load", loadPaintings, { once: true });
-    window.addEventListener("scroll", loadPaintings, { once: true, passive: true });
-  }
+  window.addEventListener("scroll", loadPaintings, { once: true, passive: true });
   // Every painting slowly zooms and rises with the whole page
   if (!lite) gsap.fromTo(paintings, { scale: 1, yPercent: 2 }, {
     scale: 1.12, yPercent: -3, ease: "none",
@@ -1397,7 +1393,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise(function (r) { setTimeout(r, 1000); })])
     .then(function () { intro.play(); });
 
-  intro.eventCallback("onComplete", buildHeroScroll);
+  intro.eventCallback("onComplete", function () { buildHeroScroll(); loadPaintings(); });
   function buildHeroScroll() {
   var heroScroll = gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1 } });
   if (!lite) heroChars.forEach(function (c) {
