@@ -1,6 +1,6 @@
 # codex-crusader.github.io
 
-Personal portfolio of Bhargavaram Krishnapur. High-fantasy theme. One static HTML page, no build step, no trackers.
+Personal portfolio of Bhargavaram Krishnapur. High-fantasy theme. One static HTML page, no build step, no cookies. Page views are counted anonymously with GoatCounter.
 
 ## What moves
 
