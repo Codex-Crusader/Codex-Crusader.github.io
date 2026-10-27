@@ -9,12 +9,18 @@
   --text: #EFE4CC;
   --muted: #BCAC8D;
   --line: rgba(214, 165, 83, 0.3);
-  --display: "Cinzel Decorative", "Cinzel", Georgia, serif;
-  --head: "Cinzel", "Trajan Pro", Georgia, serif;
-  --body: "Cormorant Garamond", Garamond, "Iowan Old Style", Georgia, serif;
+  --display: "Cinzel Decorative", "Cinzel Decorative Fallback", "Cinzel", Georgia, serif;
+  --head: "Cinzel", "Cinzel Fallback", "Trajan Pro", Georgia, serif;
+  --body: "Cormorant Garamond", "Cormorant Fallback", Garamond, "Iowan Old Style", Georgia, serif;
   --gutter: clamp(16px, 4vw, 40px);
   color-scheme: dark;
 }
+/* Fallback faces sized to match the web fonts, so text wraps the same before and after they load */
+@font-face { font-family: "Cinzel Fallback"; font-weight: 100 500; src: local("Georgia"); size-adjust: 108.7%; }
+@font-face { font-family: "Cinzel Fallback"; font-weight: 600 900; src: local("Georgia Bold"), local("Georgia-Bold"); size-adjust: 108.7%; }
+@font-face { font-family: "Cinzel Decorative Fallback"; font-weight: 100 900; src: local("Georgia Bold"), local("Georgia-Bold"); size-adjust: 116.3%; }
+@font-face { font-family: "Cormorant Fallback"; font-style: normal; src: local("Georgia"); size-adjust: 88.6%; }
+@font-face { font-family: "Cormorant Fallback"; font-style: italic; src: local("Georgia Italic"), local("Georgia-Italic"); size-adjust: 79.1%; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 90px; }
 body { margin: 0; background: var(--ink); color: var(--text); font: 500 1.28rem/1.65 var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
@@ -44,8 +50,10 @@ p, figure, ul, ol { margin: 0; }
 @media (max-width: 560px) { .bar nav a.opt { display: none; } }
 
 /* Hero */
+/* Text widths are in em, not ch: ch follows whichever font is showing, so it changed when the web fonts loaded and moved the page.
+   Each value equals the old ch width in the web font (Cinzel 0 = .634em, Cormorant 0 = .477em, italic .441em). */
 .hero { position: relative; min-height: clamp(460px, 72vh, 720px); display: flex; align-items: flex-end; overflow: hidden; padding-block: 140px 56px; isolation: isolate; }
-.hero .bg { position: absolute; inset: -8% 0; z-index: -2; will-change: transform; }
+.hero .bg { position: absolute; inset: -60px 0; z-index: -2; will-change: transform; }
 .hero .bg img { width: 100%; height: 100%; object-fit: cover; animation: drift 40s ease-in-out infinite alternate; }
 @keyframes drift { from { transform: scale(1.03); } to { transform: scale(1.14) translate(1.5%, -1.5%); } }
 .hero::after { content: ""; position: absolute; inset: 0; z-index: -1;
@@ -55,18 +63,18 @@ p, figure, ul, ol { margin: 0; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 8px; font: 500 .74rem/1.4 var(--head); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
 .crumbs a { color: var(--gold); text-decoration: none; }
 .crumbs span[aria-hidden] { color: var(--line); }
-.hero h1 { font: 600 clamp(2.1rem, 1.2rem + 3.8vw, 4.2rem)/1.08 var(--head); color: var(--gold-hi); max-width: 20ch;
+.hero h1 { font: 600 clamp(2.1rem, 1.2rem + 3.8vw, 4.2rem)/1.08 var(--head); color: var(--gold-hi); max-width: 12.68em;
   text-shadow: 0 0 40px rgba(232, 102, 44, .35), 0 2px 0 rgba(0,0,0,.6); }
-.hero .dek { margin-top: 18px; max-width: 46ch; font-style: italic; font-size: clamp(1.25rem, 1.05rem + .7vw, 1.6rem); line-height: 1.4; }
+.hero .dek { margin-top: 18px; max-width: 20.29em; font-style: italic; font-size: clamp(1.25rem, 1.05rem + .7vw, 1.6rem); line-height: 1.4; }
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 22px; font: 500 .76rem/1.4 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .tag { display: inline-block; border: 1px solid var(--line); padding: 5px 9px; color: var(--gold); text-decoration: none; }
-.painting-credit { position: absolute; right: var(--gutter); bottom: 14px; font: italic 500 .85rem/1.3 var(--body); color: rgba(239,228,204,.6); max-width: 46ch; text-align: right; }
+.painting-credit { position: absolute; right: var(--gutter); bottom: 14px; font: italic 500 .85rem/1.3 var(--body); color: rgba(239,228,204,.6); max-width: 20.29em; text-align: right; }
 .painting-credit a { color: inherit; }
 @media (max-width: 700px) { .painting-credit { display: none; } }
 
 /* Article layout */
 .article-grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 64px; align-items: start; padding-block: 48px 0; }
-.prose { max-width: 68ch; min-width: 0; display: flex; flex-direction: column; gap: 1.15em; }
+.prose { max-width: 32.44em; min-width: 0; display: flex; flex-direction: column; gap: 1.15em; }
 .prose > * { min-width: 0; }
 .prose > p:first-of-type::first-letter { float: left; font: 700 4.4rem/.8 var(--display); color: var(--gold-hi); padding: 8px 12px 0 0; text-shadow: 0 0 22px rgba(232,102,44,.45); }
 .prose h2 { font: 600 clamp(1.45rem, 1.1rem + 1.2vw, 1.95rem)/1.25 var(--head); color: var(--gold-hi); margin-top: 1.1em; display: flex; align-items: center; gap: 14px; }
@@ -121,7 +129,7 @@ p, figure, ul, ol { margin: 0; }
 @media (max-width: 1060px) { .article-grid { grid-template-columns: 1fr; } .toc { display: none; } }
 
 /* End matter */
-.endmatter { max-width: 68ch; display: flex; flex-direction: column; gap: 28px; margin-top: 56px; }
+.endmatter { max-width: 32.44em; display: flex; flex-direction: column; gap: 28px; margin-top: 56px; }
 .panel { background: var(--panel); border: 1px solid var(--line); padding: 24px; position: relative; }
 .panel::before, .panel::after { content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--gold); pointer-events: none; }
 .panel::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
