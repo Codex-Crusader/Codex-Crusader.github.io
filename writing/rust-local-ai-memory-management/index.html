@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Memory management for local AI models in Rust is a pain</title>
+<meta name="description" content="Unstrung runs a chat model in Ollama and a picture model in stable-diffusion.cpp on one 8 GB graphics card. Rust guards the memory it owns. The VRAM, the unloads and the race were mine.">
+<meta name="author" content="Bhargavaram Krishnapur">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://codex-crusader.github.io/writing/rust-local-ai-memory-management/">
+<meta name="theme-color" content="#0A0806">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="alternate" type="application/rss+xml" title="The Chronicles" href="https://codex-crusader.github.io/writing/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Bhargavaram Krishnapur">
+<meta property="og:title" content="Memory management for local AI models in Rust is a pain">
+<meta property="og:description" content="Unstrung runs a chat model in Ollama and a picture model in stable-diffusion.cpp on one 8 GB graphics card. Rust guards the memory it owns. The VRAM, the unloads and the race were mine.">
+<meta property="og:url" content="https://codex-crusader.github.io/writing/rust-local-ai-memory-management/">
+<meta property="og:image" content="https://codex-crusader.github.io/writing/og/rust-local-ai-memory-management.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Rust manages memory. Just not the memory I needed.">
+<meta property="og:locale" content="en_IN">
+<meta property="article:published_time" content="2026-11-03T16:00:00+05:30">
+<meta property="article:modified_time" content="2026-11-03T16:00:00+05:30">
+<meta property="article:author" content="https://codex-crusader.github.io/">
+<meta property="article:section" content="Software engineering">
+<meta property="article:tag" content="Rust"><meta property="article:tag" content="Ollama"><meta property="article:tag" content="VRAM"><meta property="article:tag" content="local AI"><meta property="article:tag" content="Tauri">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Memory management for local AI models in Rust is a pain">
+<meta name="twitter:description" content="Unstrung runs a chat model in Ollama and a picture model in stable-diffusion.cpp on one 8 GB graphics card. Rust guards the memory it owns. The VRAM, the unloads and the race were mine.">
+<meta name="twitter:image" content="https://codex-crusader.github.io/writing/og/rust-local-ai-memory-management.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="../blog.css">
+<link rel="preload" as="image" href="../../art/stage/burning.webp">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "@id": "https://codex-crusader.github.io/writing/rust-local-ai-memory-management/#post", "headline": "Rust manages memory. Just not the memory I needed.", "name": "Memory management for local AI models in Rust is a pain", "description": "Unstrung runs a chat model in Ollama and a picture model in stable-diffusion.cpp on one 8 GB graphics card. Rust guards the memory it owns. The VRAM, the unloads and the race were mine.", "url": "https://codex-crusader.github.io/writing/rust-local-ai-memory-management/", "mainEntityOfPage": "https://codex-crusader.github.io/writing/rust-local-ai-memory-management/", "image": ["https://codex-crusader.github.io/writing/og/rust-local-ai-memory-management.jpg", "https://codex-crusader.github.io/writing/img/unstrung-chat.webp", "https://codex-crusader.github.io/writing/img/unstrung-models.webp", "https://codex-crusader.github.io/writing/img/unstrung-memory-panel.webp"], "datePublished": "2026-11-03T16:00:00+05:30", "dateModified": "2026-11-03T16:00:00+05:30", "author": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "publisher": {"@type": "Person", "@id": "https://codex-crusader.github.io/#person", "name": "Bhargavaram Krishnapur", "url": "https://codex-crusader.github.io/"}, "inLanguage": "en", "wordCount": 1386, "keywords": "Rust, Ollama, VRAM, GPU memory, local LLM, stable-diffusion.cpp, Tauri, tokio, unload model, keep_alive, num_ctx", "articleSection": "Software engineering", "isPartOf": {"@type": "Blog", "@id": "https://codex-crusader.github.io/writing/#blog", "name": "The Chronicles", "url": "https://codex-crusader.github.io/writing/"}, "about": [{"@type": "SoftwareSourceCode", "name": "Unstrung", "codeRepository": "https://github.com/Codex-Crusader/unstrung", "programmingLanguage": ["Rust", "TypeScript"], "description": "A desktop app for roleplay chat with AI characters. The chat and the pictures run on your own PC."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Bhargavaram Krishnapur", "item": "https://codex-crusader.github.io/"}, {"@type": "ListItem", "position": 2, "name": "The Chronicles", "item": "https://codex-crusader.github.io/writing/"}, {"@type": "ListItem", "position": 3, "name": "Rust manages memory. Just not the memory I needed.", "item": "https://codex-crusader.github.io/writing/rust-local-ai-memory-management/"}]}]}</script>
+<script data-goatcounter="https://codex-crusader.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><b></b></div>
+<header class="bar">
+  <a class="sigil" href="../../" aria-label="Bhargavaram Krishnapur, home"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 42 22 22 42 2 22Z" fill="rgba(20,15,10,.8)" stroke="#D6A553" stroke-width="1.5"/><path d="M22 7 37 22 22 37 7 22Z" fill="none" stroke="#D6A553" stroke-width=".8" opacity=".6"/></svg><b>BK</b></a>
+  <nav aria-label="Site">
+    <a href="../../">Home</a>
+    <a class="opt" href="../../#work">Projects</a>
+    <a href="../" aria-current="page">Chronicles</a>
+    <a class="opt" href="../../#about">About</a>
+    <a href="../../#contact">Contact</a>
+  </nav>
+</header>
+<main id="main">
+<article>
+  <header class="hero">
+    <div class="bg" aria-hidden="true"><img src="../../art/stage/burning.webp" alt="" width="2000" height="1485" fetchpriority="high"></div>
+    <canvas aria-hidden="true"></canvas>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">/</span><a href="../">Chronicles</a></nav>
+      <h1>Rust manages memory. Just not the memory I needed.</h1>
+      <p class="dek">Two AI models, one 8 GB graphics card, and a compiler that cannot see either of them.</p>
+      <p class="meta"><span>By <a href="../../#about">Bhargavaram Krishnapur</a></span><time datetime="2026-11-03T16:00:00+05:30">3 November 2026</time><span>7 min read</span><a class="tag" href="../?tag=Software engineering">Software engineering</a></p>
+    </div>
+    <p class="painting-credit">Painting: Joseph Mallord William Turner, <a href="https://clevelandart.org/art/1942.647">The Burning of the Houses of Lords and Commons, 16 October 1834</a>, 1835. Cleveland Museum of Art, CC0.</p>
+  </header>
+  <div class="wrap article-grid">
+    <div class="prose">
+<p>Two weeks ago I wrote that <a href="../i-hate-rust/">I hate Rust more than C++</a>. Then I wrote another app in it. I do not have a good explanation for this.</p>
+<p>The app is called Unstrung. It is a desktop app for roleplay chat with AI characters, and everything runs on your own PC. A local chat model writes the replies. A local picture model paints the scene when you ask. Nothing goes to a server. In six days it grew to 152 commits and about 28,000 lines of Rust.</p>
+<p>Rust has one famous promise: memory safety. No dangling pointers, no double frees, no leaks that you did not ask for. That promise is real. This post is about the fine print.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/unstrung-chat.webp" alt="The Unstrung window: a side menu, a chat with the character Ren Kagami, a private detective, and the status line Ready, Gemma 4 E4B at the bottom." width="960" height="663" loading="lazy" decoding="async"></button></div><figcaption>A chat in Unstrung. The reply comes from Gemma 4 E4B, which runs on the same laptop.</figcaption></figure>
+<h2 id="the-memory-rust-cannot-see">The memory Rust cannot see</h2>
+<p>The borrow checker protects memory that my process owns. In Unstrung, the memory that matters is on the graphics card, and two other programs own it. The chat model lives inside the Ollama engine. The picture model lives inside <code>sd-cli.exe</code>, the command line tool of stable-diffusion.cpp.</p>
+<p>To Rust, a 6 GB model is an HTTP request and a child process. The compiler is happy. The graphics card is full. Every rule about that memory, I had to write and check by hand, the same way I would in C.</p>
+<h2 id="two-models-one-8-gb-card">Two models, one 8 GB card</h2>
+<p>My test laptop has an RTX 4060 Laptop GPU with 8 GB of VRAM. The recommended chat model is Gemma 4 E4B, a 6.15 GB download. The recommended picture model is Z-Image Turbo. It made a 1024 px picture in 67 seconds: 35 seconds to load, 9 steps of about 2.2 seconds each, and 11 seconds to decode. At its peak, the picture took 5.4 GB of the 8 GB.</p>
+<p>They do not fit together. So every picture is a small moving job: take the chat model off the card, paint, then put the chat model back.</p>
+<figure class="fig rv"><div class="frame plain"><div class="diagram" style="--minw:520px"><svg viewBox="0 0 640 258" role="img" aria-label="What happens on the graphics card for one picture, top to bottom: the chat model is loaded and kept for 30 minutes; before the picture, the app asks Ollama to unload it and checks every 250 milliseconds for up to 15 seconds; the picture engine runs with a peak of 5.4 GB of 8 GB; after the last try, the chat model is loaded again at its 8192 token context."><rect x="20" y="10" width="600" height="50" rx="3" class="dg-box"/><text x="40" y="41" class="dg-t" font-size="16">1. Chatting</text><text x="600" y="41" class="dg-s" text-anchor="end" font-size="14">Chat model in Ollama, kept for 30 min</text><rect x="20" y="70" width="600" height="50" rx="3" class="dg-box"/><text x="40" y="101" class="dg-t" font-size="16">2. Unload</text><text x="600" y="101" class="dg-s" text-anchor="end" font-size="14">keep_alive 0, check every 250 ms, up to 15 s</text><rect x="20" y="130" width="600" height="58" rx="3" class="dg-box2"/><text x="40" y="165" class="dg-h" font-size="17">3. Paint</text><text x="600" y="165" class="dg-h" text-anchor="end" font-size="15">sd-cli.exe, peak 5.4 GB of 8 GB</text><rect x="20" y="198" width="600" height="50" rx="3" class="dg-box"/><text x="40" y="229" class="dg-t" font-size="16">4. Load again</text><text x="600" y="229" class="dg-s" text-anchor="end" font-size="14">Once, after the last try, at 8192 tokens</text></svg></div></div><figcaption>One picture, as the graphics card sees it. On a card with 12 GB or more, the app skips steps 2 and 4.</figcaption></figure>
+<h2 id="unload-means-ask-then-wait">Unload means ask, then wait</h2>
+<p>There is no <code>free()</code> for a model in another process. Ollama's way to unload a model is a generate request with <code>keep_alive</code> set to 0. The engine answers at once. The memory is free later.</p>
+<p>So the app asks the engine for its list of loaded models every 250 milliseconds, until the chat model is gone. After 15 seconds it gives up and tries the picture anyway. My first version wrote "chat model unloaded" in the log even when the wait ran out. The log was lying, and Rust compiled the lie without a word.</p>
+<p>The picture engine gets two flags for bad days. <code>--offload-to-cpu</code> keeps the weights in RAM and moves them to the card as needed, so a model larger than the free VRAM still runs. <code>--vae-tiling</code> decodes the picture in tiles for the same reason. Slower, but it finishes.</p>
+<h2 id="fearless-concurrency-fearful-vram">Fearless concurrency, fearful VRAM</h2>
+<p>Rust also promises fearless concurrency: no data races. This was not a data race. It was worse, because every task did exactly what I told it to do.</p>
+<p>A picture can use the profile pictures of the characters, so the same face comes back each time. If that fails, the app tries again from text tags only. The old flow was:</p>
+<ol>
+<li>Unload the chat model. Paint with profile pictures. It fails.</li>
+<li>Start a background task to load the chat model again.</li>
+<li>Start the retry from tags, which unloads the chat model first.</li>
+</ol>
+<p>Steps 2 and 3 ran at the same time. Sometimes the load landed after the unload, so the chat model sat on the card during the retry, and the retry failed too. The fallback that existed for the bad case failed in the bad case.</p>
+<p>The fix was boring. One function frees the card before the first try and loads the chat model once, after the last try. The test now breaks a profile picture on purpose and expects a picture anyway. It failed before the change and passes after it.</p>
+<p class="lead-quote">The borrow checker knows who owns a byte. Nobody told it who owns the graphics card.</p>
+<h2 id="load-it-once-at-the-right-size">Load it once, at the right size</h2>
+<p>Ollama loads a model with a context size, <code>num_ctx</code>: how many tokens of the chat the model can see at once. The memory for that context sits on the card next to the model. Every load in my app, at start, after a model change and after a picture, sent no size. So the engine loaded the model at its default size, then loaded it again at the first reply, when the chat asked for 8192.</p>
+<p>Every model in the catalog uses 8192 tokens. A comment in the catalog says it best: the model can take more, but VRAM sets the limit. The engine also runs with flash attention and stores that context memory at 8 bits instead of 16, so more of the chat fits in the same space. Once loaded, a chat model stays for 30 minutes.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/unstrung-models.webp" alt="The Models screen: the chat model picker set to Gemma 4 E4B, a Pictures section with a Turn on pictures button, and closed sections for other models, your own models, your PC and advanced settings." width="960" height="663" loading="lazy" decoding="async"></button></div><figcaption>The Models screen. The app suggests models from what it finds under "Your PC", which is the next problem.</figcaption></figure>
+<h2 id="the-safe-app-reads-the-registry">The safe app reads the registry</h2>
+<p>To suggest a model that fits, the app must know how much VRAM the card has. Windows reports it through WMI, but WMI cuts the number at 4 GB, so my 8 GB card looks like a 4 GB card. The driver APIs would give the real number, and they need <code>unsafe</code>.</p>
+<p>Unstrung's <code>Cargo.toml</code> says <code>unsafe_code = "forbid"</code>. After 54 unsafe blocks in my PDF editor, I wanted none. So the app opens the display adapter keys in the Windows registry and reads <code>HardwareInformation.qwMemorySize</code>.</p>
+<p>My memory-safe app finds out how much memory it has by reading the registry. To be fair, the 4 GB cut is a Windows problem, and the no-unsafe rule was my own choice. I am still annoyed at Rust for it. It is my blog.</p>
+<h2 id="the-crash-that-compiled">The crash that compiled</h2>
+<p>One more, because it hurt twice. The app shell is Tauri. A Tauri command that is a plain <code>fn</code> runs on the main thread. The download code starts its work with <code>tokio::spawn</code>, which panics when no async runtime runs on that thread. And a panic in this app aborts it.</p>
+<p>So the Download button on the Models screen closed the whole app, every time, with no message. The app has no console, so the panic went nowhere. The fix was one word, <code>async</code>. Two days later the same bug closed the app on "Turn on pictures".</p>
+<p>Both versions compiled with no warning. Now every panic goes to <code>app.log</code> with a backtrace, and the model download returns an error instead of a panic when it runs outside the runtime. To be fair again, this is a tokio and Tauri rule, not a language rule. But the compiler that refuses so much happily let this through.</p>
+<h2 id="the-other-memory">The other memory</h2>
+<p>The word "memory" has a second meaning in a chat app. The model sees 8192 tokens. In a long chat, the older messages fall out of that window, and the character forgets you.</p>
+<p>So Unstrung keeps notes outside the window: what you came for, the story so far, and facts. A side pass of the same model writes them after a reply. You can read, edit or hide each note in the Memory panel. A hidden note is out of the prompt. The test for this is a chat of 200 messages that must still know facts from message 10. It passes.</p>
+<figure class="fig rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/unstrung-memory-panel.webp" alt="The Memory panel next to a chat. It has the sections What you came for, Story so far, with Edit and Hide links, and Facts, where one hidden fact is struck through." width="960" height="663" loading="lazy" decoding="async"></button></div><figcaption>The Memory panel. Older messages leave the model's view. These notes stay, and you can change them.</figcaption></figure>
+<p>This memory was the easy one. It is rows in SQLite, owned by my process, and Rust is very good at that.</p>
+<h2 id="so-rust-again">So, Rust again?</h2>
+<p>Yes. None of the bugs in this post was a use-after-free or a leak. Every one of them was memory that Rust could not see: VRAM in another process, a load that raced an unload, a context size that nobody sent, a 4 GB limit in Windows, and a thread with no runtime on it.</p>
+<p>That is the honest version. Rust keeps the memory it can see clean. With local AI, most of the memory is somewhere it cannot see. You still manage that by hand, with logs, waits and tests, like it is 1999.</p>
+<p>Unstrung is open source, and all eight build phases are done except code signing. There is no release to download yet. <a href="https://github.com/Codex-Crusader/unstrung">The code is on GitHub</a>. If you want a local model that does more than chat, read how my <a href="../local-ai-desktop-companion-hyprland/">desktop AI companion</a> learned to say no.</p>
+<figure class="fig relic rv"><div class="frame"><button class="zoom" type="button" aria-label="Enlarge image"><img src="../../writing/img/unstrung-logo.webp" alt="The Unstrung logo: a wooden artist's mannequin, running." width="256" height="256" loading="lazy" decoding="async"></button></div><figcaption>The Unstrung logo. A puppet with no strings, which is how the app treats the cloud.</figcaption></figure>
+    </div>
+    <aside class="toc" aria-label="In this chronicle">
+      <h2>In this chronicle</h2>
+      <ol><li><a href="#the-memory-rust-cannot-see">The memory Rust cannot see</a></li><li><a href="#two-models-one-8-gb-card">Two models, one 8 GB card</a></li><li><a href="#unload-means-ask-then-wait">Unload means ask, then wait</a></li><li><a href="#fearless-concurrency-fearful-vram">Fearless concurrency, fearful VRAM</a></li><li><a href="#load-it-once-at-the-right-size">Load it once, at the right size</a></li><li><a href="#the-safe-app-reads-the-registry">The safe app reads the registry</a></li><li><a href="#the-crash-that-compiled">The crash that compiled</a></li><li><a href="#the-other-memory">The other memory</a></li><li><a href="#so-rust-again">So, Rust again?</a></li></ol>
+      <div class="share"><button class="btn" type="button" data-copy-link="https://codex-crusader.github.io/writing/rust-local-ai-memory-management/">Copy link</button><a class="btn" href="../">All chronicles</a></div>
+    </aside>
+  </div>
+  <div class="wrap"><div class="endmatter">
+    <section class="panel rv" aria-labelledby="work-h"><h2 id="work-h">The work this is about</h2><ul class="work-list"><li><img src="../../writing/img/unstrung-logo.webp" alt="" width="64" height="64" loading="lazy"><div><b><a href="https://github.com/Codex-Crusader/unstrung">Unstrung</a></b><span>A desktop app for roleplay chat with AI characters. The chat model, the pictures and the memory all run on your own PC. Rust, Tauri and React.</span></div></li></ul></section>
+    <section class="panel author rv" aria-label="About the author">
+      <img src="../../photos/at-vijaybhoomi-university.webp" alt="Bhargavaram Krishnapur" width="88" height="88" loading="lazy">
+      <div><b>Bhargavaram Krishnapur</b><p>Computer science student at Vijaybhoomi University and founder of The Pulse Engine. I build local-first, open-source tools. <a href="../../">See the portfolio</a> or <a href="https://github.com/Codex-Crusader">GitHub</a>.</p></div>
+    </section>
+  </div></div>
+</article>
+<section class="wrap section" aria-labelledby="next-h">
+  <div class="section-head"><h2 id="next-h">Read next</h2><a class="btn" href="../">All chronicles</a></div>
+  <div class="cards two">
+<article class="card rv" data-tags="Software engineering">
+  <div class="thumb"><img src="../../writing/img/t-rustable-editor.webp" alt="" width="809" height="551" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-10-22T14:00:00+05:30">22 October 2026</time><span>5 min read</span><span>Software engineering</span></p>
+    <h3><a href="../../writing/i-hate-rust/">I learned something new about myself. I hate Rust.</a></h3>
+    <p>I hate it more than C++. I did not think that was possible.</p>
+  </div>
+</article><article class="card rv" data-tags="Software engineering|Machine learning">
+  <div class="thumb"><img src="../../writing/img/rice-sauce-hair-desktop.webp" alt="" width="960" height="540" loading="lazy" decoding="async"></div>
+  <div class="body">
+    <p class="meta"><time datetime="2026-10-03T21:00:00+05:30">3 October 2026</time><span>8 min read</span><span>Software engineering · Machine learning</span></p>
+    <h3><a href="../../writing/local-ai-desktop-companion-hyprland/">My desktop has an AI companion now. The hard part was teaching her to say no.</a></h3>
+    <p>Getting a local model to act was easy. Deciding what it must never decide was the work.</p>
+  </div>
+</article>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span>© 2026 Bhargavaram Krishnapur · <a href="../../">Portfolio</a> · <a href="../">Chronicles</a> · <a href="../feed.xml">RSS</a></span>
+  <span>Art: public domain (CC0), Cleveland Museum of Art and The Metropolitan Museum of Art</span>
+</div></footer>
+<dialog class="lightbox" id="lightbox" aria-label="Image"><img id="lightbox-img" src="" alt=""></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../blog.js"></script>
+</body>
+</html>
