@@ -100,6 +100,21 @@
   });
   if (lb) lb.addEventListener("click", function () { lb.close(); });
 
+  // Narrow screens hide the side column, so copy its contents into a fold before the first section.
+  // Not class "toc": the scroll spy above reads ".toc a". Built before Copy link binds, so the copied button works.
+  var side = $(".toc"), firstHead = $(".prose h2");
+  if (side && firstHead && $("ol", side)) {
+    var fold = document.createElement("details");
+    fold.className = "toc-fold";
+    var sum = document.createElement("summary");
+    sum.textContent = ($("h2", side) || {}).textContent || "In this chronicle";
+    fold.appendChild(sum);
+    fold.appendChild($("ol", side).cloneNode(true));
+    if ($(".share", side)) fold.appendChild($(".share", side).cloneNode(true));
+    firstHead.parentNode.insertBefore(fold, firstHead);
+    fold.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("ol a")) fold.open = false; });
+  }
+
   // Copy link
   $all("[data-copy-link]").forEach(function (b) {
     b.addEventListener("click", function () {

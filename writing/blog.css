@@ -43,11 +43,12 @@ p, figure, ul, ol { margin: 0; }
 .sigil svg { position: absolute; inset: 0; }
 .sigil b { position: relative; font: 700 .75rem/1 var(--display); color: var(--gold-hi); }
 .bar nav { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
-.bar nav a { font: 500 .76rem/1 var(--head); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; color: var(--muted); padding: 10px 10px; }
+.bar nav a { display: inline-flex; align-items: center; min-height: 44px; font: 500 .76rem/1 var(--head); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; color: var(--muted); padding: 10px 10px; }
 .bar nav a:hover, .bar nav a[aria-current="page"] { color: var(--gold-hi); }
 .progress { position: fixed; left: 0; right: 0; top: 0; height: 2px; z-index: 60; pointer-events: none; }
 .progress b { display: block; height: 100%; background: linear-gradient(90deg, var(--ember), var(--gold-hi)); transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 10px var(--gold); }
-@media (max-width: 560px) { .bar nav a.opt { display: none; } }
+/* On phones the BK sigil is the way home, so the nav keeps to one line */
+@media (max-width: 560px) { .bar nav a.opt, .bar nav a:first-child { display: none; } }
 
 /* Hero */
 /* Text widths are in em, not ch: ch follows whichever font is showing, so it changed when the web fonts loaded and moved the page.
@@ -71,6 +72,8 @@ p, figure, ul, ol { margin: 0; }
 .painting-credit { position: absolute; right: var(--gutter); bottom: 14px; font: italic 500 .85rem/1.3 var(--body); color: rgba(239,228,204,.6); max-width: 20.29em; text-align: right; }
 .painting-credit a { color: inherit; }
 @media (max-width: 700px) { .painting-credit { display: none; } }
+/* On a phone the first screen shows the opening lines, not only the painting */
+@media (max-width: 560px) { .hero { min-height: 0; padding-block: 100px 28px; } .article-grid { padding-top: 32px; } }
 
 /* Article layout */
 .article-grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 64px; align-items: start; padding-block: 48px 0; }
@@ -87,6 +90,15 @@ p, figure, ul, ol { margin: 0; }
 .prose table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 1.05rem; line-height: 1.4; }
 .prose th { font: 600 .74rem/1.3 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); text-align: left; background: var(--panel); }
 .prose th, .prose td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+/* A row of boxes as a real list: the detail sits right on wide screens and drops under the label on narrow ones */
+.prose ol.steps { list-style: none; padding: 0; gap: 10px; }
+.steps li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 20px; padding: 13px 18px; background: var(--panel-2); border: 1px solid var(--gold); border-radius: 3px; }
+.steps b { font: 600 1rem/1.35 var(--head); color: var(--text); }
+.steps span { font-size: 1.05rem; line-height: 1.35; color: var(--muted); }
+.steps li.key { background: #2A1A0E; border: 1.5px solid var(--gold-hi); padding-block: 16px; }
+.steps li.key b { font-weight: 700; color: var(--gold-hi); }
+.steps li.key span { font-weight: 600; color: var(--gold-hi); }
+@media (max-width: 600px) { .steps li { flex-direction: column; align-items: flex-start; } }
 .lead-quote { font-style: italic; font-size: 1.45rem; line-height: 1.4; color: var(--gold-hi); border-left: 2px solid var(--gold); padding-left: 20px; }
 
 /* Figures */
@@ -127,6 +139,17 @@ p, figure, ul, ol { margin: 0; }
   font: 600 .74rem/1 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--text); background: rgba(20, 15, 10, .8); border: 1px solid var(--gold); transition: background .3s, box-shadow .3s; }
 .btn:hover { background: rgba(214,165,83,.14); box-shadow: 0 0 28px -8px var(--gold); }
 @media (max-width: 1060px) { .article-grid { grid-template-columns: 1fr; } .toc { display: none; } }
+/* blog.js copies the side column into this fold for narrower screens */
+.toc-fold { display: none; background: var(--panel); border: 1px solid var(--line); }
+@media (max-width: 1060px) { .toc-fold { display: block; } }
+.toc-fold summary { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 18px; cursor: pointer; list-style: none; font: 600 .76rem/1 var(--head); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+.toc-fold summary::-webkit-details-marker { display: none; }
+.toc-fold summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 1.5px solid var(--gold); border-bottom: 1.5px solid var(--gold); transform: translateY(-2px) rotate(45deg); transition: transform .3s; }
+.toc-fold[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+.prose .toc-fold ol { list-style: none; padding: 0 18px; gap: 0; }
+.toc-fold ol a { display: block; padding: 10px 0; border-top: 1px solid rgba(214, 165, 83, .14); font-size: 1.08rem; line-height: 1.3; color: var(--muted); text-decoration: none; }
+.toc-fold ol a:hover { color: var(--text); }
+.toc-fold .share { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 18px 18px; }
 
 /* End matter */
 .endmatter { max-width: 32.44em; display: flex; flex-direction: column; gap: 28px; margin-top: 56px; }
@@ -144,6 +167,9 @@ p, figure, ul, ol { margin: 0; }
 .author img { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; object-position: 50% 28%; border: 3px solid #C99746; }
 .author b { display: block; font: 600 1.1rem/1.3 var(--head); color: var(--gold-hi); }
 .author p { font-size: 1.08rem; color: var(--muted); margin-top: 4px; }
+.author .reach { margin-top: 10px; overflow-wrap: break-word; }
+/* Small phones: the photo goes above the text so the email address breaks only after the @ */
+@media (max-width: 480px) { .author { grid-template-columns: minmax(0, 1fr); gap: 14px; justify-items: start; } .author img { width: 72px; height: 72px; } }
 
 /* Cards */
 .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
@@ -162,7 +188,7 @@ p, figure, ul, ol { margin: 0; }
 .card .thumb.relic img { width: auto; height: 86%; object-fit: contain; filter: sepia(.3); -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
 .card:hover .thumb img { transform: scale(1.06); }
 .card .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.card .meta { margin-top: 0; font-size: .68rem; }
+.card .meta { margin-top: 0; font-size: .72rem; }
 .card h3 { font: 600 1.25rem/1.25 var(--head); color: var(--text); }
 .card h3 a { color: inherit; text-decoration: none; }
 .card h3 a::before { content: ""; position: absolute; inset: 0; z-index: 1; }
