@@ -328,17 +328,17 @@ kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--
 
 /* Memories */
 .gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 34px); align-items: start; }
-.gallery figure { will-change: transform; }
-.gallery figure:nth-child(4n+2) { margin-top: 70px; }
-.gallery figure:nth-child(4n+3) { margin-top: 26px; }
-.gallery figure:nth-child(4n+4) { margin-top: 110px; }
+.gallery .gcol { display: flex; flex-direction: column; gap: clamp(16px, 2.5vw, 34px); min-width: 0; will-change: transform; }
 .gallery .frame { padding: 9px; cursor: zoom-in; display: block; width: 100%; border: 0; transition: box-shadow .5s; }
 .gallery .frame::after { inset: 9px; }
 .gallery .frame:hover { box-shadow: 0 40px 80px -20px #000, 0 0 40px -10px var(--gold); }
-.gallery img { width: 100%; height: auto; filter: sepia(.25) saturate(.9); transition: filter .5s; }
+.gallery img { width: 100%; height: auto; object-fit: cover; filter: sepia(.25) saturate(.9); transition: filter .5s; }
+/* Fixed slot shapes; each img's object-position keeps the faces in the crop. The lightbox shows the whole photo. */
+.gallery figure.l img { aspect-ratio: 16 / 10; }
+.gallery figure.p img { aspect-ratio: 3 / 4; }
 .gallery .frame:hover img { filter: none; }
 .gallery figcaption { font: italic 500 1rem/1.3 var(--body); color: var(--muted); text-align: center; margin-top: 10px; }
-@media (max-width: 860px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gallery figure:nth-child(n) { margin-top: 0; } .gallery figure:nth-child(even) { margin-top: 40px; } }
+@media (max-width: 860px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gallery figcaption { min-height: 2.6em; } }
 .lightbox { border: 0; padding: 0; background: transparent; max-width: min(92vw, 900px); max-height: 92vh; }
 .lightbox::backdrop { background: rgba(6, 4, 2, .88); }
 .lightbox img { max-height: 82vh; width: auto; margin-inline: auto; border: 8px solid #C99746; }
@@ -442,7 +442,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 .lite .plate { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(13, 10, 7, 0.92); }
 .lite .fog { filter: none; mix-blend-mode: normal; }
 .lite .stage .painting img { animation: none; }
-.lite .stage .painting, .lite .btn, .lite .gallery figure, .lite .slot, .lite .relic .art img,
+.lite .stage .painting, .lite .btn, .lite .gallery .gcol, .lite .slot, .lite .relic .art img,
 .lite .portrait .ring, .lite .raven, .lite .marquee .track { will-change: auto; }
 .lite .moon { animation: none; }
 
@@ -883,16 +883,26 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
       <p class="lede">Moments from panels, labs, fields and events. Select a frame to see it large.</p>
     </header>
     <div class="gallery" id="gallery">
-      <figure><button class="frame" type="button" aria-label="Open photo: Speaking on a panel"><img src="photos/speaking-on-a-panel.webp" alt="Speaking on a panel" width="480" height="356" loading="lazy" decoding="async"></button><figcaption>Speaking on a panel</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: Building in the electronics lab"><img src="photos/building-in-the-electronics-lab.webp" alt="Building in the electronics lab" width="480" height="320" loading="lazy" decoding="async"></button><figcaption>Building in the electronics lab</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: At Vijaybhoomi University"><img src="photos/at-vijaybhoomi-university.webp" alt="At Vijaybhoomi University" width="480" height="640" loading="lazy" decoding="async"></button><figcaption>At Vijaybhoomi University</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: Coding with a mountain view"><img src="photos/coding-with-a-mountain-view.webp" alt="Coding with a mountain view" width="480" height="269" loading="lazy" decoding="async"></button><figcaption>Coding with a mountain view</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: Kanyathon 2026"><img src="photos/kanyathon-2026.webp" alt="Kanyathon 2026" width="480" height="1056" loading="lazy" decoding="async"></button><figcaption>Kanyathon 2026</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: CyberSec India Expo"><img src="photos/cybersec-india-expo.webp" alt="CyberSec India Expo" width="480" height="640" loading="lazy" decoding="async"></button><figcaption>CyberSec India Expo</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: Certificates at DBM India"><img src="photos/certificates-at-dbm-india.webp" alt="Certificates at DBM India" width="480" height="361" loading="lazy" decoding="async"></button><figcaption>Certificates at DBM India</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: Internship letter at Sanjay Electrical"><img src="photos/internship-letter-at-sanjay-electrical.webp" alt="Internship letter at Sanjay Electrical" width="480" height="219" loading="lazy" decoding="async"></button><figcaption>Internship letter at Sanjay Electrical</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: With the Jamrang Student Team"><img src="photos/with-the-jamrang-student-team.webp" alt="With the Jamrang Student Team" width="480" height="218" loading="lazy" decoding="async"></button><figcaption>With the Jamrang Student Team</figcaption></figure>
-      <figure><button class="frame" type="button" aria-label="Open photo: Pitch CMO Summit 2026"><img src="photos/pitch-cmo-summit-2026.webp" alt="Pitch CMO Summit 2026" width="480" height="853" loading="lazy" decoding="async"></button><figcaption>Pitch CMO Summit 2026</figcaption></figure>
+      <div class="gcol">
+        <figure class="p"><button class="frame" type="button" aria-label="Open photo: At Vijaybhoomi University"><img src="photos/at-vijaybhoomi-university.webp" alt="At Vijaybhoomi University" width="480" height="640" loading="lazy" decoding="async"></button><figcaption>At Vijaybhoomi University</figcaption></figure>
+        <figure class="l"><button class="frame" type="button" aria-label="Open photo: Speaking on a panel"><img src="photos/speaking-on-a-panel.webp" alt="Speaking on a panel" width="480" height="356" loading="lazy" decoding="async"></button><figcaption>Speaking on a panel</figcaption></figure>
+      </div>
+      <div class="gcol">
+        <figure class="l"><button class="frame" type="button" aria-label="Open photo: Building in the electronics lab"><img src="photos/building-in-the-electronics-lab.webp" alt="Building in the electronics lab" width="480" height="320" loading="lazy" decoding="async"></button><figcaption>Building in the electronics lab</figcaption></figure>
+        <figure class="p"><button class="frame" type="button" aria-label="Open photo: CyberSec India Expo"><img src="photos/cybersec-india-expo.webp" alt="CyberSec India Expo" width="480" height="640" loading="lazy" decoding="async"></button><figcaption>CyberSec India Expo</figcaption></figure>
+      </div>
+      <div class="gcol">
+        <figure class="p"><button class="frame" type="button" aria-label="Open photo: Kanyathon 2026"><img style="object-position: 50% 70%" src="photos/kanyathon-2026.webp" alt="Kanyathon 2026" width="480" height="1056" loading="lazy" decoding="async"></button><figcaption>Kanyathon 2026</figcaption></figure>
+        <figure class="l"><button class="frame" type="button" aria-label="Open photo: Coding with a mountain view"><img style="object-position: 90% 50%" src="photos/coding-with-a-mountain-view.webp" alt="Coding with a mountain view" width="480" height="269" loading="lazy" decoding="async"></button><figcaption>Coding with a mountain view</figcaption></figure>
+      </div>
+      <div class="gcol">
+        <figure class="l"><button class="frame" type="button" aria-label="Open photo: Certificates at DBM India"><img src="photos/certificates-at-dbm-india.webp" alt="Certificates at DBM India" width="480" height="361" loading="lazy" decoding="async"></button><figcaption>Certificates at DBM India</figcaption></figure>
+        <figure class="p"><button class="frame" type="button" aria-label="Open photo: Pitch CMO Summit 2026"><img style="object-position: 50% 40%" src="photos/pitch-cmo-summit-2026.webp" alt="Pitch CMO Summit 2026" width="480" height="853" loading="lazy" decoding="async"></button><figcaption>Pitch CMO Summit 2026</figcaption></figure>
+      </div>
+      <div class="gallery-spare" hidden>
+        <figure class="l"><button class="frame" type="button" aria-label="Open photo: Internship letter at Sanjay Electrical"><img style="object-position: 38% 50%" src="photos/internship-letter-at-sanjay-electrical.webp" alt="Internship letter at Sanjay Electrical" width="480" height="219" loading="lazy" decoding="async"></button><figcaption>Internship letter at Sanjay Electrical</figcaption></figure>
+        <figure class="l"><button class="frame" type="button" aria-label="Open photo: With the Jamrang Student Team"><img style="object-position: 97% 50%" src="photos/with-the-jamrang-student-team.webp" alt="With the Jamrang Student Team" width="480" height="218" loading="lazy" decoding="async"></button><figcaption>With the Jamrang Student Team</figcaption></figure>
+      </div>
     </div>
   </section>
 
@@ -1172,16 +1182,20 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     });
   }
 
-  // ---------- Weekly photos: every visitor sees the same 8, and the set changes each Monday (UTC) ----------
+  // ---------- Weekly photos: same set for every visitor, reshuffled each Monday (UTC) ----------
+  // Each column holds one portrait and one landscape, so all columns end level. Spare photos wait in the hidden shelf.
   (function () {
-    var SHOW = 8, figs = $all(".gallery figure");
-    if (figs.length <= SHOW) return;
+    var cols = $all("#gallery .gcol"), spare = $("#gallery .gallery-spare");
     var seed = Math.floor((Date.now() / 86400000 + 3) / 7); // weeks since Monday 5 Jan 1970
     function rand() { seed = (seed + 0x6D2B79F5) | 0; var t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
-    var order = figs.map(function (f, i) { return i; });
-    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(rand() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
-    var keep = order.slice(0, SHOW).sort(function (a, b) { return a - b; });
-    figs.forEach(function (f, i) { if (keep.indexOf(i) === -1) f.remove(); });
+    function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rand() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+    var p = shuffle($all("#gallery figure.p")), l = shuffle($all("#gallery figure.l"));
+    if (!spare || p.length < cols.length || l.length < cols.length) return; // too few photos: keep the HTML layout
+    cols.forEach(function (col, i) {
+      var a = p.shift(), b = l.shift();
+      col.appendChild(i % 2 ? b : a); col.appendChild(i % 2 ? a : b);
+    });
+    p.concat(l).forEach(function (f) { spare.appendChild(f); });
   })();
 
   // ---------- Lightbox ----------
@@ -1590,17 +1604,20 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   gsap.from(".runes li", { scale: 0, opacity: 0, duration: 0.6, stagger: 0.04, ease: "back.out(2.5)", scrollTrigger: { trigger: ".runes", start: "top 88%" } });
 
   // ---------- Memories ----------
-  $all(".gallery figure").forEach(function (fig, i) {
-    var speed = [1.2, 0.5, 1.6, 0.8][i % 4];
-    gsap.set(fig.querySelector(".frame"), { rotation: [-2.5, 1.8, -1.2, 2.6][i % 4] });
-    gsap.fromTo(fig, { y: 80 * speed }, { y: -80 * speed, ease: "none", scrollTrigger: { trigger: "#gallery", start: "top bottom", end: "bottom top", scrub: 1 } });
+  $all(".gallery .gcol figure").forEach(function (fig, i) {
+    gsap.set(fig.querySelector(".frame"), { rotation: [-2.5, 1.8, -1.2, 2.6, 1.4, -2][i % 6] });
+  });
+  // Columns 1 and 3 (and 2 and 4) stack on phones, so their speeds stay close enough not to collide.
+  $all(".gallery .gcol").forEach(function (col, i) {
+    var speed = [1.2, 0.5, 1.35, 0.65][i % 4];
+    gsap.fromTo(col, { y: 80 * speed }, { y: -80 * speed, ease: "none", scrollTrigger: { trigger: "#gallery", start: "top bottom", end: "bottom top", scrub: 1 } });
   });
   $all(".gallery .frame").forEach(function (f) {
     var base = gsap.getProperty(f, "rotation");
     f.addEventListener("pointerenter", function () { gsap.to(f, { rotation: 0, y: -10, scale: 1.04, duration: 0.5, overwrite: "auto" }); });
     f.addEventListener("pointerleave", function () { gsap.to(f, { rotation: base, y: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.5)", overwrite: "auto" }); });
   });
-  gsap.from(".gallery .frame", { scale: 0.75, opacity: 0, rotationY: 40, duration: 1.3, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: "#gallery", start: "top 82%" } });
+  gsap.from(".gallery .gcol .frame", { scale: 0.75, opacity: 0, rotationY: 40, duration: 1.3, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: "#gallery", start: "top 82%" } });
 
   // ---------- Chronicler ----------
   gsap.fromTo("#ring", { rotation: -120 }, { rotation: 240, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: 1 } });
