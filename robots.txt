@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /bhargavaram-krishnapur-resume.pdf
 
 Sitemap: https://codex-crusader.github.io/sitemap.xml
