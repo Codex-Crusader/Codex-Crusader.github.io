@@ -302,7 +302,9 @@ kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--
 .seal .num { font: 900 clamp(3.5rem, 2rem + 5vw, 6rem)/0.9 var(--display); color: #FFE9B0; text-shadow: 0 2px 0 #6B1D0E, 0 0 30px rgba(255, 200, 120, .5); }
 .seal .of { font: 700 1rem/1 var(--head); letter-spacing: .2em; color: #F6D9A8; }
 .seal .what { font: 500 0.95rem/1.3 var(--body); color: #F6E3C4; font-style: italic; }
-.pennants { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.pennants { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 20px; }
+.pennants > li { display: flex; }
+.pennants .pennant { flex: 1; }
 .pennant { position: relative; padding: 26px 20px 60px; text-align: center; transform-origin: top center; animation: sway 5s ease-in-out infinite; animation-delay: var(--d, 0s);
   background: linear-gradient(180deg, #5A1A12, #3A0F0A); color: #F6E3C4;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 38px), 0 100%); border-top: 4px solid var(--gold); }
