@@ -312,6 +312,8 @@ kbd { font: 600 0.7rem/1 var(--head); padding: 5px 6px; border: 1px solid var(--
 .pennant .crest { width: 34px; height: 34px; margin: 0 auto 12px; }
 .pennant strong { display: block; font: 600 1.05rem/1.25 var(--head); color: var(--gold-hi); }
 .pennant span { display: block; margin-top: 8px; font-size: 1.02rem; line-height: 1.4; }
+.pennant .press { display: inline-block; margin-top: 10px; font-size: .92rem; line-height: 1.35; color: var(--gold-hi); text-underline-offset: 4px; text-decoration-color: var(--gold); }
+.pennant .press span { display: inline; margin: 0; font-size: inherit; }
 .pennant.blue { background: linear-gradient(180deg, #16284A, #0D1830); }
 .pennant.green { background: linear-gradient(180deg, #173A26, #0D2617); }
 .scrolls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 32px; }
@@ -851,7 +853,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
       <div>
         <ul class="pennants">
           <li><div class="pennant" style="--d:-1s"><svg class="crest" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.6 10.6 11.4 1-8.7 7.5 2.7 11.2L20 27.4 9.9 33.3l2.7-11.2L4 14.6l11.4-1z" fill="#F3D48E" stroke="#8A5A1C" stroke-width="1"/></svg><strong>Top 17 of 4,000</strong><span>NEC 2025, a six-month national competition.</span></div></li>
-          <li><div class="pennant blue" style="--d:-2.4s"><svg class="crest" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.6 10.6 11.4 1-8.7 7.5 2.7 11.2L20 27.4 9.9 33.3l2.7-11.2L4 14.6l11.4-1z" fill="#F3D48E" stroke="#8A5A1C" stroke-width="1"/></svg><strong>ISRO IRoC-U 2025</strong><span>Shortlisted from 2,000+ teams with team VSST.</span></div></li>
+          <li><div class="pennant blue" style="--d:-2.4s"><svg class="crest" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.6 10.6 11.4 1-8.7 7.5 2.7 11.2L20 27.4 9.9 33.3l2.7-11.2L4 14.6l11.4-1z" fill="#F3D48E" stroke="#8A5A1C" stroke-width="1"/></svg><strong>ISRO IRoC-U 2025</strong><span>Shortlisted from 2,000+ teams with team VSST.</span><a class="press" href="https://www.newindianexpress.com/states/karnataka/2026/Sep/07/bengaluru-professor-led-teams-drone-gets-fine-tuned-for-mars" target="_blank" rel="noopener">Featured in The New Indian Express<span aria-hidden="true"> ↗</span></a></div></li>
           <li><div class="pennant green" style="--d:-3.3s"><svg class="crest" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l4.6 10.6 11.4 1-8.7 7.5 2.7 11.2L20 27.4 9.9 33.3l2.7-11.2L4 14.6l11.4-1z" fill="#F3D48E" stroke="#8A5A1C" stroke-width="1"/></svg><strong>Youth panelist</strong><span>MANTHAN: Youth Voices, on AI and digital literacy.</span></div></li>
         </ul>
         <div class="scrolls">
